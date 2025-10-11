@@ -1,56 +1,50 @@
-export const pets = [
+export const demoPets = [
   {
-    id: 'p1',
-    name: 'Luna',
-    type: 'Cat',
-    age: 2,
-    city: 'Berlin, Germany',
-    image: require('../images/cat1.jpg'),
-    description: 'Luna is a gentle and affectionate cat who loves cuddles and cozy windowsills.',
-  },
-  {
-    id: 'p2',
-    name: 'Milo',
-    type: 'Dog',
+    id: '1',
+    name: 'Max',
+    type: 'dog',
     age: 3,
-    city: 'Amsterdam, Netherlands',
-    image: require('../images/dog1.jpg'),
-    description: 'Milo is an energetic beagle mix who enjoys long walks by the canals.',
+    desc: 'Energjik dhe miqësor',
+    image: require('../images/dog1.jpg')
   },
   {
-    id: 'p3',
-    name: 'Coco',
-    type: 'Cat',
-    age: 1,
-    city: 'Lisbon, Portugal',
-    image: require('../images/cat2.jpg'),
-    description: 'Coco is a playful and curious kitten who loves exploring sunny balconies.',
-  },
-  {
-    id: 'p4',
-    name: 'Buddy',
-    type: 'Dog',
-    age: 4,
-    city: 'Toronto, Canada',
-    image: require('../images/dog2.jpg'),
-    description: 'Buddy is a calm and loyal golden retriever mix. He’s already house-trained and loves the outdoors.',
-  },
-  {
-    id: 'p5',
-    name: 'Nala',
-    type: 'Cat',
-    age: 5,
-    city: 'Oslo, Norway',
-    image: require('../images/cat3.jpg'),
-    description: 'Nala is an independent but loving cat. She’s low-maintenance and perfect for busy owners.',
-  },
-  {
-    id: 'p6',
-    name: 'Bubu',
-    type: 'Cat',
+    id: '2',
+    name: 'Luna',
+    type: 'cat',
     age: 2,
-    city: 'Rome, Italy',
-    image: require('../images/cat4.jpg'),
-    description: 'Bubu is a shy but very sweet cat who warms up quickly once she trusts you.',
+    desc: 'Qetë dhe dashuruese',
+    image: require('../images/cat1.jpg')
   },
+  {
+    id: '3',
+    name: 'Rocky',
+    type: 'dog',
+    age: 5,
+    desc: 'Besnik dhe mbrojtës',
+    image: require('../images/dog2.jpg')
+  },
+  {
+    id: '4',
+    name: 'Mia',
+    type: 'cat',
+    age: 1,
+    desc: 'Lojtare dhe kurioze',
+    image: require('../images/cat2.jpg')
+  },
+  {
+    id: '5',
+    name: 'Nina',
+    type: 'cat',
+    age: 4,
+    desc: 'Inteligjente dhe e dashur',
+    image: require('../images/cat3.jpg')
+  },
+  {
+    id: '6',
+    name: 'Simba',
+    type: 'cat',
+    age: 2,
+    desc: 'Sovran dhe elegant',
+    image: require('../images/cat4.jpg')
+  }
 ];
