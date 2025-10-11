@@ -1,5 +1,17 @@
+import { SafeAreaView } from "react-native-safe-area-context";
+import { View, Text } from "react-native";
 
-import { Redirect } from 'expo-router';
 export default function Index() {
-  return <Redirect href="/PetList" />;
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <Text style={{ fontSize: 22, fontWeight: "700", color: "#333" }}>
+          Welcome to PetCare 🐾
+        </Text>
+        <Text style={{ color: "#666", marginTop: 6 }}>
+          This is Homepage!
+        </Text>
+      </View>
+    </SafeAreaView>
+  );
 }
