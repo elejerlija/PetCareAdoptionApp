@@ -1,5 +1,5 @@
 import React, { use, useState } from 'react';
-import { View, Text, Alert, Touchable, TouchableOpacity,ScrollView } from 'react-native';
+import { View, Text, Alert, Touchable, TouchableOpacity} from 'react-native';
 import {useRouter} from "expo-router";
 import { usePets } from './context/PetsContext';
 import { ScrollView, TextInput } from 'react-native';
