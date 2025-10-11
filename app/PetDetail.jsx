@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 
-export default function PetDetails({ pet }) {
+export default function PetDetails({ pet,onBack  }) {
   if (!pet) {
     return (
       <View style={styles.container}>
@@ -9,11 +9,9 @@ export default function PetDetails({ pet }) {
       </View>
     );
   }
-
   return (
     <View style={styles.container}>
-      <Image source={{ uri: pet.image }} style={styles.image} />
-      <Text style={styles.name}>{pet.name}</Text>
+<Image source={pet.image} style={styles.image} />
       <Text style={styles.status}>
         {pet.available ? 'Available' : 'Not available'}
       </Text>
@@ -22,10 +20,13 @@ export default function PetDetails({ pet }) {
 
       <Text style={styles.aboutTitle}>About</Text>
       <Text style={styles.aboutText}>{pet.about}</Text>
-
+  <TouchableOpacity style={[styles.button, { backgroundColor: '#ccc', marginTop: 40 }]} onPress={onBack}>
+        <Text style={[styles.buttonText, { color: 'black' }]}>Back</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.button}>
         <Text style={styles.buttonText}>Adopt</Text>
       </TouchableOpacity>
+     
     </View>
   );
 }

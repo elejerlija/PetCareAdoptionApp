@@ -1,6 +1,5 @@
 import { createContext, useState, useContext } from 'react';
 import { pets as demoPets } from '../../assets/data/pets';
-import { makeId } from '../../assets/utils/id';
 
 const PetsContext = createContext();
 
@@ -9,10 +8,12 @@ export function usePets() {
 }
 
 export function PetsProvider({ children }) {
-  const [pets, setPets] = useState(demoPets);
+  const initialPets = Array.isArray(demoPets) ? demoPets : []; 
+const [pets, setPets] = useState(initialPets);
+
 
   function addPet(pet) {
-    const newPet = { ...pet, id: makeId() };
+    const newPet = { ...pet, id: Date.now().toString() };
     setPets(prev => [...prev, newPet]);
   }
 
