@@ -1,8 +1,8 @@
 import React, { use, useState } from 'react';
-import { View, Text, Alert, Touchable, TouchableOpacity} from 'react-native';
+import { View, Text, Alert, Touchable, TouchableOpacity,ScrollView, TextInput} from 'react-native';
 import {useRouter} from "expo-router";
 import { usePets } from './context/PetsContext';
-import { ScrollView, TextInput } from 'react-native';
+
 
 export default function AddPet() {
     const router=useRouter();
@@ -87,3 +87,40 @@ export default function AddPet() {
     </ScrollView>
   );
 }
+const styles = StyleSheet.create({
+  container: {
+    padding: 20,
+    backgroundColor: "#fff",
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 10,
+  },
+  button: {
+    backgroundColor: "#007AFF",
+    paddingVertical: 14,
+    borderRadius: 10,
+    marginTop: 10,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "600",
+    textAlign: "center",
+    fontSize: 16,
+  },
+  error: {
+    color: "red",
+    fontSize: 13,
+    marginBottom: 8,
+    marginLeft: 5,
+  },
+});
