@@ -1,4 +1,3 @@
-// app/_layout.jsx
 import { Tabs } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar, View } from "react-native";
