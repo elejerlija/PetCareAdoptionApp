@@ -1,5 +1,5 @@
 import React, { use, useState } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Alert } from 'react-native';
 import {useRouter} from "expo-router";
 import { usePets } from './context/PetsContext';
 
@@ -35,6 +35,22 @@ export default function AddPet() {
         setErrors(newErrors);
         return valid;
     };
+
+    const handleAdd=()=>{
+        if(!validate())return;
+        const newPet={
+            name:form.name,
+            type:form.type,
+            age:Number(form.age),
+            desc:form.desc,
+            image:form.image
+        };
+        addPet(newPet);
+        Alert.alert("Sukses","Kafsha u shtua me sukses!");
+        router.push("/PetList");
+    };
+    const handleChange=(key,value)=>setForm({...form,[key]:value});
+
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       <Text style={{ fontSize: 24, fontWeight: 'bold' }}>Add Pet Page</Text>
