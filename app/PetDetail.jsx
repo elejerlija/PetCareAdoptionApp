@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, Alert } from 'react-native';
+import PrimaryButton from './components/PrimaryButton';
 
-export default function PetDetails({ pet,onBack  }) {
+export default function PetDetails({ pet, onBack }) {
   if (!pet) {
     return (
       <View style={styles.container}>
@@ -9,10 +10,22 @@ export default function PetDetails({ pet,onBack  }) {
       </View>
     );
   }
+
+  const handleAdopt = () => {
+    Alert.alert('Adopted 🐾', `${pet.name} u adoptua me sukses!`);
+    if (onBack) onBack();
+  };
+
   return (
     <View style={styles.container}>
-<Image source={pet.image} style={styles.image} />
-      <Text style={styles.status}>
+      <Image source={pet.image} style={styles.image} />
+      <Text style={styles.name}>{pet.name}</Text>
+      <Text
+        style={[
+          styles.status,
+          { color: pet.available ? 'green' : 'red' },
+        ]}
+      >
         {pet.available ? 'Available' : 'Not available'}
       </Text>
       <Text style={styles.details}>Age: {pet.age} yr</Text>
@@ -20,13 +33,21 @@ export default function PetDetails({ pet,onBack  }) {
 
       <Text style={styles.aboutTitle}>About</Text>
       <Text style={styles.aboutText}>{pet.about}</Text>
-  <TouchableOpacity style={[styles.button, { backgroundColor: '#ccc', marginTop: 40 }]} onPress={onBack}>
-        <Text style={[styles.buttonText, { color: 'black' }]}>Back</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Adopt</Text>
-      </TouchableOpacity>
-     
+
+      <View style={styles.buttonsContainer}>
+        {/* BACK BUTTON */}
+        <PrimaryButton
+          label="Back"
+          onPress={onBack}
+          style={{ backgroundColor: '#ccc' }}
+        />
+
+        {/* ADOPT BUTTON */}
+        <PrimaryButton
+          label="Adopt"
+          onPress={handleAdopt}
+        />
+      </View>
     </View>
   );
 }
@@ -50,7 +71,6 @@ const styles = StyleSheet.create({
   },
   status: {
     fontSize: 16,
-    color: 'green',
     marginVertical: 4,
   },
   details: {
@@ -68,16 +88,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginTop: 8,
   },
-  button: {
-    backgroundColor: '#70b4f8',
-    borderRadius: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 40,
-    marginTop: 25,
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 18,
+  buttonsContainer: {
+    width: '80%',
+    marginTop: 40,
+    gap: 16,
   },
 });
