@@ -53,7 +53,7 @@ export const pets = [
     id: '6',
     name: 'Simba',
     type: 'cat',
-    city: 'Kaçanik',
+    city: 'Drenas',
     age: 2,
     price: 75,
     desc: 'Sovran dhe elegant',
