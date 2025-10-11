@@ -1,4 +1,4 @@
-export const demoPets = [
+export const pets = [
   {
     id: '1',
     name: 'Max',
