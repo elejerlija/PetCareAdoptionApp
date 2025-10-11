@@ -1,10 +1,14 @@
-import { Stack } from 'expo-router';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Stack } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { StatusBar, View } from "react-native";
+
+const THEME_COLOR = "#83BAC9"; 
+const ICON_COLOR = "#FFFFF0"; 
 
 export default function RootLayout() {
   return (
-    <SafeAreaProvider>
-      <Stack screenOptions={{ headerShown: false }} />
-    </SafeAreaProvider>
+    <PetsProvider>
+      
+    </PetsProvider>
   );
 }
