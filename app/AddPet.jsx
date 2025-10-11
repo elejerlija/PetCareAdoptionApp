@@ -2,7 +2,7 @@ import React, { use, useState } from 'react';
 import { View, Text, Alert, Touchable, TouchableOpacity,ScrollView } from 'react-native';
 import {useRouter} from "expo-router";
 import { usePets } from './context/PetsContext';
-import { ScrollView, TextInput } from 'react-native-web';
+import { ScrollView, TextInput } from 'react-native';
 
 export default function AddPet() {
     const router=useRouter();
