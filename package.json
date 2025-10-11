@@ -2,6 +2,9 @@
   "name": "petcareadoptionapp",
   "version": "1.0.0",
   "main": "expo-router/entry",
+  "expo": {
+    "plugins": ["expo-router"]
+  },
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
