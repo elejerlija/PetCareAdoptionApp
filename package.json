@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "expo-router/entry",
   "expo": {
-    "plugins": ["expo-router"]
+    "plugins": [
+      "expo-router"
+    ]
   },
   "scripts": {
     "start": "expo start",
@@ -13,7 +15,8 @@
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",
-    "expo": "~54.0.10",
+    "@expo/vector-icons": "^15.0.2",
+    "expo": "54.0.13",
     "expo-constants": "~18.0.9",
     "expo-font": "~14.0.9",
     "expo-linking": "~8.0.8",
