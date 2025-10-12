@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 24,
     paddingHorizontal: 20,
-    paddingBottom: 60, // hapësirë për skroll poshtë
+    paddingBottom: 60, 
   },
   image: {
     width: '100%',

@@ -28,7 +28,7 @@ export const pets = [
     city: 'Gjilan',
     age: 5,
     price: 60,
-    desc: 'Besnik dhe mbrojtës',
+    desc: 'Protective and lovely',
     image: require('../images/dog2.jpg'),
     available :false 
   },
