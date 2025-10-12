@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { usePets } from './context/PetsContext';
 import PetDetails from './PetDetail';
 import PetCard from './components/PetCard';
 import { useRouter } from 'expo-router';
-
+import PrimaryButton from './components/PrimaryButton';
 
 
 export default function PetList() {
@@ -13,6 +13,8 @@ export default function PetList() {
   const { pets } = usePets();
   const router = useRouter();
   const list = Array.isArray(pets) ? pets : [];
+  const [loading, setLoading] = useState(false);
+  const [formValid, setFormValid] = useState(true);
 
   if (selectedPet) {
     return <PetDetails pet={selectedPet} onBack={() => setSelectedPet(null)} />;
@@ -22,12 +24,23 @@ export default function PetList() {
     <View style={styles.container}>
       <Text style={styles.title}>Pet List</Text>
 
-      <TouchableOpacity
-        style={styles.addButton}
+      <PrimaryButton
+        label="+ Add Pet"
         onPress={() => router.push('/AddPet')}
-      >
-        <Text style={styles.addButtonText}>+ Add Pet</Text>
-      </TouchableOpacity>
+        isLoading={loading}
+        disabled={!formValid}
+        style={{
+          marginHorizontal: 110,
+          marginTop: 1,
+          borderRadius: 20,
+          paddingVertical: 16,
+          elevation: 3,
+          shadowColor: "#000",
+          shadowOpacity: 0.15,
+          shadowRadius: 8,
+          shadowOffset: { width: 0, height: 4 },
+        }}
+      />
 
       <ScrollView
         style={styles.scrollArea}
@@ -49,6 +62,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   scrollArea: {
+    marginTop :20,
     flex: 1,
     width: '100%',
   },
@@ -61,23 +75,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 20,
-  },
-  addButton: {
-    alignSelf: 'center',
-    backgroundColor: '#70b4f8',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  addButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
+  }
 });
