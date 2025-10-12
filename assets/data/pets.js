@@ -6,7 +6,7 @@ export const pets = [
     city: 'Prishtina',
     age: 3,
     price: 80,
-    desc: 'Energjik dhe miqësor',
+    desc: 'Energetic and friendly',
     image: require('../images/dog1.jpg'),
     available :true 
   },
@@ -17,7 +17,7 @@ export const pets = [
     city: 'Malisheve',
     age: 2,
     price: 70,
-    desc: 'Qetë dhe dashuruese',
+    desc: 'Calm and loving',
     image: require('../images/cat1.jpg'),
     available :true 
   },
@@ -39,7 +39,7 @@ export const pets = [
     city: 'Kaçanik',
     age: 1,
     price: 90,
-    desc: 'Lojtare dhe kurioze',
+    desc: 'Loyal and protective',
     image: require('../images/cat2.jpg'),
     available :true 
   },
@@ -50,7 +50,7 @@ export const pets = [
     city: 'Prishtina',
     age: 4,
     price: 50,
-    desc: 'Inteligjente dhe e dashur',
+    desc: 'Intelligent and loving',
     image: require('../images/cat3.jpg'),
     available :false 
   },
@@ -61,7 +61,7 @@ export const pets = [
     city: 'Drenas',
     age: 2,
     price: 75,
-    desc: 'Sovran dhe elegant',
+    desc: 'Sovereign and elegant',
     image: require('../images/cat4.jpg'),
     available :true 
   }
