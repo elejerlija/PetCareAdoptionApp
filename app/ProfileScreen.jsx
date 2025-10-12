@@ -11,12 +11,16 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Image,
+  ImageBackground,
 } from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import InputField from './components/InputField';
 import PrimaryButton from './components/PrimaryButton';
+
+const bgImage = require('../assets/images/bg.profile.webp');
+
 
 export default function ProfileScreen() {
   const [name, setName] = useState('');
@@ -29,30 +33,27 @@ export default function ProfileScreen() {
     Alert.alert('Profile Saved', 'Your profile information has been updated.');
 
   return (
+    <ImageBackground source = {bgImage} style = {styles.bg} resizeMode='cover'>
+      <View style = {styles.overlay} />
     <SafeAreaView style={styles.safe}>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 12 : 0}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <ScrollView
-            contentContainerStyle={styles.container}
+            contentContainerStyle={[styles.container, styles.centerContent]}
             keyboardShouldPersistTaps="handled">
-            <View style={styles.header}>
-              <Image
-                source={{
-                  //uri: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=400',
-                }}
-                style={styles.avatar}
-              />
+            <View style={[styles.header, styles.blockWidth]}>
+           <Image source = {{}} style = {styles.avatar}/>
               <Text style={styles.title}>My Profile</Text>
               <Text style={styles.subtitle}>
                 Manage your personal information below
               </Text>
             </View>
 
-            <View style={styles.card}>
+            <View style={[styles.card, styles.blockWidth]}>
               <Text style={styles.cardTitle}>About the app</Text>
               <Text style={styles.cardBody}>
                 Pet Care & Adoption helps you connect with pets for adoption and
@@ -64,7 +65,7 @@ export default function ProfileScreen() {
               </View>
             </View>
 
-            <View style={styles.card}>
+            <View style={[styles.card, styles.blockWidth]}>
               <Text style={styles.cardTitle}>Personal Information</Text>
               <InputField
                 label="Full Name"
@@ -104,25 +105,49 @@ export default function ProfileScreen() {
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </SafeAreaView>
+
+  </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#f0f9ff' },
+
+  bg: {flex: 1,
+    
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(8, 23, 33, 0.35)'
+  },
+  safe: { flex: 1, },
   flex: { flex: 1 },
-  container: { padding: 16, paddingBottom: 28, gap: 16 },
+  container: { padding: 16,  gap: 16 },
+
+  centerContent: {
+    alignItems: 'center',
+    flexGrow: 1,
+    justifyContent: 'center', 
+    paddingBottom: 28,
+  },
+
+
+  blockWidth: {
+    width: "100%",
+    maxWidth: 720,
+    alignSelf: 'center',
+  },
 
   header: { alignItems: 'center', marginBottom: 12 },
   avatar: { width: 90, height: 90, borderRadius: 45, marginBottom: 10 },
-  title: { fontSize: 22, fontWeight: '700', color: '#0f172a' },
-  subtitle: { fontSize: 13, color: '#475569' },
+  title: { fontSize: 22, fontWeight: '700', color: '#ffffff' },
+  subtitle: { fontSize: 13, color: 'rgba(255,255,255,0.9)' },
 
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.9)',
     borderRadius: 18,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
+    borderColor: 'rgba(226,232,240,0.85)',
     ...Platform.select({
       ios: {
         shadowColor: '#000',
