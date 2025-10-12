@@ -2,25 +2,19 @@ import React, { useState } from 'react';
 import {
   View,
   Alert,
-  Keyboard,
+  KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-  Image,
-  ImageBackground,
 } from 'react-native';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import InputField from './components/InputField';
 import PrimaryButton from './components/PrimaryButton';
 
-const bgImage = require('../assets/images/bg.profile.webp');
-
+const ACCENT = '#83BAC9';
 
 export default function ProfileScreen() {
   const [name, setName] = useState('');
@@ -29,152 +23,178 @@ export default function ProfileScreen() {
   const [phone, setPhone] = useState('');
   const [bio, setBio] = useState('');
 
-  const onSave = () =>
-    Alert.alert('Profile Saved', 'Your profile information has been updated.');
+  const onSave = async () => {
+    const data = { name, email, city, phone, bio };
+    try {
+      await AsyncStorage.setItem('profileData', JSON.stringify(data));
+      Alert.alert('Profile Saved', 'Your information has been saved locally.');
+    } catch (e) {
+      Alert.alert('Error', 'Failed to save your information.');
+    }
+  };
 
   return (
-    <ImageBackground source = {bgImage} style = {styles.bg} resizeMode='cover'>
-      <View style = {styles.overlay} />
     <SafeAreaView style={styles.safe}>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
       <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 12 : 0}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-          <ScrollView
-            contentContainerStyle={[styles.container, styles.centerContent]}
-            keyboardShouldPersistTaps="handled">
-            <View style={[styles.header, styles.blockWidth]}>
-           <Image source = {{}} style = {styles.avatar}/>
-              <Text style={styles.title}>My Profile</Text>
-              <Text style={styles.subtitle}>
-                Manage your personal information below
-              </Text>
+        behavior={Platform.select({ ios: 'padding', android: undefined })}
+        style={{ flex: 1 }}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+          <View style={styles.header}>
+            <Text style={styles.title}>My Profile</Text>
+            <Text style={styles.subtitle}>Manage your personal information below</Text>
+          </View>
+
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Personal Information</Text>
+
+            <View style={styles.block}>
+              <Text style={styles.label}>Full Name</Text>
+              <InputField placeholder="Enter your name" value={name} onChangeText={setName} />
             </View>
 
-            <View style={[styles.card, styles.blockWidth]}>
-              <Text style={styles.cardTitle}>About the app</Text>
-              <Text style={styles.cardBody}>
-                Pet Care & Adoption helps you connect with pets for adoption and
-                learn how to take better care of them.
-              </Text>
-              <View style={styles.versionRow}>
-                <Text style={styles.versionLabel}>Version</Text>
-                <Text style={styles.versionValue}>v0.1.0</Text>
-              </View>
-            </View>
-
-            <View style={[styles.card, styles.blockWidth]}>
-              <Text style={styles.cardTitle}>Personal Information</Text>
+            <View style={styles.block}>
+              <Text style={styles.label}>Email</Text>
               <InputField
-                label="Full Name"
-                placeholder="Enter your name"
-                value={name}
-                onChangeText={setName}
-              />
-              <InputField
-                label="Email"
                 placeholder="example@gmail.com"
                 value={email}
                 onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
               />
+            </View>
+
+            <View style={styles.row}>
+              <View style={[styles.block, styles.col]}>
+                <Text style={styles.label}>City</Text>
+                <InputField placeholder="Enter your city" value={city} onChangeText={setCity} />
+              </View>
+              <View style={[styles.block, styles.col]}>
+                <Text style={styles.label}>Phone Number</Text>
+                <InputField
+                  placeholder="+383 xx xxx xxx"
+                  value={phone}
+                  onChangeText={setPhone}
+                  keyboardType="phone-pad"
+                />
+              </View>
+            </View>
+
+            <View style={styles.block}>
+              <Text style={styles.label}>Bio</Text>
               <InputField
-                label="City"
-                placeholder="Enter your city"
-                value={city}
-                onChangeText={setCity}
-              />
-              <InputField
-                label="Phone Number"
-                placeholder="+383 xx xxx xxx"
-                value={phone}
-                onChangeText={setPhone}
-              />
-              <InputField
-                label="Bio"
                 placeholder="Write something about yourself"
                 value={bio}
                 onChangeText={setBio}
+                multiline
               />
-              <PrimaryButton title="Save Changes" onPress={onSave} />
             </View>
 
-            <View style={{ height: 50 }} />
-          </ScrollView>
-        </TouchableWithoutFeedback>
+            <View style={styles.saveSection}>
+              <Text style={styles.saveText}>Click below to save your information locally</Text>
+              <PrimaryButton title="Save" onPress={onSave} />
+            </View>
+          </View>
+
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>About the app 🐾</Text>
+            <Text style={styles.body}>
+              Pet Care & Adoption is designed to help animal lovers connect with pets who need a home and provide useful resources for responsible pet care.
+With this app, you can explore profiles of adoptable animals, learn about their stories, and find the perfect companion for your lifestyle.
+            </Text>
+           
+          </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
-
-  </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-
-  bg: {flex: 1,
-    
+  safe: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
   },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(8, 23, 33, 0.35)'
-  },
-  safe: { flex: 1, },
-  flex: { flex: 1 },
-  container: { padding: 16,  gap: 16 },
-
-  centerContent: {
-    alignItems: 'center',
-    flexGrow: 1,
-    justifyContent: 'center', 
+  scrollContent: {
+    paddingHorizontal: 16,
     paddingBottom: 28,
   },
-
-
-  blockWidth: {
-    width: "100%",
-    maxWidth: 720,
-    alignSelf: 'center',
+  header: {
+    paddingVertical: 18,
+    alignItems: 'center',
+    borderRadius: 16,
+    backgroundColor: ACCENT + '22',
+    marginTop: 8,
+    marginBottom: 16,
   },
-
-  header: { alignItems: 'center', marginBottom: 12 },
-  avatar: { width: 90, height: 90, borderRadius: 45, marginBottom: 10 },
-  title: { fontSize: 22, fontWeight: '700', color: '#ffffff' },
-  subtitle: { fontSize: 13, color: 'rgba(255,255,255,0.9)' },
-
+  title: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#1F2937',
+  },
+  subtitle: {
+    marginTop: 4,
+    fontSize: 14,
+    color: '#6B7280',
+  },
   card: {
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    backgroundColor: '#F9FAFB',
     borderRadius: 18,
     padding: 16,
+    marginBottom: 16,
     borderWidth: 1,
-    borderColor: 'rgba(226,232,240,0.85)',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOpacity: 0.08,
-        shadowRadius: 8,
-        shadowOffset: { width: 0, height: 4 },
-      },
-      android: { elevation: 3 },
-    }),
+    borderColor: '#E5E7EB',
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 2,
   },
-
   cardTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '700',
-    color: '#0f172a',
-    marginBottom: 10,
+    color: '#111827',
+    marginBottom: 12,
   },
-
-  cardBody: { fontSize: 14, color: '#334155', lineHeight: 20, marginBottom: 12 },
-  versionRow: {
-    marginTop: 4,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: '#f1f5f9',
+  block: {
+    marginBottom: 14,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  label: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 6,
+  },
+  row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  versionLabel: { fontSize: 13, color: '#64748b' },
-  versionValue: { fontSize: 13, color: '#0f172a', fontWeight: '700' },
+  col: {
+    width: '48%',
+  },
+  saveSection: {
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  saveText: {
+    fontSize: 13,
+    color: '#6B7280',
+    marginBottom: 8,
+  },
+  body: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: '#374151',
+    marginBottom: 10,
+  },
+
+  bold: {
+    fontWeight: '700',
+  },
 });
