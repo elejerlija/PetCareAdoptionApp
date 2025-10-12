@@ -11,7 +11,7 @@ const svgIcon = L.divIcon({
   popupAnchor: [0, -40],
 });
 
-export default function MapWeb() {
+export default function MapScreen() {
   return (
     <MapContainer
       center={[42.6629, 21.1655]}

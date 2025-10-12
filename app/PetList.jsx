@@ -5,7 +5,10 @@ import PetDetails from './PetDetail';
 import PetCard from './components/PetCard';
 import { useRouter } from 'expo-router';
 
+
+
 export default function PetList() {
+
   const [selectedPet, setSelectedPet] = useState(null);
   const { pets } = usePets();
   const router = useRouter();
@@ -26,7 +29,6 @@ export default function PetList() {
         <Text style={styles.addButtonText}>+ Add Pet</Text>
       </TouchableOpacity>
 
-      {/* 🔹 ScrollView me layout vertikal normal */}
       <ScrollView
         style={styles.scrollArea}
         contentContainerStyle={styles.scrollContent}
@@ -51,7 +53,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   scrollContent: {
-    alignItems: 'center', 
+    alignItems: 'center',
     paddingBottom: 100,
   },
   title: {
