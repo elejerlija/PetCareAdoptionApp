@@ -1,13 +1,16 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, Alert } from 'react-native';
+import { View, Text, Image, StyleSheet, Alert, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import PrimaryButton from './components/PrimaryButton';
 
 export default function PetDetails({ pet, onBack }) {
   if (!pet) {
     return (
-      <View style={styles.container}>
-        <Text style={{ color: 'gray' }}>No pet selected</Text>
-      </View>
+      <SafeAreaView style={styles.screen}>
+        <View style={styles.emptyWrap}>
+          <Text style={{ color: 'gray' }}>No pet selected</Text>
+        </View>
+      </SafeAreaView>
     );
   }
 
@@ -17,53 +20,67 @@ export default function PetDetails({ pet, onBack }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Image source={pet.image} style={styles.image} />
-      <Text style={styles.name}>{pet.name}</Text>
-      <Text
-        style={[
-          styles.status,
-          { color: pet.available ? 'green' : 'red' },
-        ]}
+    <SafeAreaView style={styles.screen}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.content}
       >
-        {pet.available ? 'Available' : 'Not available'}
-      </Text>
-      <Text style={styles.details}>Age: {pet.age} yr</Text>
-      <Text style={styles.details}>{pet.city}</Text>
+        <Image source={pet.image} style={styles.image} />
+        <Text style={styles.name}>{pet.name}</Text>
 
-      <Text style={styles.aboutTitle}>About</Text>
-      <Text style={styles.aboutText}>{pet.about}</Text>
+        <Text
+          style={[
+            styles.status,
+            { color: pet.available ? 'green' : 'red' },
+          ]}
+        >
+          {pet.available ? 'Available' : 'Not available'}
+        </Text>
 
-      <View style={styles.buttonsContainer}>
-        {/* BACK BUTTON */}
-        <PrimaryButton
-          label="Back"
-          onPress={onBack}
-          style={{ backgroundColor: '#ccc' }}
-        />
+        <Text style={styles.details}>Age: {pet.age} yr</Text>
+        <Text style={styles.details}>{pet.city}</Text>
 
-        {/* ADOPT BUTTON */}
-        <PrimaryButton
-          label="Adopt"
-          onPress={handleAdopt}
-        />
-      </View>
-    </View>
+        <Text style={styles.aboutTitle}>About</Text>
+        <Text style={styles.aboutText}>{pet.desc}</Text>
+
+        <View style={styles.buttonsContainer}>
+          <PrimaryButton
+            label="Back"
+            onPress={onBack}
+            style={{ backgroundColor: '#ccc' }}
+          />
+          <PrimaryButton
+            label="Adopt"
+            onPress={handleAdopt}
+          />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    alignItems: 'center',
-    paddingTop: 80,
     backgroundColor: '#fff',
   },
+  emptyWrap: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  content: {
+    alignItems: 'center',
+    paddingTop: 24,
+    paddingHorizontal: 20,
+    paddingBottom: 60, // hapësirë për skroll poshtë
+  },
   image: {
-    width: 220,
-    height: 220,
+    width: '100%',
+    height: 260,
     borderRadius: 12,
     marginBottom: 20,
+    resizeMode: 'cover',
   },
   name: {
     fontSize: 26,
@@ -71,7 +88,7 @@ const styles = StyleSheet.create({
   },
   status: {
     fontSize: 16,
-    marginVertical: 4,
+    marginVertical: 6,
   },
   details: {
     fontSize: 16,
@@ -81,16 +98,18 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginTop: 20,
+    alignSelf: 'flex-start',
   },
   aboutText: {
     fontSize: 16,
-    textAlign: 'center',
-    marginHorizontal: 20,
+    textAlign: 'left',
     marginTop: 8,
+    width: '100%',
+    lineHeight: 22,
   },
   buttonsContainer: {
-    width: '80%',
-    marginTop: 40,
-    gap: 16,
+    width: '100%',
+    marginTop: 28,
+        gap: 12,
   },
 });
