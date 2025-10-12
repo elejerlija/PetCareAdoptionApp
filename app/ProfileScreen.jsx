@@ -42,7 +42,7 @@ export default function ProfileScreen() {
             <View style={styles.header}>
               <Image
                 source={{
-                  uri: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=400',
+                  //uri: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=400',
                 }}
                 style={styles.avatar}
               />
