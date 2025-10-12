@@ -30,15 +30,15 @@ export default function AddPet() {
         let newErrors={};
         
         if(!form.name.trim()|| form.name.length<3){
-            newErrors.name="Emri duhet te kete te pakten 3 shkronja.";
+            newErrors.name="Name must  contain 4 at least characters !";
             valid=false;
         }
         if(!form.age.trim()|| isNaN(form.age)){
-            newErrors.age="Mosha duhet te jete numer.";
+            newErrors.age="Age must be a number !";
             valid=false;
         }
         if(!form.desc.trim()||form.desc.length< 5){
-            newErrors.desc="Pershkrimi duhet te kete te pakten 5 karaktere.";
+            newErrors.desc="Description must contain at least 5 characters ! ";
             valid=false;
         }
         setErrors(newErrors);
@@ -55,7 +55,7 @@ export default function AddPet() {
             image:form.image
         };
         addPet(newPet);
-        Alert.alert("Sukses","Kafsha u shtua me sukses!");
+        Alert.alert("Success","The pet has been added successfully !");
         router.push("/PetList");
     };
     const handleChange=(key,value)=>setForm({...form,[key]:value});
@@ -67,30 +67,30 @@ export default function AddPet() {
       <Text style={{ fontSize: 24, fontWeight: 'bold' }}>Add Pet Page</Text>
     </View>
 
-    <Text style={styles.title}>Shto nje kafshe te re.</Text>
+    <Text style={styles.title}>Add a new animal.</Text>
 
-    <TextInput style={styles.input} placeholder="Emri i kafshes" value={form.name} 
+    <TextInput style={styles.input} placeholder="Pet name" value={form.name} 
     onChangeText={(v)=>handleChange("name",v)}/>
     {errors.name && <Text style={styles.error}>{errors.name}</Text>}
 
-    <TextInput style={styles.input} placeholder="Tipi (qen,mace,...)"
+    <TextInput style={styles.input} placeholder="Type (dog,cat,...) "
     value={form.type} onChangeText={(v)=>handleChange("type",v)}/>
     {errors.type && <Text style={styles.error}>{errors.type}</Text>}
 
-    <TextInput style={styles.input} placeholder="Mosha (numer)" 
+    <TextInput style={styles.input} placeholder="Age (number)" 
     value={form.age} keyboardType="numeric"
     onChangeText={(v)=>handleChange("age",v)}/>
     {errors.age && <Text style={styles.error}>{errors.age}</Text>}
 
     <TextInput style={[styles.input,{height:80}]}
-    placeholder="Pershkrim" value={form.desc} multiline onChangeText={(v)=> handleChange("desc",v)}/>
+    placeholder="Description" value={form.desc} multiline onChangeText={(v)=> handleChange("desc",v)}/>
     {errors.desc && <Text style={styles.error}>{errors.desc}</Text>}
 
-    <TextInput style={styles.input} placeholder="Image URL (opsionale)"
+    <TextInput style={styles.input} placeholder="Image URL (optional)"
     value={form.image} onChangeText={(v) => handleChange("image", v)}/>
    
     <TouchableOpacity style={styles.button} onPress={handleAdd}>
-        <Text style={styles.buttonText}>Shto Kafshen</Text>
+        <Text style={styles.buttonText}>Add Pet</Text>
     </TouchableOpacity> 
     </ScrollView>
   );
