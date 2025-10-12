@@ -1,6 +1,14 @@
-import React, { use, useState } from 'react';
-import { View, Text, Alert, Touchable, TouchableOpacity,ScrollView, TextInput} from 'react-native';
-import {useRouter} from "expo-router";
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  Alert,
+  TouchableOpacity,
+  ScrollView,
+  TextInput,
+  StyleSheet
+} from 'react-native';
+import { useRouter } from 'expo-router';
 import { usePets } from './context/PetsContext';
 
 
