@@ -1,84 +1,147 @@
-import { Tabs } from "expo-router";
+// app/index.jsx
+import { View, Text, StyleSheet, Image, FlatList, ScrollView, Linking } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { StatusBar, View } from "react-native";
-import { PetsProvider } from "./context/PetsContext";
-import { Ionicons } from "@expo/vector-icons";
 
-const THEME_COLOR = "#83BAC9";
-const ICON_ACTIVE = "#FFFFF0";
-const ICON_INACTIVE = "#f4deb4ff";
+const THEME = "#83BAC9";
+const LIGHT = "#FFFFF0";
 
-export default function RootLayout() {
+const FEATURED_PETS = [
+  {
+    id: "max",
+    name: "Max",
+    type: "Dog",
+    age: 3,
+    image: require("../assets/images/dog1.jpg"),
+  },
+  {
+    id: "luna",
+    name: "Luna",
+    type: "Cat",
+    age: 2,
+    image: require("../assets/images/cat2.jpg"),
+  },
+];
+
+export default function HomeScreen() {
+  const featured = FEATURED_PETS;
+
   return (
-    <PetsProvider>
-      <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-        <StatusBar barStyle="dark-content" />
-        <View style={{ flex: 1, backgroundColor: "#fff" }}>
-          <Tabs
-            screenOptions={{
-              headerShown: false, 
-              tabBarActiveTintColor: ICON_ACTIVE,
-              tabBarInactiveTintColor: ICON_INACTIVE,
-              tabBarStyle: {
-                backgroundColor: THEME_COLOR,
-                height: 62,
-                paddingBottom: 8,
-                borderTopLeftRadius: 20,
-                borderTopRightRadius: 20,
-                position: "absolute",
-                overflow: "hidden",
-              },
-              tabBarLabelStyle: { fontSize: 12, fontWeight: "600" },
-              sceneContainerStyle: { backgroundColor: "#fff" },
-              tabBarHideOnKeyboard: true,
-            }}
-          >
-            <Tabs.Screen
-              name="index"
-              options={{
-                title: "Home",
-                tabBarIcon: ({ color, size }) => (
-                  <Ionicons name="home" size={size} color={color} />
-                ),
-              }}
-            />
-            <Tabs.Screen
-              name="PetList"
-              options={{
-                title: "List",
-                tabBarIcon: ({ color, size }) => (
-                  <Ionicons name="paw" size={size} color={color} />
-                ),
-              }}
-            />
-            <Tabs.Screen
-              name="ProfileScreen"
-              options={{
-                title: "Profile",
-                tabBarIcon: ({ color, size }) => (
-                  <Ionicons name="person" size={size} color={color} />
-                ),
-              }}
-            />
-            <Tabs.Screen
-              name="MapScreen"
-              options={{
-                title: "Map",
-                tabBarIcon: ({ color, size }) => (
-                  <Ionicons name="map" size={size} color={color} />
-                ),
-              }}
-            />
-
-            <Tabs.Screen name="AddPet" options={{ href: null }} />
-            <Tabs.Screen name="PetDetail" options={{ href: null }} />
-            <Tabs.Screen name="components/PetCard" options={{ href: null }} />
-            <Tabs.Screen name="components/InputField" options={{ href: null }} />
-            <Tabs.Screen name="components/PrimaryButton" options={{ href: null }} />
-
-          </Tabs>
+    <SafeAreaView style={styles.safe}>
+      <ScrollView contentContainerStyle={styles.scroll}>
+        <View style={styles.header}>
+          <Text style={styles.appTitle}>PetCare Adoption</Text>
+          <Text style={styles.subtitle}>Welcome to the world of four-pawed friends.🐾</Text>
         </View>
-      </SafeAreaView>
-    </PetsProvider>
+
+        <Image
+          source={require("../assets/images/pets.jpg")}
+          style={styles.heroImg}
+          resizeMode="cover"
+        />
+
+        <View style={styles.banner}>
+          <Text style={styles.bannerTitle}>Adoptathon this weekend!</Text>
+          <Text style={styles.bannerSub}>
+            Discounts on vaccinations for new adoptions. Visit your nearest center!
+          </Text>
+        </View>
+
+        <Text style={styles.sectionTitle}>Featured</Text>
+        <FlatList
+          data={featured}
+          horizontal
+          keyExtractor={(item) => String(item.id)}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 8 }}
+          ItemSeparatorComponent={() => <View style={{ width: 12 }} />}
+          renderItem={({ item }) => (
+            <View style={styles.card}>
+              <Image source={item.image} style={styles.cardImg} />
+              <Text style={styles.cardName}>{item.name}</Text>
+              <Text style={styles.cardMeta}>
+                {item.type} • {item.age} yrs
+              </Text>
+            </View>
+          )}
+          style={{ marginBottom: 24 }}
+        />
+
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>Need help or want to get in touch?</Text>
+          <Text
+            style={styles.footerEmail}
+            onPress={() => Linking.openURL("mailto:contact@petcareapp.com")}
+          >
+            📧 contact@petcareapp.com
+          </Text>
+          <Text style={styles.footerCopyright}>© 2025 PetCare Adoption</Text>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: "#fff" },
+  scroll: { padding: 16, paddingBottom: 50 },
+
+  header: { marginBottom: 12 },
+  appTitle: { fontSize: 24, fontWeight: "800", color: THEME, textAlign: "center" },
+  subtitle: { textAlign: "center", color: "#667", marginTop: 4, fontSize: 14 },
+
+  heroImg: {
+    width: "100%",
+    height: 200,
+    borderRadius: 20,
+    marginVertical: 10,
+  },
+
+  banner: {
+    backgroundColor: THEME,
+    borderRadius: 18,
+    padding: 14,
+    marginVertical: 12,
+  },
+  bannerTitle: { color: LIGHT, fontWeight: "800", fontSize: 16 },
+  bannerSub: { color: LIGHT, opacity: 0.95, marginTop: 4, fontSize: 13 },
+
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "800",
+    marginTop: 12,
+    marginBottom: 10,
+    color: "#223",
+  },
+
+  card: {
+    width: 160,
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#eef2f3",
+    padding: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  cardImg: { width: "100%", height: 100, borderRadius: 12, backgroundColor: "#eee" },
+  cardName: { fontWeight: "800", marginTop: 8, color: "#222", textAlign: "center" },
+  cardMeta: { color: "#667", marginTop: 2, textAlign: "center" },
+
+    footer: {
+    marginTop: 20,
+    paddingVertical: 20,
+    borderTopWidth: 1,
+    borderTopColor: "#eef2f3",
+    alignItems: "center",
+    backgroundColor: LIGHT, 
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  footerText: { color: "#444", fontSize: 13, marginBottom: 4 },
+  footerEmail: { color: THEME, fontWeight: "700", fontSize: 14 },
+  footerCopyright: { color: "#888", fontSize: 12, marginTop: 6 },
+
+});
