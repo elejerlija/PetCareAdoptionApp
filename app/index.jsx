@@ -1,7 +1,6 @@
-import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, StyleSheet, Image, FlatList, ScrollView, Linking } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
-import { usePets } from "./context/PetsContext";
+
 
 const THEME = "#83BAC9";
 const LIGHT = "#FFFFF0";
@@ -24,8 +23,7 @@ const FEATURED_PETS = [
 ];
 
 export default function HomeScreen() {
-  const router = useRouter();
-
+  
   const featured = FEATURED_PETS;
 
   return (
@@ -59,25 +57,28 @@ export default function HomeScreen() {
           contentContainerStyle={{ paddingHorizontal: 8 }}
           ItemSeparatorComponent={() => <View style={{ width: 12 }} />}
           renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.card}
-              activeOpacity={0.85}
-              onPress={() => router.push({ pathname: "/PetDetail", params: { id: item.id } })}
-            >
+            <View style={styles.card}>
               <Image source={item.image} style={styles.cardImg} />
               <Text style={styles.cardName}>{item.name}</Text>
               <Text style={styles.cardMeta}>
                 {item.type} • {item.age} yrs
               </Text>
-            </TouchableOpacity>
-          )}
-          ListEmptyComponent={
-            <View style={{ padding: 16 }}>
-              <Text style={{ color: "#666" }}>No animals to show yet.</Text>
+
             </View>
-          }
+          )}
           style={{ marginBottom: 24 }}
         />
+
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>Need help or want to get in touch?</Text>
+          <Text
+            style={styles.footerEmail}
+            onPress={() => Linking.openURL("mailto:contact@petcareapp.com")}
+          >
+            📧 contact@petcareapp.com
+          </Text>
+          <Text style={styles.footerCopyright}>© 2025 PetCare Adoption</Text>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -85,7 +86,8 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#fff" },
-  scroll: { padding: 16, paddingBottom: 28 },
+  scroll: { padding: 16, paddingBottom: 50 },
+
   header: { marginBottom: 12 },
   appTitle: { fontSize: 24, fontWeight: "800", color: THEME, textAlign: "center" },
   subtitle: { textAlign: "center", color: "#667", marginTop: 4, fontSize: 14 },
@@ -121,8 +123,28 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#eef2f3",
     padding: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 6,
+    elevation: 3,
   },
   cardImg: { width: "100%", height: 100, borderRadius: 12, backgroundColor: "#eee" },
-  cardName: { fontWeight: "800", marginTop: 8, color: "#222" },
-  cardMeta: { color: "#667", marginTop: 2 },
+  cardName: { fontWeight: "800", marginTop: 8, color: "#222", textAlign: "center" },
+  cardMeta: { color: "#667", marginTop: 2, textAlign: "center" },
+
+  footer: {
+    marginTop: 20,
+    paddingVertical: 20,
+    borderTopWidth: 1,
+    borderTopColor: "#eef2f3",
+    alignItems: "center",
+    backgroundColor: LIGHT, 
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  footerText: { color: "#444", fontSize: 13, marginBottom: 4 },
+  footerEmail: { color: THEME, fontWeight: "700", fontSize: 14 },
+  footerCopyright: { color: "#888", fontSize: 12, marginTop: 6 },
+
 });
