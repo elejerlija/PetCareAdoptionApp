@@ -67,13 +67,13 @@ export default function AddPet() {
       <Text style={{ fontSize: 24, fontWeight: 'bold' }}>Add Pet Page</Text>
     </View>
 
-    <Text style={styles.title}>Add a new animal.</Text>
+    <Text style={styles.title}>Add a New Pet.</Text>
 
-    <TextInput style={styles.input} placeholder="Pet name" value={form.name} 
+    <TextInput style={styles.input} placeholder="Pet Name" value={form.name} 
     onChangeText={(v)=>handleChange("name",v)}/>
     {errors.name && <Text style={styles.error}>{errors.name}</Text>}
 
-    <TextInput style={styles.input} placeholder="Type (dog,cat,...) "
+    <TextInput style={styles.input} placeholder="Type (Dog,Cat,...) "
     value={form.type} onChangeText={(v)=>handleChange("type",v)}/>
     {errors.type && <Text style={styles.error}>{errors.type}</Text>}
 
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   button: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "#83BAC9",
     paddingVertical: 14,
     borderRadius: 10,
     marginTop: 10,
