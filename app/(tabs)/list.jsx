@@ -1,24 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { usePets } from './context/PetsContext';
-import PetDetails from './PetDetail';
-import PetCard from './components/PetCard';
+import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { useRouter } from 'expo-router';
-import PrimaryButton from './components/PrimaryButton';
+import { usePets } from '../../context/PetsContext';
+import PetCard from '../../components/PetCard';
+import PrimaryButton from '../../components/PrimaryButton';
 
 
 export default function PetList() {
-
-  const [selectedPet, setSelectedPet] = useState(null);
+const router = useRouter();
   const { pets } = usePets();
-  const router = useRouter();
   const list = Array.isArray(pets) ? pets : [];
-  const [loading, setLoading] = useState(false);
-  const [formValid, setFormValid] = useState(true);
 
-  if (selectedPet) {
-    return <PetDetails pet={selectedPet} onBack={() => setSelectedPet(null)} />;
-  }
+  
 
   return (
     <View style={styles.container}>
@@ -27,8 +20,6 @@ export default function PetList() {
       <PrimaryButton
         label="+ Add Pet"
         onPress={() => router.push('/AddPet')}
-        isLoading={loading}
-        disabled={!formValid}
         style={{
           marginHorizontal: 110,
           marginTop: 1,
@@ -42,15 +33,22 @@ export default function PetList() {
         }}
       />
 
-      <ScrollView
+     <FlatList
         style={styles.scrollArea}
         contentContainerStyle={styles.scrollContent}
+        data={list}
+        keyExtractor={(item, i) => (item?.id ? String(item.id) : `pet-${i}`)}
+        renderItem={({ item }) => (
+          <PetCard pet={item} onPress={() => router.push(`/pets/${item.id}`)} />
+        )}
+        ListEmptyComponent={
+          <Text style={{ textAlign: "center", color: "gray", marginTop: 24 }}>
+            No pets yet. Tap “+ Add Pet”.
+          </Text>
+        }
         showsVerticalScrollIndicator={false}
-      >
-        {list.map((pet) => (
-          <PetCard key={pet.id} pet={pet} onPress={setSelectedPet} />
-        ))}
-      </ScrollView>
+        ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+      />
     </View>
   );
 }

@@ -9,7 +9,7 @@ import {
   StyleSheet
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { usePets } from './context/PetsContext';
+import { usePets } from '../context/PetsContext';
 
 
 export default function AddPet() {
@@ -48,26 +48,24 @@ export default function AddPet() {
     const handleAdd=()=>{
         if(!validate())return;
         const newPet={
+           id: Date.now().toString(), 
             name:form.name,
             type:form.type,
             age:Number(form.age),
             desc:form.desc,
-            image:form.image
+            image:form.image,
+            available: true,
         };
         addPet(newPet);
         Alert.alert("Success","The pet has been added successfully !");
-        router.push("/PetList");
+        router.replace("/(tabs)/list");
     };
     const handleChange=(key,value)=>setForm({...form,[key]:value});
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
 
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text style={{ fontSize: 24, fontWeight: 'bold' }}>Add Pet Page</Text>
-    </View>
 
-    <Text style={styles.title}>Add a New Pet.</Text>
 
     <TextInput style={styles.input} placeholder="Pet Name" value={form.name} 
     onChangeText={(v)=>handleChange("name",v)}/>

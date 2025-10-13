@@ -1,22 +1,33 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, Alert, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import PrimaryButton from './components/PrimaryButton';
+import PrimaryButton from '../../components/PrimaryButton';
+import { useLocalSearchParams } from 'expo-router';
+import { usePets } from "../../context/PetsContext";
 
-export default function PetDetails({ pet, onBack }) {
+export default function PetDetailsRoute() {
+  const { id } = useLocalSearchParams();    
+  const { getPetById ,adoptPet} = usePets();
+  const pet = getPetById?.(id);
+
   if (!pet) {
     return (
       <SafeAreaView style={styles.screen}>
         <View style={styles.emptyWrap}>
-          <Text style={{ color: 'gray' }}>No pet selected</Text>
+          <Text style={{ color: "gray" }}>Pet not found.</Text>
         </View>
       </SafeAreaView>
     );
   }
 
-  const handleAdopt = () => {
+  const imgSource =
+    typeof pet.image === "string" && pet.image
+      ? { uri: pet.image }
+      : pet.image || null;
+
+const handleAdopt = () => {                      
+    adoptPet?.(pet.id);
     Alert.alert('Adopted 🐾', `${pet.name} u adoptua me sukses!`);
-    if (onBack) onBack();
   };
 
   return (
@@ -44,11 +55,7 @@ export default function PetDetails({ pet, onBack }) {
         <Text style={styles.aboutText}>{pet.desc}</Text>
 
         <View style={styles.buttonsContainer}>
-          <PrimaryButton
-            label="Back"
-            onPress={onBack}
-            style={{ backgroundColor: '#ccc' }}
-          />
+      
           <PrimaryButton
             label="Adopt"
             onPress={handleAdopt}

@@ -9,16 +9,26 @@ export function usePets() {
 
 export function PetsProvider({ children }) {
   const initialPets = Array.isArray(demoPets) ? demoPets : []; 
-const [pets, setPets] = useState(initialPets);
+const [pets, setPets] = useState(initialPets.map(
+  p=>({
+    available: true,
+    ...p,
+    id: String(p.id ?? Date.now() + Math.random()),
+  })
+));
 
 
   function addPet(pet) {
-    const newPet = { ...pet, id: Date.now().toString() };
+    const newPet = { 
+     available :true,
+    ...pet,
+  id : String(pet.id ??Date.now()),
+ };
     setPets(prev => [...prev, newPet]);
   }
 
   function getPetById(id) {
-    return pets.find(p => p.id === id);
+    return pets.find(p => String(p.id) === String(id));
   }
 
   return (

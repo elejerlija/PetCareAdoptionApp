@@ -11,14 +11,14 @@ const FEATURED_PETS = [
     name: "Max",
     type: "Dog",
     age: 3,
-    image: require("../assets/images/dog1.jpg"),
+    image: require("../../assets/images/dog1.jpg"),
   },
   {
     id: "luna",
     name: "Luna",
     type: "Cat",
     age: 2,
-    image: require("../assets/images/cat2.jpg"),
+    image: require("../../assets/images/cat2.jpg"),
   },
 ];
 
@@ -36,7 +36,7 @@ export default function HomeScreen() {
         </View>
 
         <Image
-          source={require("../assets/images/pets.jpg")}
+          source={require("../../assets/images/pets.jpg")}
           style={styles.heroImg}
           resizeMode="cover"
         />

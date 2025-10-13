@@ -2,7 +2,10 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 
 export default function PetCard({ pet, onPress }) {
-
+  const imgSource =
+    typeof pet.image === "string" && pet.image
+      ? { uri: pet.image }
+      : pet.image || null;
   return (
 
     <TouchableOpacity
@@ -18,21 +21,6 @@ export default function PetCard({ pet, onPress }) {
             {pet.age} yr{pet.age === 1 ? '' : 's'} · {pet.city}
           </Text>
 
-          <View
-            style={[
-              styles.badge,
-              { backgroundColor: pet.available ? '#DCFCE7' : '#FEE2E2' },
-            ]}
-          >
-            <Text
-              style={[
-                styles.badgeText,
-                { color: pet.available ? '#62b681ff' : '#da3333ff' },
-              ]}
-            >
-              {pet.available ? 'Available' : 'Not available'}
-            </Text>
-          </View>
         </View>
       </View>
 
