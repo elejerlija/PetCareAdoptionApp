@@ -1,20 +1,20 @@
-import { View, Text, StyleSheet, Image, FlatList, ScrollView, Linking } from "react-native";
+import { View, Text, StyleSheet, Image, FlatList, ScrollView, Linking, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
+import { Link } from "expo-router";
 
 const THEME = "#83BAC9";
 const LIGHT = "#FFFFF0";
 
 const FEATURED_PETS = [
   {
-    id: "max",
+    id: 1,
     name: "Max",
     type: "Dog",
     age: 3,
     image: require("../../assets/images/dog1.jpg"),
   },
   {
-    id: "luna",
+    id: 2,
     name: "Luna",
     type: "Cat",
     age: 2,
@@ -23,11 +23,12 @@ const FEATURED_PETS = [
 ];
 
 export default function HomeScreen() {
-  
+
   const featured = FEATURED_PETS;
 
   return (
     <SafeAreaView style={styles.safe}>
+      
       <ScrollView contentContainerStyle={styles.scroll}>
 
         <View style={styles.header}>
@@ -49,6 +50,7 @@ export default function HomeScreen() {
         </View>
 
         <Text style={styles.sectionTitle}>Featured</Text>
+
         <FlatList
           data={featured}
           horizontal
@@ -56,17 +58,22 @@ export default function HomeScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ paddingHorizontal: 8 }}
           ItemSeparatorComponent={() => <View style={{ width: 12 }} />}
-          renderItem={({ item }) => (
-            <View style={styles.card}>
-              <Image source={item.image} style={styles.cardImg} />
-              <Text style={styles.cardName}>{item.name}</Text>
-              <Text style={styles.cardMeta}>
-                {item.type} • {item.age} yrs
-              </Text>
-
-            </View>
-          )}
           style={{ marginBottom: 24 }}
+          renderItem={({ item }) => (
+            <Link
+              href={{ pathname: "/pets/[id]", params: { id: String(item.id) } }}
+              asChild
+            >
+              <Pressable style={styles.card}>
+                <Image source={item.image} style={styles.cardImg} />
+                <Text style={styles.cardName}>{item.name}</Text>
+                <Text style={styles.cardMeta}>
+                  {item.type} • {item.age} yrs
+                </Text>
+              </Pressable>
+            </Link>
+          )}
+
         />
 
         <View style={styles.footer}>
@@ -139,12 +146,12 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#eef2f3",
     alignItems: "center",
-    backgroundColor: LIGHT, 
+    backgroundColor: LIGHT,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
   },
   footerText: { color: "#444", fontSize: 13, marginBottom: 4 },
   footerEmail: { color: THEME, fontWeight: "700", fontSize: 14 },
   footerCopyright: { color: "#888", fontSize: 12, marginTop: 6 },
-
+  
 });
