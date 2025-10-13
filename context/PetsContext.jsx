@@ -1,5 +1,5 @@
 import { createContext, useState, useContext } from 'react';
-import { pets as demoPets } from '../../assets/data/pets';
+import { pets as demoPets } from '../assets/data/pets';
 
 const PetsContext = createContext();
 
