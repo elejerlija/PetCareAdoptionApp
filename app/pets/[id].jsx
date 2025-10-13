@@ -25,10 +25,17 @@ export default function PetDetailsRoute() {
       ? { uri: pet.image }
       : pet.image || null;
 
-const handleAdopt = () => {                      
-    adoptPet?.(pet.id);
-    Alert.alert('Adopted 🐾', `${pet.name} u adoptua me sukses!`);
-  };
+const handleAdopt = () => {
+  Alert.alert(
+    "Adopted 🐾",
+    `${pet.name} was successfully adopted!`,
+    [
+      { text: "OK", onPress: () => adoptPet?.(pet.id) }
+    ],
+    { cancelable: true }
+  );
+};
+
 
   return (
     <SafeAreaView style={styles.screen}>
