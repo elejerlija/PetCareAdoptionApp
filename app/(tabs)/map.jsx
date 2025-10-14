@@ -1,10 +1,12 @@
 import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { usePets } from "../../context/PetsContext";
+import { useRouter } from "expo-router";
 
 export default function MapScreen() {
   const { stores, getPetsForStore } = usePets();
+  const router = useRouter();
 
   return (
     <View style={styles.container}>
@@ -22,11 +24,15 @@ export default function MapScreen() {
 
           return (
             <Marker key={store.id} coordinate={store.coordinate}>
-              <View style={styles.markerWrapper}>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => router.push(`/storePets/${store.id}`)}
+                style={styles.markerWrapper}
+              >
                 <View
                   style={[
                     styles.imagesRow,
-                    { width: 40 + (petsInStore.length - 1) * 15 }, // dynamic width
+                    { width: 40 + (petsInStore.length - 1) * 15 },
                   ]}
                 >
                   {petsInStore.map((pet, index) => (
@@ -41,7 +47,7 @@ export default function MapScreen() {
                 <View style={styles.storeLabel}>
                   <Text style={styles.storeLabelText}>{store.city}</Text>
                 </View>
-              </View>
+              </TouchableOpacity>
             </Marker>
           );
         })}
@@ -51,9 +57,16 @@ export default function MapScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: "transparent" },
 
-  map: { flex: 1 },
+  map: {
+    flex: 1,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
 
   markerWrapper: {
     alignItems: "center",
