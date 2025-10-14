@@ -64,8 +64,6 @@ export default function PetDetailsRoute() {
           />
         </View>
 
-        {/* 🔎 Debug i shpejtë: hiqe më vonë */}
-        {/* <Text style={{marginTop:16, color:'gray'}}><Text>DEBUG available: {String(pet.available)}</Text></Text> */}
       </ScrollView>
     </SafeAreaView>
   );
