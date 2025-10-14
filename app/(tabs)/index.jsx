@@ -173,9 +173,10 @@ const styles = StyleSheet.create({
    authButtons: {
     flexDirection: "row",
     justifyContent: "center",
-    
+    gap: 12, 
     marginTop: 16,
     marginBottom: 40,
+
   },
   authBtn: {
     borderWidth: 1,
