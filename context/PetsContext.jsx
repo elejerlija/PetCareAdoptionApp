@@ -30,7 +30,6 @@ export function PetsProvider({ children }) {
     return pets.find(p => String(p.id) === String(id));
   }
 
-  // 🔴 SHTO KËTË
   function adoptPet(id) {
     setPets(prev =>
       prev.map(p =>
@@ -41,7 +40,7 @@ export function PetsProvider({ children }) {
 
   return (
     <PetsContext.Provider
-      value={{ pets, setPets, addPet, getPetById, adoptPet }} // 🔴 sigurohu që adoptPet është këtu
+      value={{ pets, setPets, addPet, getPetById, adoptPet }} 
     >
       {children}
     </PetsContext.Provider>
