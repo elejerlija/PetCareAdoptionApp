@@ -9,7 +9,10 @@ const ICON_INACTIVE = "#f4deb4ff";
 
 export default function RootLayout() {
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#83BAC9" }}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: "#83BAC9" }}
+      edges={["bottom"]}
+    >
       <StatusBar barStyle="dark-content" />
       <View style={{ flex: 1, backgroundColor: "#fff" }}>
         <Tabs
