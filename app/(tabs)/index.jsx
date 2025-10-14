@@ -184,6 +184,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 8,
     paddingHorizontal: 20,
+    backgroundColor: LIGHT
   },
   authBtnText: {
     color: THEME,
