@@ -1,8 +1,11 @@
 import React from "react";
-import { View, StyleSheet, Image, Text } from "react-native";
+import { View, Text, Image, StyleSheet } from "react-native";
 import MapView, { Marker } from "react-native-maps";
+import { usePets } from "../../context/PetsContext";
 
 export default function MapScreen() {
+  const { stores, getPetsForStore } = usePets();
+
   return (
     <View style={styles.container}>
       <MapView
@@ -10,53 +13,38 @@ export default function MapScreen() {
         initialRegion={{
           latitude: 42.6629,
           longitude: 21.1655,
-          latitudeDelta: 0.8, 
+          latitudeDelta: 0.8,
           longitudeDelta: 0.8,
         }}
       >
-        <Marker
-          coordinate={{ latitude: 42.66113710667629, longitude: 21.164697424961172 }}
-          title="Pet Store Prishtina"
-          description="Pet supplies and adoption center"
-        />
-        <Marker
-          coordinate={{ latitude: 42.4689406630234, longitude: 21.475182515134378 }}
-          title="Pet Store Gjilan"
-          description="Pet supplies and adoption center"
-        />
-        <Marker coordinate={{ latitude: 42.3122, longitude: 21.3964 }}>
-          <View style={{ alignItems: 'center' }}>
-            <View style={{ flexDirection: 'row', marginBottom: -10 }}>
-              <Image
-                source={require('../../assets/images/dog1.jpg')}
-                style={{ width: 30, height: 30, borderRadius: 15, borderWidth: 1, borderColor: 'white' }}
-              />
-              <Image
-                source={require('../../assets/images/cat1.jpg')}
-                style={{ width: 30, height: 30, borderRadius: 15, borderWidth: 1, borderColor: 'white', marginLeft: -10 }}
-              />
-              <Image
-                source={require('../../assets/images/dog2.jpg')}
-                style={{ width: 30, height: 30, borderRadius: 15, borderWidth: 1, borderColor: 'white', marginLeft: -10 }}
-              />
-            </View>
-            <View style={{
-              backgroundColor: '#83BAC9',
-              padding: 5,
-              borderRadius: 20,
-              borderWidth: 2,
-              borderColor: '#fffff0',
-            }}>
-              <Text style={{ color: 'white', fontWeight: 'bold' }}>Kaçanik</Text>
-            </View>
-          </View>
-        </Marker>
+        {stores.map((store) => {
+          const petsInStore = getPetsForStore(store.id);
 
-        <Marker
-          coordinate={{ latitude: 42.4122, longitude: 20.9512 }}
-          title="Pet Store Malishevë"
-          description="Pet supplies and adoption center"
-        />
+          return (
+            <Marker key={store.id} coordinate={store.coordinate}>
+              <View style={styles.markerWrapper}>
+                <View
+                  style={[
+                    styles.imagesRow,
+                    { width: 40 + (petsInStore.length - 1) * 15 }, // dynamic width
+                  ]}
+                >
+                  {petsInStore.map((pet, index) => (
+                    <Image
+                      key={pet.id}
+                      source={pet.image}
+                      style={[styles.petImage, { left: index * 15 }]}
+                    />
+                  ))}
+                </View>
+
+                <View style={styles.storeLabel}>
+                  <Text style={styles.storeLabelText}>{store.city}</Text>
+                </View>
+              </View>
+            </Marker>
+          );
+        })}
       </MapView>
     </View>
   );
@@ -64,5 +52,38 @@ export default function MapScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+
   map: { flex: 1 },
+
+  markerWrapper: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  imagesRow: {
+    flexDirection: "row",
+    position: "relative",
+    width: 70,
+    height: 40,
+  },
+  petImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 35,
+    borderWidth: 1,
+    borderColor: "white",
+    position: "absolute",
+  },
+  storeLabel: {
+    backgroundColor: "#83BAC9",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: "#fffff0",
+  },
+  storeLabelText: {
+    color: "white",
+    fontWeight: "bold",
+  },
 });
