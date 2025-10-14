@@ -10,7 +10,7 @@ export default function PetDetailsRoute() {
   const rawId = Array.isArray(params.id) ? params.id[0] : params.id; // ✅ normalizo id
   const id = rawId; // ose Number(rawId) nëse ids janë numra në data
 
-  const { getPetById, adoptPet } = usePets();
+  const { getPetById, adoptPet, getCityOfPet } = usePets();
   const pet = getPetById?.(id);
 
   if (!pet) {
@@ -51,7 +51,7 @@ export default function PetDetailsRoute() {
         </Text>
 
         <Text style={styles.details}>Age: {pet.age} yr</Text>
-        <Text style={styles.details}>{pet.city}</Text>
+        <Text style={styles.details}>City: {getCityOfPet(pet.id)}</Text>
 
         <Text style={styles.aboutTitle}>About</Text>
         <Text style={styles.aboutText}>{pet.desc}</Text>

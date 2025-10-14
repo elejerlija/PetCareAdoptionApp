@@ -1,5 +1,6 @@
 import { createContext, useState, useContext } from 'react';
 import { pets as demoPets } from '../assets/data/pets';
+import { stores } from '../assets/data/stores';
 
 const PetsContext = createContext();
 
@@ -17,6 +18,14 @@ export function PetsProvider({ children }) {
     }))
   );
 
+  function getCityOfPet(petId) {
+    const pet = getPetById(petId);          // find the pet by id
+    if (!pet) return null;                  // return null if pet not found
+
+    const store = stores.find(s => s.id === pet.storeId); // find the store for this pet
+    return store?.city;             // return city or null if store not found
+  }
+
   function addPet(pet) {
     const newPet = {
       available: true,
@@ -29,7 +38,9 @@ export function PetsProvider({ children }) {
   function getPetById(id) {
     return pets.find(p => String(p.id) === String(id));
   }
-
+  const getPetsForStore = (storeId) => {
+    return pets.filter(p => p.storeId === storeId);
+  };
   function adoptPet(id) {
     setPets(prev =>
       prev.map(p =>
@@ -40,7 +51,7 @@ export function PetsProvider({ children }) {
 
   return (
     <PetsContext.Provider
-      value={{ pets, setPets, addPet, getPetById, adoptPet }} 
+      value={{ pets, setPets, addPet, getPetById, adoptPet, getCityOfPet, getPetsForStore, stores }} 
     >
       {children}
     </PetsContext.Provider>

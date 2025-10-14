@@ -1,9 +1,9 @@
 export const pets = [
   {
     id: '1',
+    storeId: 's1',
     name: 'Max',
     type: 'dog',
-    city: 'Prishtina',
     age: 3,
     price: 80,
     desc: 'Energetic and friendly',
@@ -12,9 +12,9 @@ export const pets = [
   },
   {
     id: '2',
+    storeId: 's4',
     name: 'Luna',
     type: 'cat',
-    city: 'Malisheve',
     age: 2,
     price: 70,
     desc: 'Calm and loving',
@@ -23,9 +23,9 @@ export const pets = [
   },
   {
     id: '3',
+    storeId: 's2',
     name: 'Rocky',
     type: 'dog',
-    city: 'Gjilan',
     age: 5,
     price: 60,
     desc: 'Protective and lovely',
@@ -34,9 +34,9 @@ export const pets = [
   },
   {
     id: '4',
+    storeId: 's3',
     name: 'Mia',
     type: 'cat',
-    city: 'Kaçanik',
     age: 1,
     price: 90,
     desc: 'Loyal and protective',
@@ -45,9 +45,9 @@ export const pets = [
   },
   {
     id: '5',
+    storeId: 's1',
     name: 'Nina',
     type: 'cat',
-    city: 'Prishtina',
     age: 4,
     price: 50,
     desc: 'Intelligent and loving',
@@ -56,9 +56,9 @@ export const pets = [
   },
   {
     id: '6',
+    storeId: 's5',
     name: 'Simba',
     type: 'cat',
-    city: 'Drenas',
     age: 2,
     price: 75,
     desc: 'Sovereign and elegant',
