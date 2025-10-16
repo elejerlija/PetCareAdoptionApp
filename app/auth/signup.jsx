@@ -10,10 +10,7 @@ export default function SignUpScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-        <Image
-         // source={require("../../assets/images/pets_banner.png")}
-          style={styles.image}
-        />
+       
 
         <Text style={styles.title}>Create Account 🐾</Text>
         <Text style={styles.subtitle}>
@@ -26,9 +23,9 @@ export default function SignUpScreen() {
         <TextInput placeholder="Confirm Password" style={styles.input} placeholderTextColor="#777" secureTextEntry />
 
         <PrimaryButton
-          title="Sign Up"
+          label="Sign Up"
           onPress={() => {
-            // për tani, vetëm navigim vizual
+            
             router.replace("/");
           }}
         />

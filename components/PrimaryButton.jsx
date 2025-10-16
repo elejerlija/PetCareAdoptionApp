@@ -16,8 +16,8 @@ export default function PrimaryButton({
       style={({ pressed }) => [
         {
           backgroundColor: isBlocked
-            ? "#9CA3AF" // gri kur është i çaktivizuar
-            : "#2563EB", // blu kur është aktiv
+            ? "#9CA3AF" 
+            : "#2563EB", 
           paddingVertical: 14,
           paddingHorizontal: 20,
           borderRadius: 12,

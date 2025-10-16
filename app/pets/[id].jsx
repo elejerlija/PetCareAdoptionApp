@@ -7,8 +7,8 @@ import { usePets } from "../../context/PetsContext";
 
 export default function PetDetailsRoute() {
   const params = useLocalSearchParams();
-  const rawId = Array.isArray(params.id) ? params.id[0] : params.id; // ✅ normalizo id
-  const id = rawId; // ose Number(rawId) nëse ids janë numra në data
+  const rawId = Array.isArray(params.id) ? params.id[0] : params.id; 
+  const id = rawId; 
 
   const { getPetById, adoptPet } = usePets();
   const pet = getPetById?.(id);
@@ -29,7 +29,7 @@ export default function PetDetailsRoute() {
   const handleAdopt = () => {
     if (Platform.OS === 'web') {
       window.alert(`${pet.name} was successfully adopted!`);
-      adoptPet?.(pet.id); // ✅ ndrysho state
+      adoptPet?.(pet.id);
       return;
     }
     Alert.alert(
@@ -43,7 +43,7 @@ export default function PetDetailsRoute() {
   return (
     <SafeAreaView style={styles.screen}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
-        <Image source={imgSource} style={styles.image} /> {/* ✅ përdor imgSource */}
+        <Image source={imgSource} style={styles.image} /> 
         <Text style={styles.name}>{pet.name}</Text>
 
         <Text style={[styles.status, { color: pet.available ? 'green' : 'red' }]}>
@@ -60,7 +60,7 @@ export default function PetDetailsRoute() {
           <PrimaryButton
             label={pet.available ? "Adopt" : "Not available"}
             onPress={handleAdopt}
-            disabled={!pet.available} // ✅ çaktivizo kur është adoptuar
+            disabled={!pet.available} 
           />
         </View>
 

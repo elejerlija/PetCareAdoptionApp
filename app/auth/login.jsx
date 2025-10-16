@@ -16,8 +16,8 @@ export default function LoginScreen() {
       <TextInput placeholder="Password" secureTextEntry style={styles.input} />
 
       <PrimaryButton
-      title="Login"
-      onPress={() => router.replace("/")}   // ⬅️ kalon në HomeScreen (index.jsx)
+      label="Login"
+      onPress={() => router.replace("/")}   
     />
     <TouchableOpacity onPress={() => router.push("/auth/signup")} >
       <Text style={styles.switchText}>
