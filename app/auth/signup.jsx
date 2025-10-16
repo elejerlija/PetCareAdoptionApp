@@ -11,7 +11,6 @@ export default function SignUpScreen() {
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         <Image
-         // source={require("../../assets/images/pets_banner.png")}
           style={styles.image}
         />
 
@@ -28,7 +27,6 @@ export default function SignUpScreen() {
         <PrimaryButton
           title="Sign Up"
           onPress={() => {
-            // për tani, vetëm navigim vizual
             router.replace("/");
           }}
         />
