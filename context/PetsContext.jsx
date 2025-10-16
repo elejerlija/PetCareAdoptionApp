@@ -19,11 +19,11 @@ export function PetsProvider({ children }) {
   );
 
   function getCityOfPet(petId) {
-    const pet = getPetById(petId);          // find the pet by id
-    if (!pet) return null;                  // return null if pet not found
+    const pet = getPetById(petId);         
+    if (!pet) return null;                 
 
-    const store = stores.find(s => s.id === pet.storeId); // find the store for this pet
-    return store?.city;             // return city or null if store not found
+    const store = stores.find(s => s.id === pet.storeId); 
+    return store?.city;             
   }
 
   function addPet(pet) {
