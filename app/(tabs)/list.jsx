@@ -6,6 +6,7 @@ import PetCard from '../../components/PetCard';
 import PrimaryButton from '../../components/PrimaryButton';
 
 
+
 export default function PetList() {
 const router = useRouter();
   const { pets } = usePets();
@@ -14,6 +15,7 @@ const router = useRouter();
   
 
   return (
+   
     <View style={styles.container}>
       <Text style={styles.title}>Pet List</Text>
 
@@ -50,6 +52,7 @@ const router = useRouter();
         ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
       />
     </View>
+    
   );
 }
 
@@ -69,6 +72,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   title: {
+    marginTop:30,
     fontSize: 26,
     fontWeight: 'bold',
     textAlign: 'center',
