@@ -1,7 +1,10 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { usePets } from '../context/PetsContext';
 
 export default function PetCard({ pet, onPress }) {
+  const { getCityOfPet } = usePets();
+  const city = getCityOfPet?.(pet.id);
   const imgSource =
     typeof pet.image === "string" && pet.image
       ? { uri: pet.image }
@@ -18,7 +21,7 @@ export default function PetCard({ pet, onPress }) {
 
         <View style={styles.metaRow}>
           <Text style={styles.details}>
-            {pet.age} yr{pet.age === 1 ? '' : 's'} · {pet.city}
+            {pet.age} yr{pet.age === 1 ? '' : 's'} · {city}
           </Text>
 
         </View>

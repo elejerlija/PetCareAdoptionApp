@@ -9,69 +9,69 @@ const ICON_INACTIVE = "#f4deb4ff";
 
 export default function RootLayout() {
   return (
-    
-      <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-        <StatusBar barStyle="dark-content" />
-        <View style={{ flex: 1, backgroundColor: "#fff" }}>
-          <Tabs
-            screenOptions={{
-              headerShown: false, 
-              tabBarActiveTintColor: ICON_ACTIVE,
-              tabBarInactiveTintColor: ICON_INACTIVE,
-              tabBarStyle: {
-                backgroundColor: THEME_COLOR,
-                height: 62,
-                paddingBottom: 8,
-                borderTopLeftRadius: 20,
-                borderTopRightRadius: 20,
-                position: "absolute",
-                overflow: "hidden",
-              },
-              tabBarLabelStyle: { fontSize: 12, fontWeight: "600" },
-              sceneContainerStyle: { backgroundColor: "#fff" },
-              tabBarHideOnKeyboard: true,
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: "#83BAC9" }}
+      edges={["bottom"]}
+    >
+      <StatusBar barStyle="dark-content" />
+      <View style={{ flex: 1, backgroundColor: "#fff" }}>
+        <Tabs
+          screenOptions={{
+            headerShown: false,
+            tabBarActiveTintColor: ICON_ACTIVE,
+            tabBarInactiveTintColor: ICON_INACTIVE,
+            tabBarStyle: {
+              backgroundColor: THEME_COLOR,
+              height: 62,
+              paddingBottom: 8,
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+              position: "absolute",
+              overflow: "hidden",
+            },
+            tabBarLabelStyle: { fontSize: 12, fontWeight: "600" },
+            sceneContainerStyle: { backgroundColor: "#fff" },
+            tabBarHideOnKeyboard: true,
+          }}
+        >
+          <Tabs.Screen
+            name="index"
+            options={{
+              title: "Home",
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons name="home" size={size} color={color} />
+              ),
             }}
-          >
-            <Tabs.Screen
-              name="index"
-              options={{
-                title: "Home",
-                tabBarIcon: ({ color, size }) => (
-                  <Ionicons name="home" size={size} color={color} />
-                ),
-              }}
-            />
-            <Tabs.Screen
-              name="list"
-              options={{
-                title: "List",
-                tabBarIcon: ({ color, size }) => (
-                  <Ionicons name="paw" size={size} color={color} />
-                ),
-              }}
-            />
-            <Tabs.Screen
-              name="profile"
-              options={{
-                title: "Profile",
-                tabBarIcon: ({ color, size }) => (
-                  <Ionicons name="person" size={size} color={color} />
-                ),
-              }}
-            />
-            <Tabs.Screen
-              name="map"
-              options={{
-                title: "Map",
-                tabBarIcon: ({ color, size }) => (
-                  <Ionicons name="map" size={size} color={color} />
-                ),
-              }}
-            />
-
-          </Tabs>
-        </View>
-      </SafeAreaView>
-    
+          />
+          <Tabs.Screen
+            name="list"
+            options={{
+              title: "List",
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons name="paw" size={size} color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="profile"
+            options={{
+              title: "Profile",
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons name="person" size={size} color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="map"
+            options={{
+              title: "Map",
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons name="map" size={size} color={color} />
+              ),
+            }}
+          />
+        </Tabs>
+      </View>
+    </SafeAreaView>
   );
 }

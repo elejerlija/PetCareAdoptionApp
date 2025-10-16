@@ -10,7 +10,13 @@ export default function SignUpScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+
        
+
+        <Image
+          style={styles.image}
+        />
+
 
         <Text style={styles.title}>Create Account 🐾</Text>
         <Text style={styles.subtitle}>
@@ -25,7 +31,6 @@ export default function SignUpScreen() {
         <PrimaryButton
           label="Sign Up"
           onPress={() => {
-            
             router.replace("/");
           }}
         />

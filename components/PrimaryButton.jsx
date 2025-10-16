@@ -2,7 +2,7 @@ import React from "react";
 import { Text, Pressable, ActivityIndicator, Platform } from "react-native";
 
 export default function PrimaryButton({
-  label,
+  title,
   onPress,
   style,
   disabled = false,
@@ -40,7 +40,7 @@ export default function PrimaryButton({
             letterSpacing: 0.3,
           }}
         >
-          {label}
+          {title}
         </Text>
       )}
     </Pressable>

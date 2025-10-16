@@ -30,7 +30,7 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.safe}>
       
       <ScrollView contentContainerStyle={styles.scroll}>
-
+    
         <View style={styles.header}>
           <Text style={styles.appTitle}>PetCare Adoption</Text>
           <Text style={styles.subtitle}>Welcome to the world of four-pawed friends.🐾</Text>
@@ -47,6 +47,20 @@ export default function HomeScreen() {
           <Text style={styles.bannerSub}>
             Discounts on vaccinations for new adoptions. Visit your nearest center!
           </Text>
+        </View>
+
+      <View style={styles.authButtons}>
+          <Link href="/auth/login" asChild>
+            <Pressable style={styles.authBtn}>
+              <Text style={styles.authBtnText}>Login</Text>
+            </Pressable>
+          </Link>
+
+          <Link href="/auth/signup" asChild>
+            <Pressable style={styles.authBtn}>
+              <Text style={styles.authBtnText}>Sign Up</Text>
+            </Pressable>
+          </Link>
         </View>
 
         <Text style={styles.sectionTitle}>Featured</Text>
@@ -86,22 +100,6 @@ export default function HomeScreen() {
           </Text>
           <Text style={styles.footerCopyright}>© 2025 PetCare Adoption</Text>
         </View>
-
-
-        <View style={styles.authButtons}>
-          <Link href="/auth/login" asChild>
-            <Pressable style={styles.authBtn}>
-              <Text style={styles.authBtnText}>Login</Text>
-            </Pressable>
-          </Link>
-
-          <Link href="/auth/signup" asChild>
-            <Pressable style={styles.authBtn}>
-              <Text style={styles.authBtnText}>Sign Up</Text>
-            </Pressable>
-          </Link>
-        </View>
-
 
       </ScrollView>
     </SafeAreaView>
@@ -175,9 +173,10 @@ const styles = StyleSheet.create({
    authButtons: {
     flexDirection: "row",
     justifyContent: "center",
-    //gap: 12,
+    gap: 12, 
     marginTop: 16,
     marginBottom: 40,
+
   },
   authBtn: {
     borderWidth: 1,
@@ -185,6 +184,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 8,
     paddingHorizontal: 20,
+    backgroundColor: LIGHT
   },
   authBtnText: {
     color: THEME,
