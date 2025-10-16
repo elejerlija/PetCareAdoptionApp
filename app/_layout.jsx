@@ -15,7 +15,13 @@ export default function RootLayout() {
             <Stack.Screen name="+not-found" options={{ headerShown: false }} />
             <Stack.Screen name="auth/login" options={{ title: "Login" }} />
             <Stack.Screen name="auth/signup" options={{ title: "Sign Up" }} />
-            <Stack.Screen name="pets/[id]" options={{ title: "Pet Details" }} />
+            <Stack.Screen
+              name="pets/[id]"
+              options={{
+                title: "Pet Details",
+                headerBackButtonDisplayMode: "minimal",
+              }}
+            />
             <Stack.Screen name="AddPet" options={{ title: "Add Pet" }} />
           </Stack>
         </View>

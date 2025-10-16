@@ -15,9 +15,7 @@ export default function PrimaryButton({
       onPress={!isBlocked ? onPress : undefined}
       style={({ pressed }) => [
         {
-          backgroundColor: isBlocked
-            ? "#9CA3AF" 
-            : "#2563EB", 
+          backgroundColor: isBlocked ? "#9CA3AF" : "#83BAC9",
           paddingVertical: 14,
           paddingHorizontal: 20,
           borderRadius: 12,
