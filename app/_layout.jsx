@@ -7,10 +7,7 @@ import { PetsProvider } from "../context/PetsContext";
 export default function RootLayout() {
   return (
     <PetsProvider>
-      <SafeAreaView
-        style={{ flex: 1, backgroundColor: "#d73b3bff" }}
-        edges={[]}
-      >
+      <SafeAreaView style={{ flex: 1 }} edges={[]}>
         <StatusBar barStyle="dark-content" />
         <View style={{ flex: 1 }}>
           <Stack>
