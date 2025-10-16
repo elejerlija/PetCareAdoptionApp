@@ -58,7 +58,7 @@ export default function PetDetailsRoute() {
 
         <View style={styles.buttonsContainer}>
           <PrimaryButton
-            label={pet.available ? "Adopt" : "Not available"}
+            title={pet.available ? "Adopt" : "Not available"}
             onPress={handleAdopt}
             disabled={!pet.available} 
           />

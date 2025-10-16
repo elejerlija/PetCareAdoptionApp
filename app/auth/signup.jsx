@@ -11,12 +11,6 @@ export default function SignUpScreen() {
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
 
-       
-
-        <Image
-          style={styles.image}
-        />
-
 
         <Text style={styles.title}>Create Account 🐾</Text>
         <Text style={styles.subtitle}>
@@ -29,7 +23,7 @@ export default function SignUpScreen() {
         <TextInput placeholder="Confirm Password" style={styles.input} placeholderTextColor="#777" secureTextEntry />
 
         <PrimaryButton
-          label="Sign Up"
+          title="Sign Up"
           onPress={() => {
             router.replace("/");
           }}
@@ -55,12 +49,6 @@ const styles = StyleSheet.create({
     padding: 24,
     alignItems: "center",
     justifyContent: "center",
-  },
-  image: {
-    width: 230,
-    height: 130,
-    resizeMode: "contain",
-    marginBottom: 10,
   },
   title: {
     fontSize: 24,

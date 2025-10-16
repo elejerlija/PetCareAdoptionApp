@@ -16,7 +16,7 @@ export default function LoginScreen() {
       <TextInput placeholder="Password" secureTextEntry style={styles.input} />
 
       <PrimaryButton
-      label="Login"
+      title="Login"
       onPress={() => router.replace("/")}   
     />
     <TouchableOpacity onPress={() => router.push("/auth/signup")} >

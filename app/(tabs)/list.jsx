@@ -20,7 +20,7 @@ const router = useRouter();
       <Text style={styles.title}>Pet List</Text>
 
       <PrimaryButton
-        label="+ Add Pet"
+        title="+ Add Pet"
         onPress={() => router.push('/AddPet')}
         style={{
           marginHorizontal: 110,
