@@ -1,7 +1,7 @@
 ## Statusi i projektit
 Faza I – Prototipi minimal (UI + navigim + listë bazë).
 
-## Anëtarët e grupit
+## Anëtaret e grupit
 
 - Elë Jerlija
 - Elona Kuqi
