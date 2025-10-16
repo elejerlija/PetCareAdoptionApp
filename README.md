@@ -17,8 +17,11 @@ Aplikacion mobil për kërkim dhe adoptim të kafshëve shtëpiake. Përdoruesit
 ## Ekranet (Faza I)
 - Home – Përshkrim i shkurtër rreth aplikacionit.
 - List – Shfaqen kafshë statike (emri, mosha, qyteti, statusi) dhe butoni “+ Add Pet” për shtimin e kafshëve (funksionalitet demonstrues).
-  - Çdo kafshë paraqitet si Card; duke hapur card-in shfaqen detaje shtesë dhe butoni “Adopt”.
+- Çdo kafshë paraqitet si Card; duke hapur card-in shfaqen detaje shtesë dhe butoni “Adopt”.
 - Me klikimin e butonit "Adopt" statusi i kafshës ndryshon nga Available në Not Available.
 - Profile – Shfaq të dhënat e përdoruesit dhe formën për përditësimin e tyre (bazike).
 - Map – Hartë me lokacionet e strehimoreve.
 - Login/Signup - Vetëm screens të cilave më vonë do ti jipet funksionalitet.
+
+## Navigimi
+Përdoret expo-router (file-based routing). Ekranet vendosen në `app/`, dhe rrugët krijohen sipas emrave të skedarëve.
