@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
   card: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: ACCENT + '22',
     borderRadius: 18,
     padding: 16,
     marginBottom: 16,

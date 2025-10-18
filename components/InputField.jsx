@@ -3,8 +3,8 @@ import {View, Text, TextInput, StyleSheet} from 'react-native';
 
 export default function InputField({label, placeholder, value, onChangeText}){
     return (
-        <View style = {StyleSheet.container}>
-            {label ? <Text style = {StyleSheet.label}>{label}</Text> : null}
+        <View style = {styles.container}>
+            {label ? <Text style = {styles.label}>{label}</Text> : null}
             <TextInput 
             style = {StyleSheet.input}
             placeholder={placeholder}
