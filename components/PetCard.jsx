@@ -5,12 +5,8 @@ import { usePets } from '../context/PetsContext';
 export default function PetCard({ pet, onPress }) {
   const { getCityOfPet } = usePets();
   const city = getCityOfPet?.(pet.id);
-  const imgSource =
-    typeof pet.image === "string" && pet.image
-      ? { uri: pet.image }
-      : pet.image || null;
-  return (
 
+  return (
     <TouchableOpacity
       style={styles.card}
       onPress={() => onPress?.(pet)}
@@ -26,9 +22,7 @@ export default function PetCard({ pet, onPress }) {
 
         </View>
       </View>
-
     </TouchableOpacity>
-
   );
 }
 
@@ -40,7 +34,6 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 12,
     width: '85%',
-    marginBottom: 12,
     elevation: 3,
     shadowColor: "#000",
     shadowOpacity: 0.15,
@@ -84,5 +77,4 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   }
-
 });
