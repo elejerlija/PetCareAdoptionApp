@@ -28,9 +28,9 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      
+
       <ScrollView contentContainerStyle={styles.scroll}>
-    
+
         <View style={styles.header}>
           <Text style={styles.appTitle}>PetCare Adoption</Text>
           <Text style={styles.subtitle}>Welcome to the world of four-pawed friends.🐾</Text>
@@ -49,7 +49,7 @@ export default function HomeScreen() {
           </Text>
         </View>
 
-      <View style={styles.authButtons}>
+        <View style={styles.authButtons}>
           <Link href="/auth/login" asChild>
             <Pressable style={styles.authBtn}>
               <Text style={styles.authBtnText}>Login</Text>
@@ -107,13 +107,28 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "#fff" },
-  scroll: { padding: 16, paddingBottom: 50 },
-
-  header: { marginBottom: 12 },
-  appTitle: { fontSize: 24, fontWeight: "800", color: THEME, textAlign: "center" },
-  subtitle: { textAlign: "center", color: "#667", marginTop: 4, fontSize: 14 },
-
+  safe: {
+    flex: 1,
+    backgroundColor: "#fff" 
+  },
+  scroll: {
+    padding: 16, 
+    paddingBottom: 50 
+  },
+  header: {
+    marginBottom: 12
+   },
+  appTitle: {
+    fontSize: 24,
+    fontWeight: "800",
+    color: THEME, 
+    textAlign: "center" },
+  subtitle: {
+     textAlign: "center",
+     color: "#667", 
+     marginTop: 4, 
+     fontSize: 14 
+    },
   heroImg: {
     width: "100%",
     height: 200,
@@ -127,9 +142,16 @@ const styles = StyleSheet.create({
     padding: 14,
     marginVertical: 12,
   },
-  bannerTitle: { color: LIGHT, fontWeight: "800", fontSize: 16 },
-  bannerSub: { color: LIGHT, opacity: 0.95, marginTop: 4, fontSize: 13 },
-
+  bannerTitle: { 
+    color: LIGHT,
+    fontWeight: "800", 
+    fontSize: 16 },
+  bannerSub: {
+     color: LIGHT, 
+     opacity: 0.95, 
+     marginTop: 4, 
+     fontSize: 13 
+    },
   sectionTitle: {
     fontSize: 18,
     fontWeight: "800",
@@ -147,13 +169,29 @@ const styles = StyleSheet.create({
     padding: 10,
     shadowColor: "#000",
     shadowOpacity: 0.08,
-    shadowOffset: { width: 0, height: 3 },
+    shadowOffset: { 
+                width: 0, 
+                height: 3 
+              },
     shadowRadius: 6,
     elevation: 3,
   },
-  cardImg: { width: "100%", height: 100, borderRadius: 12, backgroundColor: "#eee" },
-  cardName: { fontWeight: "800", marginTop: 8, color: "#222", textAlign: "center" },
-  cardMeta: { color: "#667", marginTop: 2, textAlign: "center" },
+  cardImg: { 
+    width: "100%", 
+    height: 100, 
+    borderRadius: 12, 
+    backgroundColor: "#eee" 
+  },
+  cardName: {
+     fontWeight: "800", 
+     marginTop: 8, 
+     color: "#222", 
+     textAlign: "center" 
+    },
+  cardMeta: {
+     color: "#667", 
+     marginTop: 2, 
+     textAlign: "center" },
 
   footer: {
     marginTop: 20,
@@ -165,15 +203,25 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
   },
-  footerText: { color: "#444", fontSize: 13, marginBottom: 4 },
-  footerEmail: { color: THEME, fontWeight: "700", fontSize: 14 },
-  footerCopyright: { color: "#888", fontSize: 12, marginTop: 6 },
-
-
-   authButtons: {
+  footerText: { 
+    color: "#444", 
+    fontSize: 13, 
+    marginBottom: 4 
+  },
+  footerEmail: { 
+    color: THEME, 
+    fontWeight: "700", 
+    fontSize: 14 
+  },
+  footerCopyright: { 
+    color: "#888", 
+    fontSize: 12, 
+    marginTop: 6 
+  },
+  authButtons: {
     flexDirection: "row",
     justifyContent: "center",
-    gap: 12, 
+    gap: 12,
     marginTop: 16,
     marginBottom: 40,
 
@@ -193,5 +241,5 @@ const styles = StyleSheet.create({
   signupBtn: {
     backgroundColor: THEME,
   }
-  
+
 });
