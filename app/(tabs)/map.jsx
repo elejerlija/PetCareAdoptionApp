@@ -15,9 +15,12 @@ import { usePets } from "../../context/PetsContext";
 import PetCard from "../../components/PetCard";
 import { useRouter } from "expo-router";
 
+const MODAL_ANIMATION_DELAY = 300;
+
 export default function MapScreen() {
   const { stores, getPetsForStore } = usePets();
   const router = useRouter();
+
   const [region, setRegion] = useState({
     latitude: 42.6629,
     longitude: 21.1655,
@@ -36,40 +39,41 @@ export default function MapScreen() {
 
   const handlePetPress = (petId) => {
     setModalVisible(false);
-    setTimeout(() => {
-      router.push(`/pets/${petId}`);
-    }, 300); // wait for modal animation to finish
+    setTimeout(() => router.push(`/pets/${petId}`), MODAL_ANIMATION_DELAY);
   };
+
+  const StoreMarker = ({ store }) => (
+    <Marker key={store.id} coordinate={store.coordinate}>
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={() => handleStorePress(store)}
+        style={styles.markerWrapper}
+      >
+        <View style={styles.pin}>
+          <Image source={store.logo} style={styles.storeLogo} />
+          <View style={styles.pinPoint} />
+        </View>
+        {showText && (
+          <View style={styles.storeLabel}>
+            <Text style={styles.storeLabelText}>{store.name}</Text>
+          </View>
+        )}
+      </TouchableOpacity>
+    </Marker>
+  );
 
   return (
     <View style={styles.container}>
       <MapView
         style={styles.map}
         initialRegion={region}
-        onRegionChangeComplete={(r) => setRegion(r)}
+        onRegionChangeComplete={setRegion}
       >
         {stores.map((store) => (
-          <Marker key={store.id} coordinate={store.coordinate}>
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => handleStorePress(store)}
-              style={styles.markerWrapper}
-            >
-              <View style={styles.pin}>
-                <Image source={store.logo} style={styles.storeLogo} />
-                <View style={styles.pinPoint} />
-              </View>
-              {showText && (
-                <View style={styles.storeLabel}>
-                  <Text style={styles.storeLabelText}>{store.name}</Text>
-                </View>
-              )}
-            </TouchableOpacity>
-          </Marker>
+          <StoreMarker key={store.id} store={store} />
         ))}
       </MapView>
 
-      {/* Modal for pets */}
       <Modal
         visible={modalVisible}
         transparent
@@ -78,7 +82,6 @@ export default function MapScreen() {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            {/* Header with store logo and name */}
             <View style={styles.modalHeader}>
               {selectedStore?.logo && (
                 <Image
@@ -117,6 +120,8 @@ export default function MapScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   map: { flex: 1 },
+
+  // Marker
   markerWrapper: { alignItems: "center", justifyContent: "center" },
   pin: { alignItems: "center", justifyContent: "center" },
   storeLogo: {
@@ -167,7 +172,7 @@ const styles = StyleSheet.create({
   },
   storeLabelText: { color: "white", fontWeight: "bold", textAlign: "center" },
 
-  // Modal styles
+  // Modal
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.5)",
@@ -180,22 +185,10 @@ const styles = StyleSheet.create({
     padding: 20,
     maxHeight: "80%",
   },
-  modalHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  modalStoreLogo: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 10,
-  },
-  cardWrapper: {
-    width: "85%", // same width as PetCard
-    alignItems: "center",
-  },
+  modalHeader: { flexDirection: "row", alignItems: "center", marginBottom: 12 },
+  modalStoreLogo: { width: 40, height: 40, borderRadius: 20, marginRight: 10 },
   modalTitle: { fontSize: 18, fontWeight: "bold" },
+  cardWrapper: { width: "85%", alignItems: "center" },
   closeButton: {
     marginTop: 10,
     backgroundColor: "#83BAC9",
