@@ -6,7 +6,7 @@ export default function InputField({label, placeholder, value, onChangeText}){
         <View style = {styles.container}>
             {label ? <Text style = {styles.label}>{label}</Text> : null}
             <TextInput 
-            style = {StyleSheet.input}
+            style = {styles.input}
             placeholder={placeholder}
             placeholderTextColor="#9aa2ad"
             value = {value}

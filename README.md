@@ -25,3 +25,26 @@ Aplikacion mobil për kërkim dhe adoptim të kafshëve shtëpiake. Përdoruesit
 
 ## Navigimi
 Përdoret expo-router (file-based routing). Ekranet vendosen në `app/`, dhe rrugët krijohen sipas emrave të skedarëve.
+
+
+## Komponentet 
+- InputField.jsx – Komponent i personalizuar për fushat hyrëse në formularë.
+Pranon props si label, placeholder, value dhe onChangeText.
+Siguron që fusha të ketë një hapësirë të rregullt midis elementeve.
+Përdoret në ProfileScreen, AddPet, dhe forma të tjera për mbledhje të të dhënave.
+
+- PrimaryButton.jsx – Buton i cili siguron pamje të njëtrajtshme për butonat në gjithë aplikacionin (p.sh. “Save”, “Add Pet”, “Adopt”).
+Pranon props si title dhe onPress.
+Është i stilizuar me ngjyrën tematike të aplikacionit (#83BAC9).
+Siguron që përdoruesi të ketë feedback vizual kur butoni është aktiv, i shtypur ose i bllokuar.
+
+- PetCard.jsx – Komponent që paraqet informacionin e një kafshe individuale në listë.
+Përdoret në ekranet Home dhe List për të shfaqur kafshët që janë në dispozicion për adoptim.
+Pranon props:
+
+pet – objekti që përmban të dhënat e kafshës (emri, mosha, qyteti, imazhi, statusi).
+
+onPress – funksioni që thirret kur përdoruesi shtyp kartën (zakonisht për të hapur detajet e kafshës).
+Merr qytetin e kafshës përmes context-it (usePets) duke përdorur funksionin getCityOfPet.
+Kontrollon nëse pet.image është uri apo lokal për të vendosur imazhin korrekt.
+Përfshin dizajn të lehtë me hije (shadow / elevation) dhe rrethime të buta (borderRadius: 12).
