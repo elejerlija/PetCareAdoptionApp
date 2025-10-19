@@ -29,8 +29,8 @@ export default function AddPet() {
         let valid=true;
         let newErrors={};
         
-        if(!form.name.trim()|| form.name.length<3){
-            newErrors.name="Name must  contain 4 at least characters !";
+        if(!form.name.trim()|| form.name.length<4){
+            newErrors.name="Name must contain 4 at least characters !";
             valid=false;
         }
         if(!form.age.trim()|| isNaN(form.age)){
