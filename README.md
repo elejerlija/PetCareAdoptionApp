@@ -1,3 +1,9 @@
+# 🐾 PetCare Adoption App
+
+**Grupi:** 8 
+**Projekti:** PetCare Adoption  
+**Lënda:** Programimi për Pajisje Mobile  
+
 ## Statusi i projektit
 Faza I – Prototipi minimal (UI + navigim + listë bazë).
 
