@@ -1,22 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { useRouter } from 'expo-router';
 import { usePets } from '../../context/PetsContext';
 import PetCard from '../../components/PetCard';
 import PrimaryButton from '../../components/PrimaryButton';
-
-
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function PetList() {
-const router = useRouter();
+  const router = useRouter();
   const { pets } = usePets();
   const list = Array.isArray(pets) ? pets : [];
 
-  
-
   return (
-   
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Pet List</Text>
 
       <PrimaryButton
@@ -35,7 +31,7 @@ const router = useRouter();
         }}
       />
 
-     <FlatList
+      <FlatList
         style={styles.scrollArea}
         contentContainerStyle={styles.scrollContent}
         data={list}
@@ -49,21 +45,20 @@ const router = useRouter();
           </Text>
         }
         showsVerticalScrollIndicator={false}
-        ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+        ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
       />
-    </View>
-    
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 30,
+    paddingBottom:14,
     backgroundColor: '#fff',
   },
   scrollArea: {
-    marginTop :20,
+    marginTop: 20,
     flex: 1,
     width: '100%',
   },
@@ -72,7 +67,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   title: {
-    marginTop:30,
+    marginTop: 30,
     fontSize: 26,
     fontWeight: 'bold',
     textAlign: 'center',
