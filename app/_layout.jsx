@@ -13,16 +13,10 @@ export default function RootLayout() {
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="+not-found" options={{ headerShown: false }} />
-            <Stack.Screen name="auth/login" options={{ title: "Login" }} />
-            <Stack.Screen name="auth/signup" options={{ title: "Sign Up" }} />
-            <Stack.Screen
-              name="pets/[id]"
-              options={{
-                title: "Pet Details",
-                headerBackButtonDisplayMode: "minimal",
-              }}
-            />
-            <Stack.Screen name="AddPet" options={{ title: "Add Pet" }} />
+            <Stack.Screen name="auth/login" options={{ title: "Login", headerBackButtonDisplayMode: "minimal" }} />
+            <Stack.Screen name="auth/signup" options={{ title: "Sign Up", headerBackButtonDisplayMode: "minimal" }} />
+            <Stack.Screen name="pets/[id]" options={{ title: "Pet Details", headerBackButtonDisplayMode: "minimal", }} />
+            <Stack.Screen name="AddPet" options={{ title: "Add Pet", headerBackButtonDisplayMode: "minimal" }} />
           </Stack>
         </View>
       </SafeAreaView>
