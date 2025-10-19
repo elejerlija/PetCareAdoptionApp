@@ -1,7 +1,7 @@
 # 🐾 PetCare Adoption App
 
 **Grupi:** 8   
-**Projekti:** PetCare Adoption      
+**Projekti:** PetCareAdoption      
 **Lënda:** Programimi për Pajisje Mobile             
 
 ## Statusi i projektit
