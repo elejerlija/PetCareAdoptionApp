@@ -27,6 +27,7 @@ export default function SignUpScreen() {
           onPress={() => {
             router.replace("/");
           }}
+            isLoading={true}
         />
 
         <View style={styles.footer}>
