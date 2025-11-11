@@ -15,22 +15,6 @@ export default function PetList() {
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Pet List</Text>
 
-      <PrimaryButton
-        title="+ Add Pet"
-        onPress={() => router.push('/AddPet')}
-        style={{
-          marginHorizontal: 110,
-          marginTop: 1,
-          borderRadius: 20,
-          paddingVertical: 16,
-          elevation: 3,
-          shadowColor: "#000",
-          shadowOpacity: 0.15,
-          shadowRadius: 8,
-          shadowOffset: { width: 0, height: 4 },
-        }}
-      />
-
       <FlatList
         style={styles.scrollArea}
         contentContainerStyle={styles.scrollContent}
@@ -41,7 +25,7 @@ export default function PetList() {
         )}
         ListEmptyComponent={
           <Text style={{ textAlign: "center", color: "gray", marginTop: 24 }}>
-            No pets yet. Tap “+ Add Pet”.
+            No pets yet.
           </Text>
         }
         showsVerticalScrollIndicator={false}
@@ -54,23 +38,27 @@ export default function PetList() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingBottom:14,
     backgroundColor: '#fff',
-  },
-  scrollArea: {
-    marginTop: 20,
-    flex: 1,
-    width: '100%',
-  },
-  scrollContent: {
-    alignItems: 'center',
-    paddingBottom: 100,
+    alignItems:'center',
+    paddingLeft: 55,
+    paddingBottom: 14,
   },
   title: {
+    paddingRight :55,
     marginTop: 30,
     fontSize: 26,
     fontWeight: 'bold',
     textAlign: 'center',
+    color: '#333',
     marginBottom: 20,
-  }
-});
+  },
+  scrollArea: {
+    flex: 1,
+    marginTop: 10,
+    width: '100%',
+  },
+  scrollContent: {
+    paddingBottom: 100,     
+  },
+  });
+
