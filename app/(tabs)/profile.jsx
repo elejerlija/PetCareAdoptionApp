@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Alert,
@@ -13,6 +13,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import InputField from '../../components/InputField';
 import PrimaryButton from '../../components/PrimaryButton';
+import {auth, db} from "../../firebase";
+import {doc, getDoc, updateDoc} from 'firebase/firestore';
 
 const ACCENT = '#83BAC9';
 
@@ -24,15 +26,67 @@ export default function ProfileScreen() {
   const [phone, setPhone] = useState('');
   const [bio, setBio] = useState('');
 
-  const onSave = async () => {
-    const data = { name, email, city, phone, bio };
-    try {
-      await AsyncStorage.setItem('profileData', JSON.stringify(data));
-      Alert.alert('Profile Saved', 'Your information has been saved locally.');
-    } catch (e) {
-      Alert.alert('Error', 'Failed to save your information.');
+ 
+  useEffect(() => {
+    const fetchProfile = async() =>{
+      try{
+        const uid = auth.currentUser?.uid;
+        if(!uid) return; 
+
+        const docRef = doc(db, 'users', uid);
+        const snap = await getDoc (docRef);
+
+        if(snap.exists()){
+          const data = snap.data(); 
+          setName(data.fullName || '');
+          setEmail(data.email || '');
+          setCity(data.city || '');
+          setPhone(data.phone || '');
+          setBio(data.bio || '');
+
+          await AsyncStorage.setItem('profileData', JSON.stringify(data));
+        }else{
+          console.log('No profile found in Firestore.');
+        }
+       
+      } catch (err) {
+        console.error(err);
+        Alert.alert('Error', 'Failed to load profile data.');
     }
-  };
+  }; 
+
+fetchProfile();
+}, []);
+
+
+  const onSave = async () => {
+    try {
+      const uid = auth.currentUser?.uid;
+      if (!uid) {
+        Alert.alert('Error', 'No user logged in.');
+        return;
+      }
+
+      const data = {
+        fullName: name,
+        email,
+        city,
+        phone,
+        bio,
+      };
+
+     
+      await updateDoc(doc(db, 'users', uid), data);
+
+      
+      await AsyncStorage.setItem('profileData', JSON.stringify(data));
+
+      Alert.alert('Success', 'Profile updated successfully!');
+    } catch (e) {
+      console.error(e);
+      Alert.alert('Error', 'Failed to update your information.');
+    }
+  }
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -93,7 +147,7 @@ export default function ProfileScreen() {
             </View>
 
             <View style={styles.saveSection}>
-              <Text style={styles.saveText}>Click below to save your information locally</Text>
+              <Text style={styles.saveText}>Click below to save your profile information</Text>
               <PrimaryButton title="Save" onPress={onSave} />
             </View>
           </View>

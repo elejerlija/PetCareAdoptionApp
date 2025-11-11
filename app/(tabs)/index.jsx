@@ -1,6 +1,9 @@
-import { View, Text, StyleSheet, Image, FlatList, ScrollView, Linking, Pressable } from "react-native";
+import { View, Text, StyleSheet, Image, FlatList, ScrollView, Linking } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
+import { signOut } from "firebase/auth";
+import { auth } from "../../firebase";
+import PrimaryButton from "../../components/PrimaryButton";
 
 const THEME = "#83BAC9";
 const LIGHT = "#FFFFF0";
@@ -26,6 +29,15 @@ export default function HomeScreen() {
 
   const featured = FEATURED_PETS;
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+        window.location.href = "/";
+    } catch (error) {
+      alert("Logout failed: " + error.message);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safe}>
 
@@ -33,7 +45,9 @@ export default function HomeScreen() {
 
         <View style={styles.header}>
           <Text style={styles.appTitle}>PetCare Adoption</Text>
-          <Text style={styles.subtitle}>Welcome to the world of four-pawed friends.🐾</Text>
+          <Text style={styles.subtitle}>
+            Welcome to the world of four-pawed friends. 🐾
+          </Text>
         </View>
 
         <Image
@@ -47,7 +61,7 @@ export default function HomeScreen() {
           <Text style={styles.bannerSub}>
             Discounts on vaccinations for new adoptions. Visit your nearest center!
           </Text>
-       </View>
+        </View>
 
         <Text style={styles.sectionTitle}>Featured</Text>
 
@@ -64,17 +78,21 @@ export default function HomeScreen() {
               href={{ pathname: "/pets/[id]", params: { id: String(item.id) } }}
               asChild
             >
-              <Pressable style={styles.card}>
+              <View style={styles.card}>
                 <Image source={item.image} style={styles.cardImg} />
                 <Text style={styles.cardName}>{item.name}</Text>
                 <Text style={styles.cardMeta}>
                   {item.type} • {item.age} yrs
                 </Text>
-              </Pressable>
+              </View>
             </Link>
           )}
 
         />
+
+        <View style={styles.logoutContainer}>
+          <PrimaryButton title="Logout" onPress={handleLogout} />
+        </View>
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>Need help or want to get in touch?</Text>
@@ -95,26 +113,31 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#fff" 
+    backgroundColor: "#fff",
   },
   scroll: {
-    padding: 16, 
-    paddingBottom: 50 
+    padding: 16,
+    paddingBottom: 50,
   },
   header: {
-    marginBottom: 12
-   },
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 8,
+    marginBottom: 10,
+  },
   appTitle: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: "800",
-    color: THEME, 
-    textAlign: "center" },
+    color: THEME,
+    textAlign: "center",
+  },
   subtitle: {
-     textAlign: "center",
-     color: "#667", 
-     marginTop: 4, 
-     fontSize: 14 
-    },
+    textAlign: "center",
+    color: "#667",
+    marginTop: 4,
+    fontSize: 15,
+    paddingHorizontal: 12,
+  },
   heroImg: {
     width: "100%",
     height: 200,
@@ -128,16 +151,17 @@ const styles = StyleSheet.create({
     padding: 14,
     marginVertical: 12,
   },
-  bannerTitle: { 
+  bannerTitle: {
     color: LIGHT,
-    fontWeight: "800", 
-    fontSize: 16 },
+    fontWeight: "800",
+    fontSize: 16,
+  },
   bannerSub: {
-     color: LIGHT, 
-     opacity: 0.95, 
-     marginTop: 4, 
-     fontSize: 13 
-    },
+    color: LIGHT,
+    opacity: 0.95,
+    marginTop: 4,
+    fontSize: 13,
+  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: "800",
@@ -155,30 +179,31 @@ const styles = StyleSheet.create({
     padding: 10,
     shadowColor: "#000",
     shadowOpacity: 0.08,
-    shadowOffset: { 
-                width: 0, 
-                height: 3 
-              },
+    shadowOffset: { width: 0, height: 3 },
     shadowRadius: 6,
     elevation: 3,
   },
-  cardImg: { 
-    width: "100%", 
-    height: 100, 
-    borderRadius: 12, 
-    backgroundColor: "#eee" 
+  cardImg: {
+    width: "100%",
+    height: 100,
+    borderRadius: 12,
+    backgroundColor: "#eee",
   },
   cardName: {
-     fontWeight: "800", 
-     marginTop: 8, 
-     color: "#222", 
-     textAlign: "center" 
-    },
+    fontWeight: "800",
+    marginTop: 8,
+    color: "#222",
+    textAlign: "center",
+  },
   cardMeta: {
-     color: "#667", 
-     marginTop: 2, 
-     textAlign: "center" },
-
+    color: "#667",
+    marginTop: 2,
+    textAlign: "center",
+  },
+  logoutContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
   footer: {
     marginTop: 20,
     paddingVertical: 20,
@@ -189,19 +214,19 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
   },
-  footerText: { 
-    color: "#444", 
-    fontSize: 13, 
-    marginBottom: 4 
+  footerText: {
+    color: "#444",
+    fontSize: 13,
+    marginBottom: 4,
   },
-  footerEmail: { 
-    color: THEME, 
-    fontWeight: "700", 
-    fontSize: 14 
+  footerEmail: {
+    color: THEME,
+    fontWeight: "700",
+    fontSize: 14,
   },
-  footerCopyright: { 
-    color: "#888", 
-    fontSize: 12, 
-    marginTop: 6 
-  }
+  footerCopyright: {
+    color: "#888",
+    fontSize: 12,
+    marginTop: 6,
+  },
 });
