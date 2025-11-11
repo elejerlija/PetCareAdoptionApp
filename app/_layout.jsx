@@ -7,16 +7,22 @@ import { PetsProvider } from "../context/PetsContext";
 export default function RootLayout() {
   return (
     <PetsProvider>
-      <SafeAreaView style={{ flex: 1 }} edges={[]}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
         <StatusBar barStyle="dark-content" />
         <View style={{ flex: 1 }}>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="+not-found" options={{ headerShown: false }} />
-            <Stack.Screen name="auth/login" options={{ title: "Login", headerBackButtonDisplayMode: "minimal" }} />
-            <Stack.Screen name="auth/signup" options={{ title: "Sign Up", headerBackButtonDisplayMode: "minimal" }} />
-            <Stack.Screen name="pets/[id]" options={{ title: "Pet Details", headerBackButtonDisplayMode: "minimal", }} />
-            <Stack.Screen name="AddPet" options={{ title: "Add Pet", headerBackButtonDisplayMode: "minimal" }} />
+          <Stack
+            screenOptions={{
+              headerShown: false, 
+              animation: "none",
+            }}
+          >
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="(admin)" />
+            <Stack.Screen name="auth/login" />
+            <Stack.Screen name="auth/signup" />
+            <Stack.Screen name="pets/[id]" />
+            <Stack.Screen name="AddPet" />
+            <Stack.Screen name="+not-found" />
           </Stack>
         </View>
       </SafeAreaView>
