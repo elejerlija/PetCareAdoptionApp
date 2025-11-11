@@ -14,7 +14,7 @@ export default function AdminDashboard() {
    const handleLogout = async () => {
     try {
       await signOut(auth);
-      router.replace("/pets/index");
+       window.location.href = "/";
     } catch (error) {
       alert("Logout failed: " + error.message);
     }
