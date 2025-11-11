@@ -47,21 +47,7 @@ export default function HomeScreen() {
           <Text style={styles.bannerSub}>
             Discounts on vaccinations for new adoptions. Visit your nearest center!
           </Text>
-        </View>
-
-        <View style={styles.authButtons}>
-          <Link href="/auth/login" asChild>
-            <Pressable style={styles.authBtn}>
-              <Text style={styles.authBtnText}>Login</Text>
-            </Pressable>
-          </Link>
-
-          <Link href="/auth/signup" asChild>
-            <Pressable style={styles.authBtn}>
-              <Text style={styles.authBtnText}>Sign Up</Text>
-            </Pressable>
-          </Link>
-        </View>
+       </View>
 
         <Text style={styles.sectionTitle}>Featured</Text>
 
@@ -217,29 +203,5 @@ const styles = StyleSheet.create({
     color: "#888", 
     fontSize: 12, 
     marginTop: 6 
-  },
-  authButtons: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 12,
-    marginTop: 16,
-    marginBottom: 40,
-
-  },
-  authBtn: {
-    borderWidth: 1,
-    borderColor: THEME,
-    borderRadius: 10,
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    backgroundColor: LIGHT
-  },
-  authBtnText: {
-    color: THEME,
-    fontWeight: "600",
-  },
-  signupBtn: {
-    backgroundColor: THEME,
   }
-
 });
