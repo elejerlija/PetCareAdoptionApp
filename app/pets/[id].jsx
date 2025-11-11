@@ -1,14 +1,22 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, Alert, ScrollView, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  Alert,
+  ScrollView,
+  Platform,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PrimaryButton from '../../components/PrimaryButton';
 import { useLocalSearchParams } from 'expo-router';
-import { usePets } from "../../context/PetsContext";
+import { usePets } from '../../context/PetsContext';
 
 export default function PetDetailsRoute() {
   const params = useLocalSearchParams();
-  const rawId = Array.isArray(params.id) ? params.id[0] : params.id; 
-  const id = rawId; 
+  const rawId = Array.isArray(params.id) ? params.id[0] : params.id;
+  const id = rawId; // Firestore doc id
 
   const { getPetById, adoptPet, getCityOfPet } = usePets();
   const pet = getPetById?.(id);
@@ -17,14 +25,17 @@ export default function PetDetailsRoute() {
     return (
       <SafeAreaView style={styles.screen}>
         <View style={styles.emptyWrap}>
-          <Text style={{ color: "gray" }}>Pet not found.</Text>
+          <Text style={{ color: 'gray' }}>Pet not found.</Text>
         </View>
       </SafeAreaView>
     );
   }
 
   const imgSource =
-    typeof pet.image === "string" && pet.image ? { uri: pet.image } : pet.image || null;
+  pet.imageUrl
+    ? { uri: pet.imageUrl }
+    : require('../../assets/images/default.jpg'); 
+
 
   const handleAdopt = () => {
     if (Platform.OS === 'web') {
@@ -32,22 +43,34 @@ export default function PetDetailsRoute() {
       adoptPet?.(pet.id);
       return;
     }
+
     Alert.alert(
-      "Adopted 🐾",
+      'Adopted 🐾',
       `${pet.name} was successfully adopted!`,
-      [{ text: "OK", onPress: () => adoptPet?.(pet.id) }],
+      [{ text: 'OK', onPress: () => adoptPet?.(pet.id) }],
       { cancelable: true }
     );
   };
 
+  const isAvailable = pet.available !== false; 
+
   return (
     <SafeAreaView style={styles.screen}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
-        <Image source={imgSource} style={styles.image} /> 
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.content}
+      >
+        {imgSource && <Image source={imgSource} style={styles.image} />}
+
         <Text style={styles.name}>{pet.name}</Text>
 
-        <Text style={[styles.status, { color: pet.available ? 'green' : 'red' }]}>
-          {pet.available ? 'Available' : 'Not available'}
+        <Text
+          style={[
+            styles.status,
+            { color: isAvailable ? 'green' : 'red' },
+          ]}
+        >
+          {isAvailable ? 'Available' : 'Not available'}
         </Text>
 
         <Text style={styles.details}>Age: {pet.age} yr</Text>
@@ -58,12 +81,11 @@ export default function PetDetailsRoute() {
 
         <View style={styles.buttonsContainer}>
           <PrimaryButton
-            title={pet.available ? "Adopt" : "Not available"}
+            title={isAvailable ? 'Adopt' : 'Not available'}
             onPress={handleAdopt}
-            disabled={!pet.available} 
+            disabled={!isAvailable}
           />
         </View>
-
       </ScrollView>
     </SafeAreaView>
   );
@@ -72,12 +94,34 @@ export default function PetDetailsRoute() {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: '#fff' },
   emptyWrap: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  content: { alignItems: 'center', paddingTop: 24, paddingHorizontal: 20, paddingBottom: 60 },
-  image: { width: '100%', height: 260, borderRadius: 12, marginBottom: 20, resizeMode: 'cover' },
+  content: {
+    alignItems: 'center',
+    paddingTop: 24,
+    paddingHorizontal: 20,
+    paddingBottom: 60,
+  },
+  image: {
+    width: '100%',
+    height: 260,
+    borderRadius: 12,
+    marginBottom: 20,
+    resizeMode: 'cover',
+  },
   name: { fontSize: 26, fontWeight: 'bold' },
   status: { fontSize: 16, marginVertical: 6 },
   details: { fontSize: 16, color: 'gray' },
-  aboutTitle: { fontSize: 20, fontWeight: 'bold', marginTop: 20, alignSelf: 'flex-start' },
-  aboutText: { fontSize: 16, textAlign: 'left', marginTop: 8, width: '100%', lineHeight: 22 },
+  aboutTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginTop: 20,
+    alignSelf: 'flex-start',
+  },
+  aboutText: {
+    fontSize: 16,
+    textAlign: 'left',
+    marginTop: 8,
+    width: '100%',
+    lineHeight: 22,
+  },
   buttonsContainer: { width: '100%', marginTop: 28, gap: 12 },
 });

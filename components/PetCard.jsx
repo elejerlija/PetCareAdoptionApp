@@ -7,19 +7,22 @@ export default function PetCard({ pet, onPress }) {
   const city = getCityOfPet?.(pet.id);
 
   return (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={() => onPress?.(pet)}
-    >
-      <Image source={pet.image} style={styles.image} />
+    <TouchableOpacity style={styles.card} onPress={() => onPress?.(pet)}>
+      <Image
+        style={styles.image}
+        source={
+          pet.imageUrl
+            ? { uri: pet.imageUrl }
+            : require('../assets/images/default.jpg')
+        }
+      />
+
       <View style={styles.infoContainer}>
         <Text style={styles.name}>{pet.name}</Text>
-
         <View style={styles.metaRow}>
           <Text style={styles.details}>
             {pet.age} yr{pet.age === 1 ? '' : 's'} · {city}
           </Text>
-
         </View>
       </View>
     </TouchableOpacity>
@@ -33,7 +36,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f2f2f2',
     padding: 10,
     borderRadius: 12,
-    width: '85%',
+    width: '100%',       
     elevation: 3,
     shadowColor: "#000",
     shadowOpacity: 0.15,
@@ -53,28 +56,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold'
   },
-  details: {
-    color: 'gray'
-  },
   metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     marginTop: 2,
   },
   details: {
     color: '#6B7280',
     fontSize: 14,
   },
-  badge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 999,
-    minWidth: 80,
-    alignItems: 'center'
-  },
-  badgeText: {
-    fontSize: 12,
-    fontWeight: '600',
-  }
 });
