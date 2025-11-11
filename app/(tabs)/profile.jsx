@@ -81,7 +81,7 @@ fetchProfile();
       
       await AsyncStorage.setItem('profileData', JSON.stringify(data));
 
-      Alert.alert('✅ Success', 'Profile updated successfully!');
+      Alert.alert('Success', 'Profile updated successfully!');
     } catch (e) {
       console.error(e);
       Alert.alert('Error', 'Failed to update your information.');
@@ -147,7 +147,7 @@ fetchProfile();
             </View>
 
             <View style={styles.saveSection}>
-              <Text style={styles.saveText}>Click below to save your information locally</Text>
+              <Text style={styles.saveText}>Click below to save your profile information</Text>
               <PrimaryButton title="Save" onPress={onSave} />
             </View>
           </View>
