@@ -31,6 +31,7 @@ export default function LoginScreen() {
       // 2. Merr dokumentin e Firestore (profile + role)
       const ref = doc(db, "users", uid);
       const snap = await getDoc(ref);
+      //test/test
 
       if (!snap.exists()) {
         alert("Profili nuk u gjet në Firestore.");
