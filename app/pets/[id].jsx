@@ -16,7 +16,7 @@ import { usePets } from '../../context/PetsContext';
 export default function PetDetailsRoute() {
   const params = useLocalSearchParams();
   const rawId = Array.isArray(params.id) ? params.id[0] : params.id;
-  const id = rawId; // Firestore doc id
+  const id = rawId; 
 
   const { getPetById, adoptPet, getCityOfPet } = usePets();
   const pet = getPetById?.(id);
@@ -34,7 +34,7 @@ export default function PetDetailsRoute() {
   const imgSource =
   pet.imageUrl
     ? { uri: pet.imageUrl }
-    : require('../../assets/images/default.jpg'); 
+    : require('../../assets/images/random.jpg'); 
 
 
   const handleAdopt = () => {

@@ -36,10 +36,18 @@ export function PetsProvider({ children }) {
       console.error("Error adopting pet:", err);
     }
   };
+  const toggleFavorite = async (id, currentValue) => {
+  try {
+    const ref = doc(db, "pets", id);
+    await updateDoc(ref, { favorite: !currentValue });
+  } catch (err) {
+    console.error("Error toggling favorite:", err);
+  }
+};
 
   return (
     <PetsContext.Provider
-      value={{ pets, loadingPets, getPetById, getCityOfPet, adoptPet }}
+      value={{ pets, loadingPets, getPetById, getCityOfPet, adoptPet,toggleFavorite }}
     >
       {children}
     </PetsContext.Provider>
