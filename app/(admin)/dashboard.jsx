@@ -2,11 +2,23 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
+import { signOut } from "firebase/auth";
+import { auth } from "../../firebase";
+
+import PrimaryButton from "../../components/PrimaryButton";
 
 const THEME = "#83BAC9";
 const LIGHT = "#FFFFF0";
 
 export default function AdminDashboard() {
+   const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      router.replace("/pets/index");
+    } catch (error) {
+      alert("Logout failed: " + error.message);
+    }
+  };
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
@@ -85,6 +97,17 @@ export default function AdminDashboard() {
           </View>
           <Ionicons name="chevron-forward" size={20} color="#777" />
         </TouchableOpacity>
+        
+       <PrimaryButton
+  title="Log Out"
+  onPress={handleLogout}
+  style={{
+    marginTop: 25,
+    width: "100%",
+    alignSelf: "center",
+  }}
+/>
+
       </View>
     </SafeAreaView>
   );
