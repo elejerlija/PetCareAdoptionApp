@@ -22,11 +22,11 @@ export default function PetCard({ pet, onPress }) {
         <View style={styles.row}>
           <Text style={styles.name}>{pet.name}</Text>
 
-          {/* Butoni për favorite */}
+         
           <TouchableOpacity onPress={() => toggleFavorite(pet.id, pet.favorite)}>
             <Ionicons
               name={pet.favorite ? "heart" : "heart-outline"}
-              size={22}
+              size={25}
               color={pet.favorite ? "red" : "#777"}
             />
           </TouchableOpacity>
