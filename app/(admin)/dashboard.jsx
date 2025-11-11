@@ -10,11 +10,11 @@ export default function AdminDashboard() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
-        {/* Header */}
+
         <Text style={styles.title}>ADMIN DASHBOARD</Text>
         <Text style={styles.subtitle}>PetAdoption Care</Text>
 
-        {/* Statistics */}
+
         <View style={styles.statsContainer}>
           <View style={styles.statCard}>
             <Text style={styles.statTitle}>Total Pets</Text>
@@ -35,7 +35,7 @@ export default function AdminDashboard() {
           </View>
         </View>
 
-        {/* Management Section */}
+
         <Text style={styles.sectionTitle}>Management</Text>
 
         <TouchableOpacity
