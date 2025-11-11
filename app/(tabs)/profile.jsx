@@ -17,6 +17,7 @@ import PrimaryButton from '../../components/PrimaryButton';
 const ACCENT = '#83BAC9';
 
 export default function ProfileScreen() {
+  
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [city, setCity] = useState('');
