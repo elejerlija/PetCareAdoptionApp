@@ -14,7 +14,7 @@ export default function AdminDashboard() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      window.location.href = "/"; // redirect to main index
+      window.location.href = "/"; 
     } catch (error) {
       alert("Logout failed: " + error.message);
     }
@@ -53,12 +53,11 @@ export default function AdminDashboard() {
           </View>
         </View>
 
-        {/* Management Section */}
-        <Text style={styles.sectionTitle}>Management</Text>
+         <Text style={styles.sectionTitle}>Management</Text>
 
         <TouchableOpacity
           style={styles.manageItem}
-          onPress={() => router.push("/admin/managePets")}
+          onPress={() => router.push("/(admin)/managePets")}
         >
           <View style={styles.iconCircle}>
             <Ionicons name="paw" size={22} color="#fff" />
@@ -72,25 +71,25 @@ export default function AdminDashboard() {
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.manageItem}
-          onPress={() => router.push("/admin/manageRequests")}
-        >
-          <View style={styles.iconCircle}>
-            <Ionicons name="mail" size={22} color="#fff" />
-          </View>
-          <View style={styles.textContainer}>
-            <Text style={styles.manageTitle}>Adoption Requests</Text>
-            <Text style={styles.manageDesc}>
-              View and manage pending adoption requests.
-            </Text>
-          </View>
-          <Ionicons name="chevron-forward" size={20} color="#999" />
-        </TouchableOpacity>
+      <TouchableOpacity
+      style={styles.manageItem}
+      onPress={() => router.push("/(admin)/manageUsers")}
+    >
+      <View style={styles.iconCircle}>
+        <Ionicons name="people" size={22} color="#fff" /> 
+      </View>
+      <View style={styles.textContainer}>
+        <Text style={styles.manageTitle}>Manage Users</Text>
+        <Text style={styles.manageDesc}>
+          View, deactivate or delete registered users.
+        </Text>
+      </View>
+      <Ionicons name="chevron-forward" size={20} color="#999" />
+    </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.manageItem}
-          onPress={() => router.push("/admin/manageStores")}
+          onPress={() => router.push("/(admin)/manageStoresMap")}
         >
           <View style={styles.iconCircle}>
             <Ionicons name="storefront" size={22} color="#fff" />
@@ -104,7 +103,7 @@ export default function AdminDashboard() {
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
-        {/* Logout Button */}
+
         <View style={styles.logoutContainer}>
           <PrimaryButton title="Logout" onPress={handleLogout} style={styles.logoutBtn} />
         </View>
