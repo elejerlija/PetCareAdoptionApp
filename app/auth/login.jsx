@@ -43,9 +43,9 @@ export default function LoginScreen() {
 
       // 3. Ndarja e rruagëve sipas rolit
       if (role === "admin") {
-        router.replace("/admin/home");
+        router.replace("/dashboard");
       } else {
-        router.replace("/home");
+        router.replace("/tabs");
       }
 
     } catch (error) {
