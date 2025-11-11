@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator,TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { usePets } from '../../context/PetsContext';
 import PetCard from '../../components/PetCard';
-import PrimaryButton from '../../components/PrimaryButton';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons'
 
 export default function PetList() {
   const router = useRouter();
@@ -20,14 +20,51 @@ export default function PetList() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Pet List</Text>
+   
+<View
+  style={{
+    marginTop :50,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 10,
+    marginBottom: 30,
+  }}
+>
+  
+  <TouchableOpacity
+    style={{
+      backgroundColor: '#E5E7EB',
+      paddingVertical: 6,
+      paddingHorizontal: 18,
+      borderRadius: 20,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+    }}
+    onPress={() => setShowFavorites(false)} 
+  >
+    <Ionicons name="paw-outline" size={18} color="#6B7280" />
+    <Text style={{ color: '#374151', fontWeight: '600' }}>All Pets</Text>
+  </TouchableOpacity>
 
-      {/* Buton për me ndërru filtrin */}
-      <PrimaryButton
-        title={showFavorites ? "Show All" : "Show Favorites ❤️"}
-        onPress={() => setShowFavorites(prev => !prev)}
-        style={{ alignSelf: 'center', marginBottom: 12 }}
-      />
+
+  <TouchableOpacity
+    style={{
+      backgroundColor: '#FFE4EC',
+      paddingVertical: 6,
+      paddingHorizontal: 18,
+      borderRadius: 20,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+    }}
+    onPress={() => setShowFavorites(true)} 
+  >
+    <Ionicons name="heart" size={18} color="#E11D48" />
+    <Text style={{ color: '#E11D48', fontWeight: '600' }}>Favorites </Text>
+  </TouchableOpacity>
+</View>
+
 
       {loadingPets ? (
         <ActivityIndicator style={{ marginTop: 20 }} />
@@ -59,17 +96,9 @@ export default function PetList() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F4F6FA',
     paddingHorizontal: 20,
     paddingBottom: 14,
-  },
-  title: {
-    marginTop: 30,
-    fontSize: 26,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#333',
-    marginBottom: 16,
   },
   scrollArea: {
     flex: 1,
@@ -88,3 +117,4 @@ const styles = StyleSheet.create({
     height: 16,
   },
 });
+

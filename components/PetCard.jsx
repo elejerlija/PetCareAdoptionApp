@@ -41,24 +41,25 @@ export default function PetCard({ pet, onPress }) {
 }
 
 const styles = StyleSheet.create({
-  card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f2f2f2',
-    padding: 10,
-    borderRadius: 12,
-    width: '100%',
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-  },
-  image: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-  },
+card: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  backgroundColor: '#FFFFFF',
+  paddingVertical: 10,
+  paddingHorizontal: 12,
+  borderRadius: 18,
+  width: '100%',
+  shadowColor: '#000',
+  shadowOpacity: 0.08,
+  shadowRadius: 8,
+  shadowOffset: { width: 0, height: 4 },
+  elevation: 2,
+},image: {
+  width: 56,
+  height: 56,
+  borderRadius: 28,
+  backgroundColor: '#FFE4EC',
+},
   infoContainer: {
     flex: 1,
     marginLeft: 12,
