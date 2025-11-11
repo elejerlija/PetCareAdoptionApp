@@ -46,7 +46,7 @@ export default function LoginScreen() {
       if (role === "admin") {
         router.replace("/dashboard");
       } else {
-        router.replace("/tabs");
+        router.replace("/(tabs)/");
       }
 
     } catch (error) {

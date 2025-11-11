@@ -46,7 +46,7 @@ export default function SignUpScreen() {
       });
 
       alert("Llogaria u krijua me sukses!");
-      router.replace("/"); // ose /home nese e ke ashtu
+      router.replace("/auth/login"); // ose /home nese e ke ashtu
 
     } catch (error) {
       alert(error.message);
