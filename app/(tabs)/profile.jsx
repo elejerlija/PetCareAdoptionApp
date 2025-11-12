@@ -70,7 +70,7 @@ export default function ProfileScreen() {
 />
 
 
- /*const handleSaveProfile = async () => {
+ const handleSaveProfile = async () => {
   console.log(" Save button pressed!");
   const user = auth.currentUser;
 
@@ -90,10 +90,10 @@ export default function ProfileScreen() {
   try {
     setLoading(true);
 
-    // Test log për të parë nëse funksioni po hyn këtu
+
     console.log("Updating profile...");
 
-    // Nëse ndryshohet emaili
+
     if (oldEmail !== email) {
       console.log("Email change detected:", oldEmail, "→", email);
 
@@ -105,7 +105,7 @@ export default function ProfileScreen() {
 
       const credential = EmailAuthProvider.credential(oldEmail, currentPasswordForEmail);
 
-      // Reauthenticate
+      
       await reauthenticateWithCredential(user, credential);
       await updateEmail(user, email);
 
@@ -113,7 +113,7 @@ export default function ProfileScreen() {
       Alert.alert(" Email Updated", `Email changed from ${oldEmail} to ${email}`);
     }
 
-    // Ruaj ndryshimet në Firestore
+
     await setDoc(doc(db, "users", uid), {
       fullName: name,
       email: email,
@@ -141,7 +141,7 @@ export default function ProfileScreen() {
   } finally {
     setLoading(false);
   }
-};*/
+};
 
   const handlePasswordChange = async () => {
     if (!currentPasswordForPassword) {
@@ -269,44 +269,66 @@ export default function ProfileScreen() {
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "#FFFFFF" },
-  scrollContent: { paddingHorizontal: 16, paddingBottom: 28 },
+  safe: { flex: 1, backgroundColor: "#F9FAFB" },
+  scrollContent: { paddingHorizontal: 18, paddingBottom: 32 },
+  
   header: {
-    paddingVertical: 18,
+    paddingVertical: 24,
     alignItems: "center",
-    borderRadius: 16,
-    backgroundColor: ACCENT + "22",
-    marginTop: 8,
-    marginBottom: 16,
+    marginTop: 10,
+    marginBottom: 20,
   },
-  title: { fontSize: 22, fontWeight: "700", color: "#1F2937" },
-  subtitle: { marginTop: 4, fontSize: 14, color: "#6B7280" },
+  title: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#1F2937",
+  },
+  subtitle: {
+    marginTop: 6,
+    fontSize: 14,
+    color: "#6B7280",
+    textAlign: "center",
+    maxWidth: "85%",
+  },
+
   card: {
-    backgroundColor: ACCENT + "22",
-    borderRadius: 18,
-    padding: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 18,
+    marginBottom: 18,
     shadowColor: "#000",
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.07,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
     elevation: 2,
   },
-  cardTitle: { fontSize: 18, fontWeight: "700", color: "#111827", marginBottom: 12 },
-  block: {
+  cardTitle: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: "#111827",
     marginBottom: 14,
-    backgroundColor: "#FFFDF2",
-    borderRadius: 12,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderLeftWidth: 4,
+    borderColor: ACCENT,
+    paddingLeft: 10,
   },
-  label: { fontSize: 13, fontWeight: "600", color: "#374151", marginBottom: 6 },
-  row: { flexDirection: "row", justifyContent: "space-between" },
-  col: { width: "48%" },
-  body: { fontSize: 15, lineHeight: 22, color: "#374151", marginBottom: 10 },
+
+  block: { marginBottom: 14 },
+  label: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#374151",
+    marginBottom: 6,
+    marginLeft: 2,
+  },
+
+  row: { flexDirection: "row", justifyContent: "space-between", gap: 10 },
+  col: { flex: 1 },
+
+  body: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: "#374151",
+    marginBottom: 10,
+  },
 });
