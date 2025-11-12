@@ -1,59 +1,57 @@
-import { createContext, useState, useContext } from 'react';
-import { pets as demoPets } from '../assets/data/pets';
-import { stores } from '../assets/data/stores';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { collection, onSnapshot, doc, updateDoc } from "firebase/firestore";
+import { db } from "../firebase";
 
 const PetsContext = createContext();
 
-export function usePets() {
-  return useContext(PetsContext);
-}
-
 export function PetsProvider({ children }) {
-  const initialPets = Array.isArray(demoPets) ? demoPets : [];
-  const [pets, setPets] = useState(
-    initialPets.map(p => ({
-      available: true,
-      ...p,
-      id: String(p.id ?? Date.now() + Math.random()),
-    }))
-  );
+  const [pets, setPets] = useState([]);
+  const [loadingPets, setLoadingPets] = useState(true);
 
-  function getCityOfPet(petId) {
-    const pet = getPetById(petId);         
-    if (!pet) return null;                 
+  useEffect(() => {
+    const colRef = collection(db, "pets");
 
-    const store = stores.find(s => s.id === pet.storeId); 
-    return store?.city;             
-  }
+    const unsub = onSnapshot(colRef, (snapshot) => {
+      const list = snapshot.docs.map((d) => ({
+        id: d.id,       
+        ...d.data(),    
+      }));
+      setPets(list);
+      setLoadingPets(false);
+    });
 
-  function addPet(pet) {
-    const newPet = {
-      available: true,
-      ...pet,
-      id: String(pet.id ?? Date.now()),
-    };
-    setPets(prev => [...prev, newPet]);
-  }
+    return unsub;
+  }, []);
 
-  function getPetById(id) {
-    return pets.find(p => String(p.id) === String(id));
-  }
-  const getPetsForStore = (storeId) => {
-    return pets.filter(p => p.storeId === storeId);
+  const getPetById = (id) => pets.find((p) => p.id === id);
+
+  const getCityOfPet = (petId) =>
+    pets.find((p) => p.id === petId)?.city || "Unknown";
+
+  const adoptPet = async (id) => {
+    try {
+      const ref = doc(db, "pets", id);
+      await updateDoc(ref, { available: false });
+    } catch (err) {
+      console.error("Error adopting pet:", err);
+    }
   };
-  function adoptPet(id) {
-    setPets(prev =>
-      prev.map(p =>
-        String(p.id) === String(id) ? { ...p, available: false } : p
-      )
-    );
+  const toggleFavorite = async (id, currentValue) => {
+  try {
+    const ref = doc(db, "pets", id);
+    await updateDoc(ref, { favorite: !currentValue });
+  } catch (err) {
+    console.error("Error toggling favorite:", err);
   }
+};
 
   return (
     <PetsContext.Provider
-      value={{ pets, setPets, addPet, getPetById, adoptPet, getCityOfPet, getPetsForStore, stores }} 
+      value={{ pets, loadingPets, getPetById, getCityOfPet, adoptPet,toggleFavorite }}
     >
       {children}
     </PetsContext.Provider>
   );
 }
+
+export const usePets = () => useContext(PetsContext);
