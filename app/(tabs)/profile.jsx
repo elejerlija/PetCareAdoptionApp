@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   View,
   Alert,
@@ -7,92 +7,181 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { StatusBar } from 'expo-status-bar';
-import InputField from '../../components/InputField';
-import PrimaryButton from '../../components/PrimaryButton';
-import {auth, db} from "../../firebase";
-import {doc, getDoc, updateDoc} from 'firebase/firestore';
+  ActivityIndicator,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { StatusBar } from "expo-status-bar";
+import InputField from "../../components/InputField";
+import PrimaryButton from "../../components/PrimaryButton";
+import { auth, db } from "../../firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import {
+  updateEmail,
+  updatePassword,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
+} from "firebase/auth";
 
-const ACCENT = '#83BAC9';
+const ACCENT = "#83BAC9";
 
 export default function ProfileScreen() {
-  
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [city, setCity] = useState('');
-  const [phone, setPhone] = useState('');
-  const [bio, setBio] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [city, setCity] = useState("");
+  const [phone, setPhone] = useState("");
+  const [bio, setBio] = useState("");
+  const [currentPasswordForEmail, setCurrentPasswordForEmail] = useState("");
+  const [currentPasswordForPassword, setCurrentPasswordForPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [loadingPassword, setLoadingPassword] = useState(false);
+  const [initializing, setInitializing] = useState(true);
 
- 
   useEffect(() => {
-    const fetchProfile = async() =>{
-      try{
+    const fetchProfile = async () => {
+      try {
         const uid = auth.currentUser?.uid;
-        if(!uid) return; 
-
-        const docRef = doc(db, 'users', uid);
-        const snap = await getDoc (docRef);
-
-        if(snap.exists()){
-          const data = snap.data(); 
-          setName(data.fullName || '');
-          setEmail(data.email || '');
-          setCity(data.city || '');
-          setPhone(data.phone || '');
-          setBio(data.bio || '');
-
-          await AsyncStorage.setItem('profileData', JSON.stringify(data));
-        }else{
-          console.log('No profile found in Firestore.');
+        if (!uid) return;
+        const userRef = doc(db, "users", uid);
+        const snap = await getDoc(userRef);
+        if (snap.exists()) {
+          const data = snap.data();
+          setName(data.fullName || "");
+          setEmail(data.email || "");
+          setCity(data.city || "");
+          setPhone(data.phone || "");
+          setBio(data.bio || "");
         }
-       
-      } catch (err) {
-        console.error(err);
-        Alert.alert('Error', 'Failed to load profile data.');
-    }
-  }; 
+      } catch {
+        Alert.alert("Error", "Failed to load profile data.");
+      } finally {
+        setInitializing(false);
+      }
+    };
+    fetchProfile();
+  }, []);
 
-fetchProfile();
-}, []);
+  <PrimaryButton
+  title="Save Test"
+  onPress={() => {
+    console.log("Button pressed!");
+    Alert.alert("Clicked!", "Button is working fine.");
+  }}
+/>
 
 
-  const onSave = async () => {
-    try {
-      const uid = auth.currentUser?.uid;
-      if (!uid) {
-        Alert.alert('Error', 'No user logged in.');
+ /*const handleSaveProfile = async () => {
+  console.log(" Save button pressed!");
+  const user = auth.currentUser;
+
+  if (!user) {
+    Alert.alert("Error", "No user logged in.");
+    return;
+  }
+
+  const uid = user.uid;
+  const oldEmail = user.email;
+
+  if (!name || !email) {
+    Alert.alert("Validation Error", "Please fill in your name and email.");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    // Test log për të parë nëse funksioni po hyn këtu
+    console.log("Updating profile...");
+
+    // Nëse ndryshohet emaili
+    if (oldEmail !== email) {
+      console.log("Email change detected:", oldEmail, "→", email);
+
+      if (!currentPasswordForEmail) {
+        Alert.alert("Security Check", "Please enter your current password to change email.");
+        setLoading(false);
         return;
       }
 
-      const data = {
-        fullName: name,
-        email,
-        city,
-        phone,
-        bio,
-      };
+      const credential = EmailAuthProvider.credential(oldEmail, currentPasswordForEmail);
 
-     
-      await updateDoc(doc(db, 'users', uid), data);
+      // Reauthenticate
+      await reauthenticateWithCredential(user, credential);
+      await updateEmail(user, email);
 
-      
-      await AsyncStorage.setItem('profileData', JSON.stringify(data));
-
-      Alert.alert('Success', 'Profile updated successfully!');
-    } catch (e) {
-      console.error(e);
-      Alert.alert('Error', 'Failed to update your information.');
+      console.log(" Email updated successfully!");
+      Alert.alert(" Email Updated", `Email changed from ${oldEmail} to ${email}`);
     }
+
+    // Ruaj ndryshimet në Firestore
+    await setDoc(doc(db, "users", uid), {
+      fullName: name,
+      email: email,
+      city: city,
+      phone: phone,
+      bio: bio,
+      updatedAt: new Date().toISOString(),
+    });
+
+    console.log("✅ Firestore document updated!");
+    Alert.alert(
+      "✅ Profile Updated",
+      `Name: ${name}\nEmail: ${email}\nCity: ${city}\nPhone: ${phone}`
+    );
+  } catch (error) {
+    console.log(" Error:", error);
+    if (error.code === "auth/requires-recent-login") {
+      Alert.alert(
+        "Security Notice",
+        "Please log in again before changing your email."
+      );
+    } else {
+      Alert.alert("Error", error.message || "Failed to update profile.");
+    }
+  } finally {
+    setLoading(false);
+  }
+};*/
+
+  const handlePasswordChange = async () => {
+    if (!currentPasswordForPassword) {
+      Alert.alert("Error", "Please enter your current password first.");
+      return;
+    }
+    if (!newPassword || newPassword.length < 6) {
+      Alert.alert("Error", "New password must be at least 6 characters long.");
+      return;
+    }
+    try {
+      setLoadingPassword(true);
+      const user = auth.currentUser;
+      const credential = EmailAuthProvider.credential(user.email, currentPasswordForPassword);
+      await reauthenticateWithCredential(user, credential);
+      await updatePassword(user, newPassword);
+      setNewPassword("");
+      setCurrentPasswordForPassword("");
+      Alert.alert("Success", "Password changed successfully!");
+    } catch {
+      Alert.alert("Error", "Failed to change password.");
+    } finally {
+      setLoadingPassword(false);
+    }
+  };
+
+  if (initializing) {
+    return (
+      <SafeAreaView style={[styles.safe, { justifyContent: "center", alignItems: "center" }]}>
+        <ActivityIndicator size="large" color={ACCENT} />
+        <Text>Loading profile...</Text>
+      </SafeAreaView>
+    );
   }
 
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar style="dark" />
       <KeyboardAvoidingView
-        behavior={Platform.select({ ios: 'padding', android: undefined })}
+        behavior={Platform.select({ ios: "padding", android: undefined })}
         style={{ flex: 1 }}
       >
         <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
@@ -103,12 +192,10 @@ fetchProfile();
 
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Personal Information</Text>
-
             <View style={styles.block}>
               <Text style={styles.label}>Full Name</Text>
               <InputField placeholder="Enter your name" value={name} onChangeText={setName} />
             </View>
-
             <View style={styles.block}>
               <Text style={styles.label}>Email</Text>
               <InputField
@@ -119,7 +206,6 @@ fetchProfile();
                 autoCapitalize="none"
               />
             </View>
-
             <View style={styles.row}>
               <View style={[styles.block, styles.col]}>
                 <Text style={styles.label}>City</Text>
@@ -135,7 +221,6 @@ fetchProfile();
                 />
               </View>
             </View>
-
             <View style={styles.block}>
               <Text style={styles.label}>Bio</Text>
               <InputField
@@ -145,20 +230,39 @@ fetchProfile();
                 multiline
               />
             </View>
-
-            <View style={styles.saveSection}>
-              <Text style={styles.saveText}>Click below to save your profile information</Text>
-              <PrimaryButton title="Save" onPress={onSave} />
-            </View>
+            <PrimaryButton
+              title={loading ? "Saving..." : "Save Changes"}
+              onPress={handleSaveProfile}
+              isLoading={loading}
+            />
           </View>
 
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>About the app 🐾</Text>
+            <Text style={styles.cardTitle}>Change Password</Text>
+            <InputField
+              placeholder="Enter current password"
+              secureTextEntry={true}
+              value={currentPasswordForPassword}
+              onChangeText={setCurrentPasswordForPassword}
+            />
+            <InputField
+              placeholder="Enter new password"
+              secureTextEntry={true}
+              value={newPassword}
+              onChangeText={setNewPassword}
+            />
+            <PrimaryButton
+              title={loadingPassword ? "Updating..." : "Update Password"}
+              onPress={handlePasswordChange}
+              isLoading={loadingPassword}
+            />
+          </View>
+
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>About the app</Text>
             <Text style={styles.body}>
-              Pet Care & Adoption is designed to help animal lovers connect with pets who need a home and provide useful resources for responsible pet care.
-With this app, you can explore profiles of adoptable animals, learn about their stories, and find the perfect companion for your lifestyle.
+              Pet Care and Adoption helps connect pet lovers with animals in need of a home
             </Text>
-           
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -167,89 +271,42 @@ With this app, you can explore profiles of adoptable animals, learn about their 
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  scrollContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 28,
-  },
+  safe: { flex: 1, backgroundColor: "#FFFFFF" },
+  scrollContent: { paddingHorizontal: 16, paddingBottom: 28 },
   header: {
     paddingVertical: 18,
-    alignItems: 'center',
+    alignItems: "center",
     borderRadius: 16,
-    backgroundColor: ACCENT + '22',
+    backgroundColor: ACCENT + "22",
     marginTop: 8,
     marginBottom: 16,
   },
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#1F2937',
-  },
-  subtitle: {
-    marginTop: 4,
-    fontSize: 14,
-    color: '#6B7280',
-  },
+  title: { fontSize: 22, fontWeight: "700", color: "#1F2937" },
+  subtitle: { marginTop: 4, fontSize: 14, color: "#6B7280" },
   card: {
-    backgroundColor: ACCENT + '22',
+    backgroundColor: ACCENT + "22",
     borderRadius: 18,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-    shadowColor: '#000',
+    borderColor: "#E5E7EB",
+    shadowColor: "#000",
     shadowOpacity: 0.06,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 4 },
     elevation: 2,
   },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#111827',
-    marginBottom: 12,
-  },
+  cardTitle: { fontSize: 18, fontWeight: "700", color: "#111827", marginBottom: 12 },
   block: {
     marginBottom: 14,
-    backgroundColor: '#FFFDF2',
+    backgroundColor: "#FFFDF2",
     borderRadius: 12,
     padding: 10,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: "#E5E7EB",
   },
-  label: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#374151',
-    marginBottom: 6,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  col: {
-    width: '48%',
-  },
-  saveSection: {
-    alignItems: 'center',
-    marginTop: 12,
-  },
-  saveText: {
-    fontSize: 13,
-    color: '#6B7280',
-    marginBottom: 8,
-  },
-  body: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: '#374151',
-    marginBottom: 10,
-  },
-
-  bold: {
-    fontWeight: '700',
-  },
+  label: { fontSize: 13, fontWeight: "600", color: "#374151", marginBottom: 6 },
+  row: { flexDirection: "row", justifyContent: "space-between" },
+  col: { width: "48%" },
+  body: { fontSize: 15, lineHeight: 22, color: "#374151", marginBottom: 10 },
 });

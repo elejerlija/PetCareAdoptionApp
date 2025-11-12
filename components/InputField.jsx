@@ -1,7 +1,16 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
 
-export default function InputField({ label, placeholder, value, onChangeText, multiline = false }) {
+export default function InputField({
+  label,
+  placeholder,
+  value,
+  onChangeText,
+  multiline = false,
+  secureTextEntry = false,
+  keyboardType = 'default',
+  autoCapitalize = 'none',
+}) {
   return (
     <View style={styles.container}>
       {label ? <Text style={styles.label}>{label}</Text> : null}
@@ -12,9 +21,11 @@ export default function InputField({ label, placeholder, value, onChangeText, mu
         value={value}
         onChangeText={onChangeText}
         returnKeyType="done"
-        autoCapitalize="words"
         underlineColorAndroid="transparent"
         multiline={multiline}
+        secureTextEntry={secureTextEntry}
+        keyboardType={keyboardType}
+        autoCapitalize={autoCapitalize}
       />
     </View>
   );
@@ -41,7 +52,7 @@ const styles = StyleSheet.create({
     color: '#111827',
   },
   textarea: {
-    height: 100, 
+    height: 100,
     textAlignVertical: 'top',
   },
 });
