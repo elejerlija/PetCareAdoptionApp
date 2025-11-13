@@ -128,3 +128,83 @@ function AddEditPetModal({ visible, onClose, onSubmit, initial }) {
     </Modal>
   );
 }
+export default function ManagePets() {
+  const router = useRouter();
+  const [pets, setPets] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [editingPet, setEditingPet] = useState(null);
+
+  useEffect(() => {
+    
+    const q = query(collection(db, "pets"), orderBy("createdAt", "desc"));
+    const unsub = onSnapshot(
+      q,
+      (snapshot) => {
+        const arr = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+        setPets(arr);
+        setLoading(false);
+      },
+      (err) => {
+        console.error("Pets onSnapshot error:", err);
+        setLoading(false);
+      }
+    );
+    return () => unsub();
+  }, []);
+
+  const handleAdd = async (payload) => {
+    await addDoc(collection(db, "pets"), {
+      ...payload,
+      adopted: false,
+      createdAt: serverTimestamp(),
+    });
+  };
+
+  const handleUpdate = async (payload) => {
+    if (!editingPet) throw new Error("No pet selected for update");
+    const ref = doc(db, "pets", editingPet.id);
+    await updateDoc(ref, {
+      ...payload,
+    });
+    setEditingPet(null);
+  };
+
+  const handleDelete = (pet) => {
+    Alert.alert(
+      "Delete pet",
+      `Are you sure you want to delete "${pet.name}"?`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteDoc(doc(db, "pets", pet.id));
+            } catch (e) {
+              Alert.alert("Error", "Couldn't delete pet: " + e.message);
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const toggleAdopted = async (pet) => {
+    try {
+      await updateDoc(doc(db, "pets", pet.id), { adopted: !pet.adopted });
+    } catch (e) {
+      Alert.alert("Error", "Couldn't update status: " + e.message);
+    }
+  };
+
+  const openAdd = () => {
+    setEditingPet(null);
+    setModalVisible(true);
+  };
+  const openEdit = (pet) => {
+    setEditingPet(pet);
+    setModalVisible(true);
+  };
+}
