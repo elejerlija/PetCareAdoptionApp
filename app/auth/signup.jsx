@@ -1,15 +1,27 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PrimaryButton from "../../components/PrimaryButton";
 import { useRouter } from "expo-router";
 
 import { auth, db } from "../../firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { 
+  GoogleAuthProvider, 
+  signInWithPopup, 
+  createUserWithEmailAndPassword 
+} from "firebase/auth";
+
+import { 
+  doc, 
+  setDoc, 
+  getDoc 
+} from "firebase/firestore";
+
 
 export default function SignUpScreen() {
   const router = useRouter();
+   
+  const googleProvider = new GoogleAuthProvider();
 
   // States për inputet
   const [fullName, setFullName] = useState("");
@@ -54,6 +66,56 @@ export default function SignUpScreen() {
 
     setLoading(false);
   };
+
+
+const HandleGoogleLogin = async () => {
+ 
+
+  try {
+    alert("2. Duke hapur Google popup...");
+
+    const result = await signInWithPopup(auth, googleProvider);
+
+    alert("3. Popup u hap — user u kthye!");
+
+    console.log("GOOGLE USER:", result.user);
+    alert("User: " + JSON.stringify(result.user));
+
+    const user = result.user;
+
+    alert("4. Duke kontrolluar Firestore...");
+
+    const ref = doc(db, "users", user.uid);
+    const snap = await getDoc(ref);
+
+    if (!snap.exists()) {
+      alert("5. User nuk ekziston — po e krijoj!");
+
+      await setDoc(ref, {
+        fullName: user.displayName || "Unknown",
+        email: user.email,
+        role: "user",
+        status: "active",
+      });
+
+      alert("6. User u ruajt në Firestore!");
+    } else {
+      alert("User ekziston në databazë!");
+    }
+
+    router.replace("/auth/login");
+
+  } catch (error) {
+    console.error("❌ GOOGLE LOGIN ERROR:", error);
+    alert("❌ ERROR: " + error.message);
+  }
+};
+
+
+
+
+
+
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -109,6 +171,26 @@ export default function SignUpScreen() {
             <Text style={styles.link}>Log in</Text>
           </TouchableOpacity>
         </View>
+             <button
+            type="button"
+            onClick={HandleGoogleLogin}
+            style={{
+              width: "100%",
+              padding: 12,
+              backgroundColor: "#e8f0fe",
+              borderRadius: 6,
+              border: "1px solid #ccc",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 10,
+              fontSize: 16,
+              cursor: "pointer",
+            }}
+          >
+            <span style={{ fontSize: 18 }}>🟦</span>
+            Continue With Google
+          </button>
 
       </ScrollView>
     </SafeAreaView>
