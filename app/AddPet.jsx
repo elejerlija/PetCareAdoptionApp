@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { usePets } from '../context/PetsContext';
+import PrimaryButton from "../components/PrimaryButton";
+
 
 
 export default function AddPet() {
@@ -58,7 +60,7 @@ export default function AddPet() {
         };
         addPet(newPet);
         Alert.alert("Success","The pet has been added successfully !");
-        router.replace("/(tabs)/list");
+        router.push("/(tabs)/list");
     };
     const handleChange=(key,value)=>setForm({...form,[key]:value});
 
@@ -87,9 +89,11 @@ export default function AddPet() {
     <TextInput style={styles.input} placeholder="Image URL (optional)"
     value={form.image} onChangeText={(v) => handleChange("image", v)}/>
    
-    <TouchableOpacity style={styles.button} onPress={handleAdd}>
-        <Text style={styles.buttonText}>Add Pet</Text>
-    </TouchableOpacity> 
+      <PrimaryButton
+        title="Add Pet"
+        onPress={handleAdd}
+      />
+ 
     </ScrollView>
   );
 }
