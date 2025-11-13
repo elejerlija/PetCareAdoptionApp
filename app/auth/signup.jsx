@@ -3,6 +3,8 @@ import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Platfo
 import { SafeAreaView } from "react-native-safe-area-context";
 import PrimaryButton from "../../components/PrimaryButton";
 import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+
 
 import { auth, db } from "../../firebase";
 import { 
@@ -93,11 +95,11 @@ const HandleGoogleSignUp = async () => {
  
 
   try {
-    alert("2. Duke hapur Google popup...");
+    
 
     const result = await signInWithPopup(auth, googleProvider);
 
-    alert("3. Popup u hap — user u kthye!");
+   
 
     console.log("GOOGLE USER:", result.user);
     alert("User: " + JSON.stringify(result.user));
@@ -192,26 +194,18 @@ const HandleGoogleSignUp = async () => {
             <Text style={styles.link}>Log in</Text>
           </TouchableOpacity>
         </View>
-             <button
-            type="button"
-            onClick={HandleGoogleSignUp}
-            style={{
-              width: "100%",
-              padding: 12,
-              backgroundColor: "#e8f0fe",
-              borderRadius: 6,
-              border: "1px solid #ccc",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 10,
-              fontSize: 16,
-              cursor: "pointer",
-            }}
-          >
-            <span style={{ fontSize: 18 }}>🟦</span>
-            Continue With Google
-          </button>
+        
+  <PrimaryButton
+  title={
+    <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+      <Ionicons name="logo-google" size={20} color="#fff" />
+      <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>SignUp with Google</Text>
+    </View>
+  }
+  onPress={HandleGoogleSignUp}
+/>
+
+
 
       </ScrollView>
     </SafeAreaView>

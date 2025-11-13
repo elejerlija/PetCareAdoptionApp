@@ -5,7 +5,7 @@ import PrimaryButton from "../../components/PrimaryButton";
 import { useRouter } from "expo-router";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-
+import { Ionicons } from "@expo/vector-icons";
 
 
 import { auth, db } from "../../firebase";
@@ -127,23 +127,15 @@ const handleGoogleLogin = async () => {
         </Text>
       </TouchableOpacity>
 
-        <button
-            type="button"
-            onClick={handleGoogleLogin}
-            style={{
-              width: "100%",
-              padding: 12,
-              backgroundColor: "#e8f0fe",
-              borderRadius: 6,
-              border: "1px solid #ccc",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 10,
-              fontSize: 16,
-              cursor: "pointer",
-            }}
-          ></button>
+      <PrimaryButton
+  title={
+    <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+      <Ionicons name="logo-google" size={20} color="#fff" />
+      <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>Continue with Google</Text>
+    </View>
+  }
+  onPress={handleGoogleLogin}
+/>
 
     </SafeAreaView>
   );
