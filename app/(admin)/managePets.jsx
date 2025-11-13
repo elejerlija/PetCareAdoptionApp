@@ -1,4 +1,33 @@
 import { db } from "../../firebase";
+import React, { useEffect, useState } from "react";
+import {
+  SafeAreaView,
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+  Modal,
+  TextInput,
+  ActivityIndicator,
+  Alert,
+  Platform,
+  KeyboardAvoidingView,
+  ScrollView,
+} from "react-native";
+import { useRouter } from "expo-router";
+import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  query,
+  orderBy,
+  serverTimestamp,
+} from "firebase/firestore";
 function AddEditPetModal({ visible, onClose, onSubmit, initial }) {
   const [name, setName] = useState(initial?.name ?? "");
   const [species, setSpecies] = useState(initial?.species ?? "");
@@ -35,4 +64,67 @@ function AddEditPetModal({ visible, onClose, onSubmit, initial }) {
     } finally {
       setLoading(false);
     }
-  };}
+  };
+  return (
+    <Modal visible={visible} animationType="slide" transparent>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.modalContainer}
+      >
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>
+            {initial ? "Edit Pet" : "Add New Pet"}
+          </Text>
+          <ScrollView style={{ width: "100%" }}>
+            <TextInput
+              placeholder="Name"
+              value={name}
+              onChangeText={setName}
+              style={styles.input}
+            />
+            <TextInput
+              placeholder="Species (e.g. Dog, Cat)"
+              value={species}
+              onChangeText={setSpecies}
+              style={styles.input}
+            />
+            <TextInput
+              placeholder="Age (years)"
+              value={age}
+              onChangeText={setAge}
+              keyboardType="numeric"
+              style={styles.input}
+            />
+            <TextInput
+              placeholder="Image URL (optional)"
+              value={imageUrl}
+              onChangeText={setImageUrl}
+              style={styles.input}
+            />
+            <TextInput
+              placeholder="Short description"
+              value={description}
+              onChangeText={setDescription}
+              style={[styles.input, { height: 80 }]}
+              multiline
+            />
+          </ScrollView>
+           <View style={styles.modalButtons}>
+            <TouchableOpacity style={styles.btnGhost} onPress={onClose}>
+              <Text style={styles.btnGhostText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.btnPrimary} onPress={submit}>
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.btnPrimaryText}>
+                  {initial ? "Save" : "Add"}
+                </Text>
+              )}
+            </TouchableOpacity>
+          </View>
+        </View>
+      </KeyboardAvoidingView>
+    </Modal>
+  );
+}
