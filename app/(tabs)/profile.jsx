@@ -121,7 +121,9 @@ export default function ProfileScreen() {
       phone: phone,
       bio: bio,
       updatedAt: new Date().toISOString(),
-    });
+    },
+       { merge: true }
+    );
 
     console.log("✅ Firestore document updated!");
     Alert.alert(
