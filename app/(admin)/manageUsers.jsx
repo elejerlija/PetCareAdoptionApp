@@ -12,7 +12,7 @@ import {
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";   // ⬅️ SHTUAR
+import { useRouter } from "expo-router";  
 import {
   collection,
   onSnapshot,
@@ -26,7 +26,7 @@ const THEME = "#83BAC9";
 const LIGHT = "#FFFFF0";
 
 export default function ManageUsers() {
-  const router = useRouter(); // ⬅️ SHTUAR
+  const router = useRouter(); 
 
  
   const [users, setUsers] = useState([]);
@@ -47,7 +47,7 @@ export default function ManageUsers() {
   }, []);
 
 
-  
+
   const toggleStatus = async (id, currentStatus) => {
     const newStatus = currentStatus === "active" ? "inactive" : "active";
 
@@ -100,7 +100,7 @@ export default function ManageUsers() {
   return (
     <SafeAreaView style={styles.safe}>
 
-      {/* 🔙 BACK ICON */}
+
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => router.push("/(admin)/dashboard")}
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
 
-  // 🔙 BACK BUTTON STYLE
+
   backButton: {
     position: "absolute",
     top: 16,
