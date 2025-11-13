@@ -3,10 +3,14 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-nativ
 import { SafeAreaView } from "react-native-safe-area-context";
 import PrimaryButton from "../../components/PrimaryButton";
 import { useRouter } from "expo-router";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { Ionicons } from "@expo/vector-icons";
+
 
 import { auth, db } from "../../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -55,6 +59,40 @@ export default function LoginScreen() {
 
     setLoading(false);
   };
+  const googleProvider = new GoogleAuthProvider();
+
+const handleGoogleLogin = async () => {
+  try {
+    // 1. Hape Google popup
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+
+    // 2. Kontrollo nëse ekziston në Firestore
+    const ref = doc(db, "users", user.uid);
+    const snap = await getDoc(ref);
+
+    if (!snap.exists()) {
+      alert("❌ Ky përdorues NUK është i regjistruar. Bëni Sign Up më parë.");
+      return; // STOP — mos e lejo login
+    }
+
+    // 3. Merr të dhënat dhe vazhdo login
+    const data = snap.data();
+    const role = data.role;
+
+    if (role === "admin") {
+      router.replace("/dashboard");
+    } else {
+      router.replace("/(tabs)/");
+    }
+
+  } catch (error) {
+    console.log("GOOGLE LOGIN ERROR:", error);
+    alert("Error: " + error.message);
+  }
+};
+
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -88,6 +126,22 @@ export default function LoginScreen() {
           Don’t have an account? <Text style={styles.link}>Sign up</Text>
         </Text>
       </TouchableOpacity>
+
+  <PrimaryButton
+   onPress={handleGoogleLogin}
+   style={{
+     marginTop: 30,        // 👈 zbret më poshtë
+     width: "100%",        // 👈 e bën më të gjatë
+   }}
+   title={
+     <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+       
+       <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>
+         Continue with Google
+       </Text>
+     </View>
+   }
+ />
 
     </SafeAreaView>
   );

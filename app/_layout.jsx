@@ -20,7 +20,7 @@ export default function RootLayout() {
             <Stack.Screen name="(admin)" />
             <Stack.Screen name="auth/login" />
             <Stack.Screen name="auth/signup" />
-            <Stack.Screen name="pets/[id]" />
+            <Stack.Screen name="pets/[id]" options={{ headerShown: true, title: "Pet Details" }} />
             <Stack.Screen name="AddPet" />
             <Stack.Screen name="+not-found" />
           </Stack>

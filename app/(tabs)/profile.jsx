@@ -111,7 +111,40 @@ export default function ProfileScreen() {
     } finally {
       setLoading(false);
     }
-  };
+
+
+
+    await setDoc(doc(db, "users", uid), {
+      fullName: name,
+      email: email,
+      city: city,
+      phone: phone,
+      bio: bio,
+      updatedAt: new Date().toISOString(),
+    },
+       { merge: true }
+    );
+
+    console.log("✅ Firestore document updated!");
+    Alert.alert(
+      "✅ Profile Updated",
+      `Name: ${name}\nEmail: ${email}\nCity: ${city}\nPhone: ${phone}`
+    );
+  } catch(error) {
+    console.log(" Error:", error);
+    if (error.code === "auth/requires-recent-login") {
+      Alert.alert(
+        "Security Notice",
+        "Please log in again before changing your email."
+      );
+    } else {
+      Alert.alert("Error", error.message || "Failed to update profile.");
+    }
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handlePasswordChange = async () => {
     if (!currentPasswordForPassword) {
@@ -244,7 +277,6 @@ export default function ProfileScreen() {
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
-}
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#F9FAFB" },

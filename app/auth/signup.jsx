@@ -1,15 +1,29 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PrimaryButton from "../../components/PrimaryButton";
 import { useRouter } from "expo-router";
 
+
+
 import { auth, db } from "../../firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { 
+  GoogleAuthProvider, 
+  signInWithPopup, 
+  createUserWithEmailAndPassword 
+} from "firebase/auth";
+
+import { 
+  doc, 
+  setDoc, 
+  getDoc 
+} from "firebase/firestore";
+
 
 export default function SignUpScreen() {
   const router = useRouter();
+   
+  const googleProvider = new GoogleAuthProvider();
 
   // States për inputet
   const [fullName, setFullName] = useState("");
@@ -21,6 +35,26 @@ export default function SignUpScreen() {
 
   // Funksioni kryesor Sign Up
   const handleSignup = async () => {
+    const nameRegex = /^[A-Za-z\s]{3,}$/; 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
+  if (!nameRegex.test(fullName)) {
+    alert("Emri duhet të përmbajë vetëm shkronja dhe të jetë minimalisht 3 karaktere.");
+    return;
+  }
+
+  if (!emailRegex.test(email)) {
+    alert("Ju lutem vendosni një email valid.");
+    return;
+  }
+
+  if (!passwordRegex.test(password)) {
+    alert(
+      "Password-i duhet të ketë min 8 karaktere, 1 shkronjë të madhe, 1 të vogël, 1 numër dhe 1 simbol."
+    );
+    return;
+  }
     if (!fullName || !email || !password || !confirm) {
       alert("Ju lutem plotësoni të gjitha fushat.");
       return;
@@ -30,6 +64,7 @@ export default function SignUpScreen() {
       alert("Password-at nuk përputhen.");
       return;
     }
+
 
     setLoading(true);
 
@@ -54,6 +89,56 @@ export default function SignUpScreen() {
 
     setLoading(false);
   };
+
+
+const HandleGoogleSignUp = async () => {
+ 
+
+  try {
+    
+
+    const result = await signInWithPopup(auth, googleProvider);
+
+   
+
+    console.log("GOOGLE USER:", result.user);
+    alert("User: " + JSON.stringify(result.user));
+
+    const user = result.user;
+
+    alert("4. Duke kontrolluar Firestore...");
+
+    const ref = doc(db, "users", user.uid);
+    const snap = await getDoc(ref);
+
+    if (!snap.exists()) {
+      alert("5. User nuk ekziston — po e krijoj!");
+
+      await setDoc(ref, {
+        fullName: user.displayName || "Unknown",
+        email: user.email,
+        role: "user",
+        status: "active",
+      });
+
+      alert("6. User u ruajt në Firestore!");
+    } else {
+      alert("User ekziston në databazë!");
+    }
+
+    router.replace("/auth/login");
+
+  } catch (error) {
+    console.error("❌ GOOGLE LOGIN ERROR:", error);
+    alert("❌ ERROR: " + error.message);
+  }
+};
+
+
+
+
+
+
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -109,6 +194,24 @@ export default function SignUpScreen() {
             <Text style={styles.link}>Log in</Text>
           </TouchableOpacity>
         </View>
+        
+ <PrimaryButton
+  onPress={HandleGoogleSignUp}
+  style={{
+    marginTop: 30,        // 👈 zbret më poshtë
+    width: "100%",        // 👈 e bën më të gjatë
+  }}
+  title={
+    <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+      
+      <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>
+        SignUp with Google
+      </Text>
+    </View>
+  }
+/>
+
+
 
       </ScrollView>
     </SafeAreaView>
