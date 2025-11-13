@@ -14,7 +14,7 @@ import {
   Platform,
   KeyboardAvoidingView,
   ScrollView,
-} from "react-native";
+} from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import {
