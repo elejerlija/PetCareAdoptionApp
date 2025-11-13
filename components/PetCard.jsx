@@ -24,7 +24,7 @@ export default function PetCard({ pet, onPress }) {
         <View style={styles.row}>
           <Text style={styles.name}>{pet.name}</Text>
 
-          {/* ❤️ LOGJIKA E RE E FAVORITOUS */}
+      
           <TouchableOpacity onPress={() => toggleFavorite(pet.id)}>
             <Ionicons
               name={fav ? "heart" : "heart-outline"}
