@@ -20,6 +20,8 @@ import {
   updatePassword,
   reauthenticateWithCredential,
   EmailAuthProvider,
+  sendEmailVerification,
+  signOut,
 } from "firebase/auth";
 
 const ACCENT = "#83BAC9";
@@ -61,87 +63,55 @@ export default function ProfileScreen() {
     fetchProfile();
   }, []);
 
-  <PrimaryButton
-  title="Save Test"
-  onPress={() => {
-    console.log("Button pressed!");
-    Alert.alert("Clicked!", "Button is working fine.");
-  }}
-/>
-
-
- const handleSaveProfile = async () => {
-  console.log(" Save button pressed!");
-  const user = auth.currentUser;
-
-  if (!user) {
-    Alert.alert("Error", "No user logged in.");
-    return;
-  }
-
-  const uid = user.uid;
-  const oldEmail = user.email;
-
-  if (!name || !email) {
-    Alert.alert("Validation Error", "Please fill in your name and email.");
-    return;
-  }
-
-  try {
-    setLoading(true);
-
-
-    console.log("Updating profile...");
-
-
-    if (oldEmail !== email) {
-      console.log("Email change detected:", oldEmail, "→", email);
-
-      if (!currentPasswordForEmail) {
-        Alert.alert("Security Check", "Please enter your current password to change email.");
-        setLoading(false);
+  const handleSaveProfile = async () => {
+    const user = auth.currentUser;
+    if (!user) {
+      Alert.alert("Error", "No user logged in.");
+      return;
+    }
+    const uid = user.uid;
+    const oldEmail = user.email;
+    if (!name || !email) {
+      Alert.alert("Validation Error", "Please fill in your name and email.");
+      return;
+    }
+    try {
+      setLoading(true);
+      if (oldEmail !== email) {
+        if (!currentPasswordForEmail) {
+          Alert.alert("Security Check", "Please enter your current password to change email.");
+          setLoading(false);
+          return;
+        }
+        const credential = EmailAuthProvider.credential(oldEmail, currentPasswordForEmail);
+        await reauthenticateWithCredential(user, credential);
+        await updateEmail(user, email);
+        await sendEmailVerification(user);
+        await signOut(auth);
+        Alert.alert("Verify Email", "Check your new inbox for a verification link, then log in again.");
         return;
       }
-
-      const credential = EmailAuthProvider.credential(oldEmail, currentPasswordForEmail);
-
-      
-      await reauthenticateWithCredential(user, credential);
-      await updateEmail(user, email);
-
-      console.log(" Email updated successfully!");
-      Alert.alert(" Email Updated", `Email changed from ${oldEmail} to ${email}`);
+      await setDoc(doc(db, "users", uid), {
+        fullName: name,
+        email: email,
+        city: city,
+        phone: phone,
+        bio: bio,
+        updatedAt: new Date().toISOString(),
+      });
+      setTimeout(() => {
+        Alert.alert("✅ Profile Updated", "Your profile has been saved successfully!");
+      }, 50);
+    } catch (error) {
+      if (error.code === "auth/requires-recent-login") {
+        Alert.alert("Security Notice", "Please log in again before changing your email.");
+      } else {
+        Alert.alert("Error", error.message || "Failed to update profile.");
+      }
+    } finally {
+      setLoading(false);
     }
-
-
-    await setDoc(doc(db, "users", uid), {
-      fullName: name,
-      email: email,
-      city: city,
-      phone: phone,
-      bio: bio,
-      updatedAt: new Date().toISOString(),
-    });
-
-    console.log("✅ Firestore document updated!");
-    Alert.alert(
-      "✅ Profile Updated",
-      `Name: ${name}\nEmail: ${email}\nCity: ${city}\nPhone: ${phone}`
-    );
-  } catch (error) {
-    console.log(" Error:", error);
-    if (error.code === "auth/requires-recent-login") {
-      Alert.alert(
-        "Security Notice",
-        "Please log in again before changing your email."
-      );
-    } else {
-      Alert.alert("Error", error.message || "Failed to update profile.");
-    }
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const handlePasswordChange = async () => {
     if (!currentPasswordForPassword) {
@@ -204,6 +174,12 @@ export default function ProfileScreen() {
                 onChangeText={setEmail}
                 keyboardType="email-address"
                 autoCapitalize="none"
+              />
+              <InputField
+                placeholder="Enter current password (required if changing email)"
+                secureTextEntry={true}
+                value={currentPasswordForEmail}
+                onChangeText={setCurrentPasswordForEmail}
               />
             </View>
             <View style={styles.row}>
@@ -269,10 +245,10 @@ export default function ProfileScreen() {
     </SafeAreaView>
   );
 }
+
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#F9FAFB" },
   scrollContent: { paddingHorizontal: 18, paddingBottom: 32 },
-  
   header: {
     paddingVertical: 24,
     alignItems: "center",
@@ -291,7 +267,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     maxWidth: "85%",
   },
-
   card: {
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
@@ -312,7 +287,6 @@ const styles = StyleSheet.create({
     borderColor: ACCENT,
     paddingLeft: 10,
   },
-
   block: { marginBottom: 14 },
   label: {
     fontSize: 13,
@@ -321,10 +295,8 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     marginLeft: 2,
   },
-
   row: { flexDirection: "row", justifyContent: "space-between", gap: 10 },
   col: { flex: 1 },
-
   body: {
     fontSize: 15,
     lineHeight: 22,
