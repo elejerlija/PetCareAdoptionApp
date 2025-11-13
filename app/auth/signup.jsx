@@ -68,7 +68,7 @@ export default function SignUpScreen() {
   };
 
 
-const HandleGoogleLogin = async () => {
+const HandleGoogleSignUp = async () => {
  
 
   try {
@@ -173,7 +173,7 @@ const HandleGoogleLogin = async () => {
         </View>
              <button
             type="button"
-            onClick={HandleGoogleLogin}
+            onClick={HandleGoogleSignUp}
             style={{
               width: "100%",
               padding: 12,
