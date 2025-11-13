@@ -33,6 +33,26 @@ export default function SignUpScreen() {
 
   // Funksioni kryesor Sign Up
   const handleSignup = async () => {
+    const nameRegex = /^[A-Za-z\s]{3,}$/; 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
+  if (!nameRegex.test(fullName)) {
+    alert("Emri duhet të përmbajë vetëm shkronja dhe të jetë minimalisht 3 karaktere.");
+    return;
+  }
+
+  if (!emailRegex.test(email)) {
+    alert("Ju lutem vendosni një email valid.");
+    return;
+  }
+
+  if (!passwordRegex.test(password)) {
+    alert(
+      "Password-i duhet të ketë min 8 karaktere, 1 shkronjë të madhe, 1 të vogël, 1 numër dhe 1 simbol."
+    );
+    return;
+  }
     if (!fullName || !email || !password || !confirm) {
       alert("Ju lutem plotësoni të gjitha fushat.");
       return;
@@ -42,6 +62,7 @@ export default function SignUpScreen() {
       alert("Password-at nuk përputhen.");
       return;
     }
+
 
     setLoading(true);
 
