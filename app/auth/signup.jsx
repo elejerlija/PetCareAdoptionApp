@@ -3,7 +3,7 @@ import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Platfo
 import { SafeAreaView } from "react-native-safe-area-context";
 import PrimaryButton from "../../components/PrimaryButton";
 import { useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+
 
 
 import { auth, db } from "../../firebase";
@@ -195,14 +195,20 @@ const HandleGoogleSignUp = async () => {
           </TouchableOpacity>
         </View>
         
-  <PrimaryButton
+ <PrimaryButton
+  onPress={HandleGoogleSignUp}
+  style={{
+    marginTop: 30,        // 👈 zbret më poshtë
+    width: "100%",        // 👈 e bën më të gjatë
+  }}
   title={
-    <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-      <Ionicons name="logo-google" size={20} color="#fff" />
-      <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>SignUp with Google</Text>
+    <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+      
+      <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>
+        SignUp with Google
+      </Text>
     </View>
   }
-  onPress={HandleGoogleSignUp}
 />
 
 
