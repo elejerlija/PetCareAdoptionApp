@@ -332,6 +332,72 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   cardLeft: { width: 60, alignItems: "center", justifyContent: "center" },
-  
+  avatar: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "#e6f3f4",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  avatarText: { fontSize: 24, fontWeight: "700", color: "#2b9aa0" },
+
+  cardBody: { flex: 1, paddingLeft: 12 },
+  petName: { fontSize: 16, fontWeight: "700" },
+  petMeta: { color: "#666", marginTop: 2, marginBottom: 6 },
+  petDesc: { color: "#444", opacity: 0.8 },
+
+  cardActions: {
+    flexDirection: "row",
+    marginTop: 10,
+    gap: 10,
+  },
+  actionBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: 12,
+    gap: 6,
+  },
+  actionText: { marginLeft: 6 },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    padding: 20,
+    backgroundColor: "rgba(0,0,0,0.36)",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 16,
+    maxHeight: "85%",
+  },
+  modalTitle: { fontSize: 18, fontWeight: "700", marginBottom: 8 },
+  input: {
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 10,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginTop: 8,
+    gap: 8,
+  },
+  btnGhost: {
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+  },
+  btnGhostText: { color: "#555" },
+  btnPrimary: {
+    backgroundColor: "#2b9aa0",
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  btnPrimaryText: { color: "#fff", fontWeight: "700" },
 });
 
