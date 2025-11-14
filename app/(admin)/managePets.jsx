@@ -296,4 +296,42 @@ export default function ManagePets() {
     </SafeAreaView>
   );
 }
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "#fff" },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 16,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: "#e6e6e6",
+  },
+  headerTitle: { fontSize: 20, fontWeight: "700" },
+  addBtn: {
+    backgroundColor: "#2b9aa0",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  addBtnText: { color: "#fff", fontWeight: "600" },
+
+  empty: { flex: 1, alignItems: "center", justifyContent: "center" },
+  emptyText: { color: "#777", fontSize: 16 },
+
+  card: {
+    flexDirection: "row",
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 12,
+    marginVertical: 8,
+    shadowColor: "#000",
+    shadowOpacity: 0.03,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 6,
+    elevation: 2,
+    alignItems: "center",
+  },
+  cardLeft: { width: 60, alignItems: "center", justifyContent: "center" },
+  
+});
 
