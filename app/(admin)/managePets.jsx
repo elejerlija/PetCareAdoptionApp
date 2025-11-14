@@ -24,8 +24,6 @@ import {
   deleteDoc,
   doc,
   onSnapshot,
-  query,
-  orderBy,
   serverTimestamp,
 } from "firebase/firestore";
 
@@ -130,133 +128,122 @@ function AddEditPetModal({ visible, onClose, onSubmit, initial }) {
   );
 }
 export default function ManagePets() {
-  const router = useRouter();
   const [pets, setPets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingPet, setEditingPet] = useState(null);
+  const [name, setName] = useState("");
+  const [type, setType] = useState("");
+  const [age, setAge] = useState("");
+  const [city, setCity] = useState("");
+  const [price, setPrice] = useState("");
+  const [desc, setDesc] = useState("");
+  const [image, setImage] = useState("");
 
   useEffect(() => {
-    
-    const q = query(collection(db, "pets"), orderBy("createdAt", "desc"));
-    const unsub = onSnapshot(
-      q,
-      (snapshot) => {
-        const arr = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-        setPets(arr);
-        setLoading(false);
-      },
-      (err) => {
-        console.error("Pets onSnapshot error:", err);
-        setLoading(false);
-      }
-    );
-    return () => unsub();
+    const unsubscribe = onSnapshot(collection(db, "pets"), (snapshot) => {
+      const petList = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setPets(petList);
+      setLoading(false);
+    });
+
+    return unsubscribe;
   }, []);
 
-  const handleAdd = async (payload) => {
-    await addDoc(collection(db, "pets"), {
-      ...payload,
-      adopted: false,
-      createdAt: serverTimestamp(),
-    });
+  const resetForm = () => {
+    setName("");
+    setType("");
+    setAge("");
+    setCity("");
+    setPrice("");
+    setDesc("");
+    setImage("");
   };
+  const openModal = (pet = null) => {
+    if (pet) {
+      setEditingPet(pet);
+      setName(pet.name);
+      setType(pet.type);
+      setAge(pet.age?.toString() || "");
+      setCity(pet.city || "");
+      setPrice(pet.price?.toString() || "");
+      setDesc(pet.desc || "");
+      setImage(pet.image || "");
+    } else {
+      setEditingPet(null);
+      resetForm();
+    }
 
-  const handleUpdate = async (payload) => {
-    if (!editingPet) throw new Error("No pet selected for update");
-    const ref = doc(db, "pets", editingPet.id);
-    await updateDoc(ref, {
-      ...payload,
-    });
-    setEditingPet(null);
+    setModalVisible(true);
   };
+  const savePet = async () => {
+    if (!name.trim()) {
+      Alert.alert("Error", "Pet name is required.");
+      return;
+    }
 
-  const handleDelete = (pet) => {
-    Alert.alert(
-      "Delete pet",
-      `Are you sure you want to delete "${pet.name}"?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await deleteDoc(doc(db, "pets", pet.id));
-            } catch (e) {
-              Alert.alert("Error", "Couldn't delete pet: " + e.message);
-            }
-          },
-        },
-      ]
-    );
-  };
+    const data = {
+      name,
+      type,
+      age: age ? Number(age) : null,
+      city,
+      price: price ? Number(price) : 0,
+      desc,
+      image,
+      available: editingPet?.available ?? true,
+      favorite: editingPet?.favorite ?? false,
+    };
 
-  const toggleAdopted = async (pet) => {
     try {
-      await updateDoc(doc(db, "pets", pet.id), { adopted: !pet.adopted });
-    } catch (e) {
-      Alert.alert("Error", "Couldn't update status: " + e.message);
+      if (editingPet) {
+        await updateDoc(doc(db, "pets", editingPet.id), data);
+      } else {
+        await addDoc(collection(db, "pets"), {
+          ...data,
+          createdAt: serverTimestamp(),
+        });
+      }
+
+      setModalVisible(false);
+      resetForm();
+    } catch (error) {
+      Alert.alert("Error", error.message);
     }
   };
+  const toggleAvailable = async (pet) => {
+    await updateDoc(doc(db, "pets", pet.id), {
+      available: !pet.available,
+    });
+  };
+const renderPet = ({ item }) => (
+    <View style={styles.petCard}>
+      <Text style={styles.petName}>{item.name}</Text>
+      <Text style={styles.petMeta}>{item.type} • {item.age} yrs</Text>
+      <Text style={styles.petDesc}>{item.desc}</Text>
 
-  const openAdd = () => {
-    setEditingPet(null);
-    setModalVisible(true);
-  };
-  const openEdit = (pet) => {
-    setEditingPet(pet);
-    setModalVisible(true);
-  };
-  const renderItem = ({ item }) => (
-    <View style={styles.card}>
-      <View style={styles.cardLeft}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>
-            {item.name ? item.name.charAt(0).toUpperCase() : "?"}
+      <View style={styles.actions}>
+        <TouchableOpacity
+          onPress={() => toggleAvailable(item)}
+          style={styles.actionBtn}
+        >
+          <MaterialIcons
+            name={item.available ? "check-circle" : "radio-button-unchecked"}
+            size={20}
+            color={item.available ? "green" : "gray"}
+          />
+          <Text style={styles.actionText}>
+            {item.available ? "Available" : "Unavailable"}
           </Text>
-        </View>
-      </View>
+        </TouchableOpacity>
 
-      <View style={styles.cardBody}>
-        <Text style={styles.petName}>{item.name}</Text>
-        <Text style={styles.petMeta}>
-          {item.species ?? "Unknown"} • {item.age ?? "-"} yrs
-        </Text>
-        <Text style={styles.petDesc} numberOfLines={2}>
-          {item.description ?? ""}
-        </Text>
-
-        <View style={styles.cardActions}>
-          <TouchableOpacity
-            style={styles.actionBtn}
-            onPress={() => toggleAdopted(item)}
-          >
-            <MaterialIcons
-              name={item.adopted ? "check-circle" : "radio-button-unchecked"}
-              size={18}
-            />
-            <Text style={styles.actionText}>
-              {item.adopted ? "Adopted" : "Mark Adopted"}
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.actionBtn}
-            onPress={() => openEdit(item)}
-          >
-            <FontAwesome5 name="edit" size={14} />
-            <Text style={styles.actionText}>Edit</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.actionBtn}
-            onPress={() => handleDelete(item)}
-          >
-            <MaterialIcons name="delete" size={18} />
-            <Text style={[styles.actionText, { color: "#d33" }]}>Delete</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity onPress={() => openModal(item)} style={styles.actionBtn}>
+          <MaterialIcons name="edit" size={20} color="#007AFF" />
+          <Text style={styles.actionText}>Edit</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
