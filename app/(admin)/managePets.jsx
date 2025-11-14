@@ -249,39 +249,107 @@ const renderPet = ({ item }) => (
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.headerRow}>
-        <Text style={styles.headerTitle}>Manage Pets</Text>
-        <TouchableOpacity style={styles.addBtn} onPress={openAdd}>
-          <Text style={styles.addBtnText}>+ Add Pet</Text>
-        </TouchableOpacity>
-      </View>
+    <View style={styles.container}>
+      <Text style={styles.title}>Manage Pets</Text>
 
       {loading ? (
-        <ActivityIndicator style={{ marginTop: 30 }} />
-      ) : pets.length === 0 ? (
-        <View style={styles.empty}>
-          <Text style={styles.emptyText}>No pets yet. Add one!</Text>
-        </View>
+        <ActivityIndicator size="large" style={{ marginTop: 40 }} />
       ) : (
         <FlatList
           data={pets}
-          keyExtractor={(i) => i.id}
-          renderItem={renderItem}
-          contentContainerStyle={{ paddingBottom: 40, paddingHorizontal: 12 }}
+          keyExtractor={(item) => item.id}
+          renderItem={renderPet}
+          contentContainerStyle={{ paddingBottom: 120 }}
         />
       )}
 
-      <AddEditPetModal
-        visible={modalVisible}
-        onClose={() => {
-          setModalVisible(false);
-          setEditingPet(null);
-        }}
-        onSubmit={editingPet ? handleUpdate : handleAdd}
-        initial={editingPet}
-      />
-    </SafeAreaView>
+      <TouchableOpacity
+        style={styles.addBtn}
+        onPress={() => openModal(null)}
+      >
+        <Text style={styles.addBtnText}>+ Add New Pet</Text>
+      </TouchableOpacity>
+
+      <Modal visible={modalVisible} animationType="slide" transparent>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={styles.modalContainer}
+        >
+          <View style={styles.modalContent}>
+            <ScrollView>
+              <Text style={styles.modalTitle}>
+                {editingPet ? "Edit Pet" : "Add Pet"}
+              </Text>
+
+              <TextInput
+                placeholder="Name"
+                value={name}
+                onChangeText={setName}
+                style={styles.input}
+              />
+
+              <TextInput
+                placeholder="Type (dog, cat...)"
+                value={type}
+                onChangeText={setType}
+                style={styles.input}
+              />
+
+              <TextInput
+                placeholder="Age (years)"
+                value={age}
+                keyboardType="number-pad"
+                onChangeText={setAge}
+                style={styles.input}
+              />
+
+              <TextInput
+                placeholder="City"
+                value={city}
+                onChangeText={setCity}
+                style={styles.input}
+              />
+
+              <TextInput
+                placeholder="Price"
+                value={price}
+                keyboardType="number-pad"
+                onChangeText={setPrice}
+                style={styles.input}
+              />
+
+              <TextInput
+                placeholder="Image URL"
+                value={image}
+                onChangeText={setImage}
+                style={styles.input}
+              />
+
+              <TextInput
+                placeholder="Description"
+                value={desc}
+                onChangeText={setDesc}
+                multiline
+                style={[styles.input, { height: 80 }]}
+              />
+
+              <TouchableOpacity onPress={savePet} style={styles.saveBtn}>
+                <Text style={styles.saveBtnText}>
+                  {editingPet ? "Save Changes" : "Add Pet"}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => setModalVisible(false)}
+                style={styles.cancelBtn}
+              >
+                <Text style={styles.cancelBtnText}>Cancel</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
+    </View>
   );
 }
 const styles = StyleSheet.create({
