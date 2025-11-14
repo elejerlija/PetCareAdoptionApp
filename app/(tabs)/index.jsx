@@ -1,42 +1,28 @@
-import { View, Text, StyleSheet, Image, FlatList, ScrollView, Linking } from "react-native";
+import { View, Text, StyleSheet, Image, ScrollView, Linking } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Link, router } from "expo-router";
-import { signOut } from "firebase/auth";
-import { auth } from "../../firebase";
-import PrimaryButton from "../../components/PrimaryButton";
+import { useEffect, useState } from "react";
 
 const THEME = "#83BAC9";
 const LIGHT = "#FFFFF0";
-
-const FEATURED_PETS = [
-  {
-    id: 1,
-    name: "Max",
-    type: "Dog",
-    age: 3,
-    image: require("../../assets/images/dog1.jpg"),
-  },
-  {
-    id: 2,
-    name: "Luna",
-    type: "Cat",
-    age: 2,
-    image: require("../../assets/images/cat2.jpg"),
-  },
-];
-
+ 
 export default function HomeScreen() {
+  const NEWS_LIST = [
+    "Vaccination week is coming! 🩺",
+    "Free grooming for adopted pets this month ✂️",
+    "New shelter opening in Prishtina 🏥",
+    "Donate a blanket — help keep pets warm this winter 🧣",
+    "Low-cost microchipping available this Friday 🐾",
+    "Adoption marathon coming next month 🐶",
+    "Shelter volunteers needed this weekend 🤝",
+  ];
 
-  const featured = FEATURED_PETS;
+  const [randomNews, setRandomNews] = useState([]);
 
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-        window.location.href = "/";
-    } catch (error) {
-      alert("Logout failed: " + error.message);
-    }
-  };
+  useEffect(() => {
+    const shuffled = [...NEWS_LIST].sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, 3);
+    setRandomNews(selected);
+  }, []);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -63,35 +49,17 @@ export default function HomeScreen() {
           </Text>
         </View>
 
-        <Text style={styles.sectionTitle}>Featured</Text>
+        <View style={styles.newsRow}>
+          <Text style={styles.newsIcon}>📰</Text>
+          <Text style={styles.newsTitle}>PetCare News</Text>
+        </View>
 
-        <FlatList
-          data={featured}
-          horizontal
-          keyExtractor={(item) => String(item.id)}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 8 }}
-          ItemSeparatorComponent={() => <View style={{ width: 12 }} />}
-          style={{ marginBottom: 24 }}
-          renderItem={({ item }) => (
-            <Link
-              href={{ pathname: "/pets/[id]", params: { id: String(item.id) } }}
-              asChild
-            >
-              <View style={styles.card}>
-                <Image source={item.image} style={styles.cardImg} />
-                <Text style={styles.cardName}>{item.name}</Text>
-                <Text style={styles.cardMeta}>
-                  {item.type} • {item.age} yrs
-                </Text>
-              </View>
-            </Link>
-          )}
-
-        />
-
-        <View style={styles.logoutContainer}>
-          <PrimaryButton title="Logout" onPress={handleLogout} />
+        <View style={styles.newsBox}>
+          {randomNews.map((news, index) => (
+            <Text key={index} style={styles.newsItem}>
+              • {news}
+            </Text>
+          ))}
         </View>
 
         <View style={styles.footer}>
@@ -119,6 +87,7 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 50,
   },
+
   header: {
     alignItems: "center",
     justifyContent: "center",
@@ -138,16 +107,17 @@ const styles = StyleSheet.create({
     fontSize: 15,
     paddingHorizontal: 12,
   },
+
   heroImg: {
     width: "100%",
     height: 200,
-    borderRadius: 20,
+    borderRadius: 24,
     marginVertical: 10,
   },
 
   banner: {
     backgroundColor: THEME,
-    borderRadius: 18,
+    borderRadius: 20,
     padding: 14,
     marginVertical: 12,
   },
@@ -162,48 +132,47 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontSize: 13,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "800",
-    marginTop: 12,
-    marginBottom: 10,
-    color: "#223",
+
+  newsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 18,
+    marginBottom: 6,
+  },
+  newsIcon: {
+    fontSize: 22,
+    marginRight: 8,
+    color: THEME,
+  },
+  newsTitle: {
+    fontSize: 19,
+    fontWeight: "700",
+    color: "#2A3A3F",
+    letterSpacing: 0.3,
   },
 
-  card: {
-    width: 160,
-    backgroundColor: "#fff",
-    borderRadius: 16,
+  newsBox: {
+    backgroundColor: "#E8F5F7",
+    padding: 18,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: "#eef2f3",
-    padding: 10,
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
+    borderColor: "#D4EBEF",
+    marginBottom: 22,
+    shadowColor: "#83BAC9",
+    shadowOpacity: 0.12,
     shadowOffset: { width: 0, height: 3 },
     shadowRadius: 6,
     elevation: 3,
   },
-  cardImg: {
-    width: "100%",
-    height: 100,
-    borderRadius: 12,
-    backgroundColor: "#eee",
+
+  newsItem: {
+    fontSize: 16,
+    color: "#2A3A3F",
+    marginBottom: 8,
+    lineHeight: 24,
+    fontWeight: "500",
   },
-  cardName: {
-    fontWeight: "800",
-    marginTop: 8,
-    color: "#222",
-    textAlign: "center",
-  },
-  cardMeta: {
-    color: "#667",
-    marginTop: 2,
-    textAlign: "center",
-  },
-  logoutContainer: {
-    alignItems: "center",
-    marginBottom: 20,
-  },
+
   footer: {
     marginTop: 20,
     paddingVertical: 20,
