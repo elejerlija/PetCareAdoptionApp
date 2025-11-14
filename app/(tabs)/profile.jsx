@@ -23,9 +23,13 @@ import {
   signOut,
 } from "firebase/auth";
 
+import { useRouter } from "expo-router";
+
 const ACCENT = "#83BAC9";
 
 export default function ProfileScreen() {
+  const router = useRouter();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [city, setCity] = useState("");
@@ -55,6 +59,7 @@ export default function ProfileScreen() {
           setBio(data.bio || "");
         }
       } catch (err) {}
+
       setLoadingProfile(false);
     };
 
@@ -79,6 +84,7 @@ export default function ProfileScreen() {
         { merge: true }
       );
     } catch (err) {}
+
     setSaving(false);
   };
 
@@ -100,12 +106,14 @@ export default function ProfileScreen() {
       setNewPassword("");
       setCurrentPasswordPassword("");
     } catch (err) {}
+
     setSavingPass(false);
   };
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      router.replace("/auth/login");
     } catch (err) {}
   };
 
