@@ -24,381 +24,297 @@ import {
   deleteDoc,
   doc,
   onSnapshot,
-  query,
-  orderBy,
   serverTimestamp,
 } from "firebase/firestore";
-
-function AddEditPetModal({ visible, onClose, onSubmit, initial }) {
-  const [name, setName] = useState(initial?.name ?? "");
-  const [species, setSpecies] = useState(initial?.species ?? "");
-  const [age, setAge] = useState(initial?.age ? String(initial.age) : "");
-  const [imageUrl, setImageUrl] = useState(initial?.imageUrl ?? "");
-  const [description, setDescription] = useState(initial?.description ?? "");
-  const [loading, setLoading] = useState(false);
-
-   useEffect(() => {
-    if (visible) {
-      setName(initial?.name ?? "");
-      setSpecies(initial?.species ?? "");
-      setAge(initial?.age ? String(initial.age) : "");
-      setImageUrl(initial?.imageUrl ?? "");
-      setDescription(initial?.description ?? "");
-    }
-  }, [visible, initial]);
-
-  const submit = async () => {
-    if (!name.trim()) return Alert.alert("Validation", "Please enter a name.");
-    setLoading(true);
-    const payload = {
-      name: name.trim(),
-      species: species.trim() || "Unknown",
-      age: age ? Number(age) : null,
-      imageUrl: imageUrl.trim() || null,
-      description: description.trim() || "",
-    };
-    try {
-      await onSubmit(payload);
-      onClose();
-    } catch (e) {
-      Alert.alert("Error", e.message || "Could not save pet.");
-    } finally {
-      setLoading(false);
-    }
-  };
-  return (
-    <Modal visible={visible} animationType="slide" transparent>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.modalContainer}
-      >
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>
-            {initial ? "Edit Pet" : "Add New Pet"}
-          </Text>
-          <ScrollView style={{ width: "100%" }}>
-            <TextInput
-              placeholder="Name"
-              value={name}
-              onChangeText={setName}
-              style={styles.input}
-            />
-            <TextInput
-              placeholder="Species (e.g. Dog, Cat)"
-              value={species}
-              onChangeText={setSpecies}
-              style={styles.input}
-            />
-            <TextInput
-              placeholder="Age (years)"
-              value={age}
-              onChangeText={setAge}
-              keyboardType="numeric"
-              style={styles.input}
-            />
-            <TextInput
-              placeholder="Image URL (optional)"
-              value={imageUrl}
-              onChangeText={setImageUrl}
-              style={styles.input}
-            />
-            <TextInput
-              placeholder="Short description"
-              value={description}
-              onChangeText={setDescription}
-              style={[styles.input, { height: 80 }]}
-              multiline
-            />
-          </ScrollView>
-           <View style={styles.modalButtons}>
-            <TouchableOpacity style={styles.btnGhost} onPress={onClose}>
-              <Text style={styles.btnGhostText}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.btnPrimary} onPress={submit}>
-              {loading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.btnPrimaryText}>
-                  {initial ? "Save" : "Add"}
-                </Text>
-              )}
-            </TouchableOpacity>
-          </View>
-        </View>
-      </KeyboardAvoidingView>
-    </Modal>
-  );
-}
 export default function ManagePets() {
   const router = useRouter();
   const [pets, setPets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingPet, setEditingPet] = useState(null);
+  const [name, setName] = useState("");
+  const [type, setType] = useState("");
+  const [age, setAge] = useState("");
+  const [city, setCity] = useState("");
+  const [price, setPrice] = useState("");
+  const [desc, setDesc] = useState("");
+  const [image, setImage] = useState("");
 
   useEffect(() => {
-    
-    const q = query(collection(db, "pets"), orderBy("createdAt", "desc"));
-    const unsub = onSnapshot(
-      q,
-      (snapshot) => {
-        const arr = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-        setPets(arr);
-        setLoading(false);
-      },
-      (err) => {
-        console.error("Pets onSnapshot error:", err);
-        setLoading(false);
-      }
-    );
-    return () => unsub();
+    const unsubscribe = onSnapshot(collection(db, "pets"), (snapshot) => {
+      const petList = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setPets(petList);
+      setLoading(false);
+    });
+
+    return unsubscribe;
   }, []);
 
-  const handleAdd = async (payload) => {
-    await addDoc(collection(db, "pets"), {
-      ...payload,
-      adopted: false,
-      createdAt: serverTimestamp(),
-    });
+  const resetForm = () => {
+    setName("");
+    setType("");
+    setAge("");
+    setCity("");
+    setPrice("");
+    setDesc("");
+    setImage("");
   };
+  const openModal = (pet = null) => {
+    if (pet) {
+      setEditingPet(pet);
+      setName(pet.name);
+      setType(pet.type);
+      setAge(pet.age?.toString() || "");
+      setCity(pet.city || "");
+      setPrice(pet.price?.toString() || "");
+      setDesc(pet.desc || "");
+      setImage(pet.image || "");
+    } else {
+      setEditingPet(null);
+      resetForm();
+    }
 
-  const handleUpdate = async (payload) => {
-    if (!editingPet) throw new Error("No pet selected for update");
-    const ref = doc(db, "pets", editingPet.id);
-    await updateDoc(ref, {
-      ...payload,
-    });
-    setEditingPet(null);
+    setModalVisible(true);
   };
+  const savePet = async () => {
+    if (!name.trim()) {
+      Alert.alert("Error", "Pet name is required.");
+      return;
+    }
 
-  const handleDelete = (pet) => {
-    Alert.alert(
-      "Delete pet",
-      `Are you sure you want to delete "${pet.name}"?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await deleteDoc(doc(db, "pets", pet.id));
-            } catch (e) {
-              Alert.alert("Error", "Couldn't delete pet: " + e.message);
-            }
-          },
-        },
-      ]
-    );
-  };
+    const data = {
+      name,
+      type,
+      age: age ? Number(age) : null,
+      city,
+      price: price ? Number(price) : 0,
+      desc,
+      image,
+      available: editingPet?.available ?? true,
+      favorite: editingPet?.favorite ?? false,
+    };
 
-  const toggleAdopted = async (pet) => {
     try {
-      await updateDoc(doc(db, "pets", pet.id), { adopted: !pet.adopted });
-    } catch (e) {
-      Alert.alert("Error", "Couldn't update status: " + e.message);
+      if (editingPet) {
+        await updateDoc(doc(db, "pets", editingPet.id), data);
+      } else {
+        await addDoc(collection(db, "pets"), {
+          ...data,
+          createdAt: serverTimestamp(),
+        });
+      }
+
+      setModalVisible(false);
+      resetForm();
+    } catch (error) {
+      Alert.alert("Error", error.message);
     }
   };
+  const toggleAvailable = async (pet) => {
+    await updateDoc(doc(db, "pets", pet.id), {
+      available: !pet.available,
+    });
+  };
+const renderPet = ({ item }) => (
+    <View style={styles.petCard}>
+      <Text style={styles.petName}>{item.name}</Text>
+      <Text style={styles.petMeta}>{item.type} • {item.age} yrs • {item.city}</Text>
+      <Text style={styles.petDesc}>{item.desc}</Text>
 
-  const openAdd = () => {
-    setEditingPet(null);
-    setModalVisible(true);
-  };
-  const openEdit = (pet) => {
-    setEditingPet(pet);
-    setModalVisible(true);
-  };
-  const renderItem = ({ item }) => (
-    <View style={styles.card}>
-      <View style={styles.cardLeft}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>
-            {item.name ? item.name.charAt(0).toUpperCase() : "?"}
+      <View style={styles.actions}>
+        <TouchableOpacity
+          onPress={() => toggleAvailable(item)}
+          style={styles.actionBtn}
+        >
+          <MaterialIcons
+            name={item.available ? "check-circle" : "radio-button-unchecked"}
+            size={20}
+            color={item.available ? "green" : "gray"}
+          />
+          <Text style={styles.actionText}>
+            {item.available ? "Available" : "Unavailable"}
           </Text>
-        </View>
-      </View>
+        </TouchableOpacity>
 
-      <View style={styles.cardBody}>
-        <Text style={styles.petName}>{item.name}</Text>
-        <Text style={styles.petMeta}>
-          {item.species ?? "Unknown"} • {item.age ?? "-"} yrs
-        </Text>
-        <Text style={styles.petDesc} numberOfLines={2}>
-          {item.description ?? ""}
-        </Text>
-
-        <View style={styles.cardActions}>
-          <TouchableOpacity
-            style={styles.actionBtn}
-            onPress={() => toggleAdopted(item)}
-          >
-            <MaterialIcons
-              name={item.adopted ? "check-circle" : "radio-button-unchecked"}
-              size={18}
-            />
-            <Text style={styles.actionText}>
-              {item.adopted ? "Adopted" : "Mark Adopted"}
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.actionBtn}
-            onPress={() => openEdit(item)}
-          >
-            <FontAwesome5 name="edit" size={14} />
-            <Text style={styles.actionText}>Edit</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.actionBtn}
-            onPress={() => handleDelete(item)}
-          >
-            <MaterialIcons name="delete" size={18} />
-            <Text style={[styles.actionText, { color: "#d33" }]}>Delete</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity onPress={() => openModal(item)} style={styles.actionBtn}>
+          <MaterialIcons name="edit" size={20} color="#007AFF" />
+          <Text style={styles.actionText}>Edit</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.headerRow}>
-        <Text style={styles.headerTitle}>Manage Pets</Text>
-        <TouchableOpacity style={styles.addBtn} onPress={openAdd}>
-          <Text style={styles.addBtnText}>+ Add Pet</Text>
+        <TouchableOpacity
+          onPress={() => router.push("/(admin)")}
+          style={styles.backBtn}>
+          <MaterialIcons name="arrow-back" size={22} />
         </TouchableOpacity>
+      <Text style={styles.title}>Manage Pets</Text>
       </View>
 
       {loading ? (
-        <ActivityIndicator style={{ marginTop: 30 }} />
-      ) : pets.length === 0 ? (
-        <View style={styles.empty}>
-          <Text style={styles.emptyText}>No pets yet. Add one!</Text>
-        </View>
+        <ActivityIndicator size="large" style={{ marginTop: 40 }} />
       ) : (
         <FlatList
           data={pets}
-          keyExtractor={(i) => i.id}
-          renderItem={renderItem}
-          contentContainerStyle={{ paddingBottom: 40, paddingHorizontal: 12 }}
+          keyExtractor={(item) => item.id}
+          renderItem={renderPet}
+          contentContainerStyle={{ paddingBottom: 120 }}
         />
       )}
 
-      <AddEditPetModal
-        visible={modalVisible}
-        onClose={() => {
-          setModalVisible(false);
-          setEditingPet(null);
-        }}
-        onSubmit={editingPet ? handleUpdate : handleAdd}
-        initial={editingPet}
-      />
-    </SafeAreaView>
+      <TouchableOpacity
+        style={styles.addBtn}
+        onPress={() => openModal(null)}
+      >
+        <Text style={styles.addBtnText}>+ Add New Pet</Text>
+      </TouchableOpacity>
+
+      <Modal visible={modalVisible} animationType="slide" transparent>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={styles.modalContainer}
+        >
+          <View style={styles.modalContent}>
+            <ScrollView>
+              <Text style={styles.modalTitle}>
+                {editingPet ? "Edit Pet" : "Add Pet"}
+              </Text>
+
+              <TextInput
+                placeholder="Name"
+                value={name}
+                onChangeText={setName}
+                style={styles.input}
+              />
+
+              <TextInput
+                placeholder="Type (dog, cat...)"
+                value={type}
+                onChangeText={setType}
+                style={styles.input}
+              />
+
+              <TextInput
+                placeholder="Age (years)"
+                value={age}
+                keyboardType="number-pad"
+                onChangeText={setAge}
+                style={styles.input}
+              />
+
+              <TextInput
+                placeholder="City"
+                value={city}
+                onChangeText={setCity}
+                style={styles.input}
+              />
+
+              <TextInput
+                placeholder="Price"
+                value={price}
+                keyboardType="number-pad"
+                onChangeText={setPrice}
+                style={styles.input}
+              />
+
+              <TextInput
+                placeholder="Image URL"
+                value={image}
+                onChangeText={setImage}
+                style={styles.input}
+              />
+
+              <TextInput
+                placeholder="Description"
+                value={desc}
+                onChangeText={setDesc}
+                multiline
+                style={[styles.input, { height: 80 }]}
+              />
+
+              <TouchableOpacity onPress={savePet} style={styles.saveBtn}>
+                <Text style={styles.saveBtnText}>
+                  {editingPet ? "Save Changes" : "Add Pet"}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => setModalVisible(false)}
+                style={styles.cancelBtn}
+              >
+                <Text style={styles.cancelBtnText}>Cancel</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
+    </View>
   );
 }
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 16,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#e6e6e6",
-  },
-  headerTitle: { fontSize: 20, fontWeight: "700" },
-  addBtn: {
-    backgroundColor: "#2b9aa0",
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  addBtnText: { color: "#fff", fontWeight: "600" },
-
-  empty: { flex: 1, alignItems: "center", justifyContent: "center" },
-  emptyText: { color: "#777", fontSize: 16 },
-
-  card: {
-    flexDirection: "row",
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 12,
+  container: { flex: 1,padding: 20, backgroundColor: "#fff" },
+  title: { fontSize: 26, fontWeight: "700", marginBottom: 10 },
+  petCard: {
+    padding: 15,
     marginVertical: 8,
-    shadowColor: "#000",
-    shadowOpacity: 0.03,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 6,
-    elevation: 2,
-    alignItems: "center",
+    backgroundColor: "#f7f7f7",
+    borderRadius: 10,
   },
-  cardLeft: { width: 60, alignItems: "center", justifyContent: "center" },
-  avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "#e6f3f4",
-    alignItems: "center",
-    justifyContent: "center",
+  petName: { fontSize: 20, fontWeight: "bold" },
+  petMeta: { fontSize: 14, color: "#666" },
+  petDesc: { marginTop: 5, color: "#444" },
+  actions: { flexDirection: "row", marginTop: 10 },
+  actionBtn: { flexDirection: "row", alignItems: "center", marginRight: 20 },
+  actionText: { marginLeft: 4 },
+  addBtn: {
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    right: 20,
+    backgroundColor: "#007AFF",
+    padding: 15,
+    borderRadius: 10,
   },
-  avatarText: { fontSize: 24, fontWeight: "700", color: "#2b9aa0" },
-
-  cardBody: { flex: 1, paddingLeft: 12 },
-  petName: { fontSize: 16, fontWeight: "700" },
-  petMeta: { color: "#666", marginTop: 2, marginBottom: 6 },
-  petDesc: { color: "#444", opacity: 0.8 },
-
-  cardActions: {
-    flexDirection: "row",
-    marginTop: 10,
-    gap: 10,
-  },
-  actionBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginRight: 12,
-    gap: 6,
-  },
-  actionText: { marginLeft: 6 },
+  addBtnText: { color: "#fff", textAlign: "center", fontSize: 18 },
   modalContainer: {
     flex: 1,
-    justifyContent: "center",
-    padding: 20,
-    backgroundColor: "rgba(0,0,0,0.36)",
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0,0,0,0.4)",
   },
   modalContent: {
     backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 16,
-    maxHeight: "85%",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    maxHeight: "90%",
   },
-  modalTitle: { fontSize: 18, fontWeight: "700", marginBottom: 8 },
+  modalTitle: { fontSize: 22, fontWeight: "700", marginBottom: 15 },
   input: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#ccc",
+    backgroundColor: "#f2f2f2",
+    padding: 12,
     borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
     marginBottom: 10,
   },
-  modalButtons: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginTop: 8,
-    gap: 8,
-  },
-  btnGhost: {
-    paddingVertical: 10,
-    paddingHorizontal: 14,
+  saveBtn: {
+    backgroundColor: "#007AFF",
+    padding: 14,
     borderRadius: 8,
+    marginTop: 10,
   },
-  btnGhostText: { color: "#555" },
-  btnPrimary: {
-    backgroundColor: "#2b9aa0",
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+  saveBtnText: { color: "#fff", textAlign: "center", fontSize: 18 },
+  cancelBtn: {
+    padding: 14,
     borderRadius: 8,
+    marginTop: 10,
+    backgroundColor: "#ddd",
   },
-  btnPrimaryText: { color: "#fff", fontWeight: "700" },
+  cancelBtnText: { textAlign: "center", fontSize: 16 },
 });
-
