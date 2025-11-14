@@ -140,21 +140,23 @@ const handleGoogleLogin = async () => {
         </Text>
       </TouchableOpacity>
 
-  <PrimaryButton
-   onPress={handleGoogleLogin}
-   style={{
-     marginTop: 30,        // 👈 zbret më poshtë
-     width: "100%",        // 👈 e bën më të gjatë
-   }}
-   title={
-     <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-       
-       <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>
-         Continue with Google
-       </Text>
-     </View>
-   }
- />
+<button
+  onClick={handleGoogleLogin}
+  style={{
+    marginTop: 30,
+    width: "100%",
+    padding: 14,
+    borderRadius: 12,
+    backgroundColor: "#83BAC9",
+    color: "white",
+    fontWeight: 700,
+    fontSize: 16,
+    cursor: "pointer"
+  }}
+>
+  Continue with Google
+</button>
+
 
     </SafeAreaView>
   );
