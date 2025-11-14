@@ -20,6 +20,8 @@ import {
   updatePassword,
   reauthenticateWithCredential,
   EmailAuthProvider,
+  sendEmailVerification,
+  signOut,
 } from "firebase/auth";
 
 const ACCENT = "#83BAC9";
@@ -61,89 +63,65 @@ export default function ProfileScreen() {
     fetchProfile();
   }, []);
 
-  <PrimaryButton
-  title="Save Test"
-  onPress={() => {
-    console.log("Button pressed!");
-    Alert.alert("Clicked!", "Button is working fine.");
-  }}
-/>
+  const handleSaveProfile = async () => {
+    const user = auth.currentUser;
+    if (!user) {
+      Alert.alert("Error", "No user logged in.");
+      return;
+    }
 
+    const uid = user.uid;
+    const oldEmail = user.email;
 
- const handleSaveProfile = async () => {
-  console.log(" Save button pressed!");
-  const user = auth.currentUser;
+    if (!name || !email) {
+      Alert.alert("Validation Error", "Please fill in your name and email.");
+      return;
+    }
 
-  if (!user) {
-    Alert.alert("Error", "No user logged in.");
-    return;
-  }
+    try {
+      setLoading(true);
 
-  const uid = user.uid;
-  const oldEmail = user.email;
+      if (oldEmail !== email) {
+        if (!currentPasswordForEmail) {
+          Alert.alert("Security Check", "Please enter your current password to change email.");
+          setLoading(false);
+          return;
+        }
 
-  if (!name || !email) {
-    Alert.alert("Validation Error", "Please fill in your name and email.");
-    return;
-  }
+        const credential = EmailAuthProvider.credential(oldEmail, currentPasswordForEmail);
+        await reauthenticateWithCredential(user, credential);
+        await updateEmail(user, email);
+        await sendEmailVerification(user);
+        await signOut(auth);
 
-  try {
-    setLoading(true);
-
-
-    console.log("Updating profile...");
-
-
-    if (oldEmail !== email) {
-      console.log("Email change detected:", oldEmail, "→", email);
-
-      if (!currentPasswordForEmail) {
-        Alert.alert("Security Check", "Please enter your current password to change email.");
-        setLoading(false);
+        Alert.alert("Verify Email", "Check your new inbox for a verification link, then log in again.");
         return;
       }
 
-      const credential = EmailAuthProvider.credential(oldEmail, currentPasswordForEmail);
-
-      
-      await reauthenticateWithCredential(user, credential);
-      await updateEmail(user, email);
-
-      console.log(" Email updated successfully!");
-      Alert.alert(" Email Updated", `Email changed from ${oldEmail} to ${email}`);
-    }
-
-
-    await setDoc(doc(db, "users", uid), {
-      fullName: name,
-      email: email,
-      city: city,
-      phone: phone,
-      bio: bio,
-      updatedAt: new Date().toISOString(),
-    },
-       { merge: true }
-    );
-
-    console.log("✅ Firestore document updated!");
-    Alert.alert(
-      "✅ Profile Updated",
-      `Name: ${name}\nEmail: ${email}\nCity: ${city}\nPhone: ${phone}`
-    );
-  } catch (error) {
-    console.log(" Error:", error);
-    if (error.code === "auth/requires-recent-login") {
-      Alert.alert(
-        "Security Notice",
-        "Please log in again before changing your email."
+      await setDoc(
+        doc(db, "users", uid),
+        {
+          fullName: name,
+          email: email,
+          city: city,
+          phone: phone,
+          bio: bio,
+          updatedAt: new Date().toISOString(),
+        },
+        { merge: true }
       );
-    } else {
-      Alert.alert("Error", error.message || "Failed to update profile.");
+
+      Alert.alert("Profile Updated", "Your profile has been saved successfully.");
+    } catch (error) {
+      if (error.code === "auth/requires-recent-login") {
+        Alert.alert("Security Notice", "Please log in again before changing your email.");
+      } else {
+        Alert.alert("Error", error.message || "Failed to update profile.");
+      }
+    } finally {
+      setLoading(false);
     }
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const handlePasswordChange = async () => {
     if (!currentPasswordForPassword) {
@@ -154,15 +132,17 @@ export default function ProfileScreen() {
       Alert.alert("Error", "New password must be at least 6 characters long.");
       return;
     }
+
     try {
       setLoadingPassword(true);
       const user = auth.currentUser;
       const credential = EmailAuthProvider.credential(user.email, currentPasswordForPassword);
       await reauthenticateWithCredential(user, credential);
       await updatePassword(user, newPassword);
+
       setNewPassword("");
       setCurrentPasswordForPassword("");
-      Alert.alert("Success", "Password changed successfully!");
+      Alert.alert("Success", "Password changed successfully.");
     } catch {
       Alert.alert("Error", "Failed to change password.");
     } finally {
@@ -194,143 +174,66 @@ export default function ProfileScreen() {
 
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Personal Information</Text>
+
             <View style={styles.block}>
               <Text style={styles.label}>Full Name</Text>
               <InputField placeholder="Enter your name" value={name} onChangeText={setName} />
             </View>
+
             <View style={styles.block}>
               <Text style={styles.label}>Email</Text>
-              <InputField
-                placeholder="example@gmail.com"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
+              <InputField placeholder="example@gmail.com" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" />
+              <InputField placeholder="Enter current password (required if changing email)" secureTextEntry value={currentPasswordForEmail} onChangeText={setCurrentPasswordForEmail} />
             </View>
+
             <View style={styles.row}>
               <View style={[styles.block, styles.col]}>
                 <Text style={styles.label}>City</Text>
                 <InputField placeholder="Enter your city" value={city} onChangeText={setCity} />
               </View>
+
               <View style={[styles.block, styles.col]}>
                 <Text style={styles.label}>Phone Number</Text>
-                <InputField
-                  placeholder="+383 xx xxx xxx"
-                  value={phone}
-                  onChangeText={setPhone}
-                  keyboardType="phone-pad"
-                />
+                <InputField placeholder="+383 xx xxx xxx" value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
               </View>
             </View>
+
             <View style={styles.block}>
               <Text style={styles.label}>Bio</Text>
-              <InputField
-                placeholder="Write something about yourself"
-                value={bio}
-                onChangeText={setBio}
-                multiline
-              />
+              <InputField placeholder="Write something about yourself" value={bio} onChangeText={setBio} multiline />
             </View>
-            <PrimaryButton
-              title={loading ? "Saving..." : "Save Changes"}
-              onPress={handleSaveProfile}
-              isLoading={loading}
-            />
+
+            <PrimaryButton title={loading ? "Saving..." : "Save Changes"} onPress={handleSaveProfile} isLoading={loading} />
           </View>
 
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Change Password</Text>
-            <InputField
-              placeholder="Enter current password"
-              secureTextEntry={true}
-              value={currentPasswordForPassword}
-              onChangeText={setCurrentPasswordForPassword}
-            />
-            <InputField
-              placeholder="Enter new password"
-              secureTextEntry={true}
-              value={newPassword}
-              onChangeText={setNewPassword}
-            />
-            <PrimaryButton
-              title={loadingPassword ? "Updating..." : "Update Password"}
-              onPress={handlePasswordChange}
-              isLoading={loadingPassword}
-            />
+            <InputField placeholder="Enter current password" secureTextEntry value={currentPasswordForPassword} onChangeText={setCurrentPasswordForPassword} />
+            <InputField placeholder="Enter new password" secureTextEntry value={newPassword} onChangeText={setNewPassword} />
+            <PrimaryButton title={loadingPassword ? "Updating..." : "Update Password"} onPress={handlePasswordChange} isLoading={loadingPassword} />
           </View>
 
           <View style={styles.card}>
             <Text style={styles.cardTitle}>About the app</Text>
-            <Text style={styles.body}>
-              Pet Care and Adoption helps connect pet lovers with animals in need of a home
-            </Text>
+            <Text style={styles.body}>Pet Care and Adoption helps connect pet lovers with animals in need of a home.</Text>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
+
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#F9FAFB" },
   scrollContent: { paddingHorizontal: 18, paddingBottom: 32 },
-  
-  header: {
-    paddingVertical: 24,
-    alignItems: "center",
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#1F2937",
-  },
-  subtitle: {
-    marginTop: 6,
-    fontSize: 14,
-    color: "#6B7280",
-    textAlign: "center",
-    maxWidth: "85%",
-  },
-
-  card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    padding: 18,
-    marginBottom: 18,
-    shadowColor: "#000",
-    shadowOpacity: 0.07,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 2,
-  },
-  cardTitle: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: "#111827",
-    marginBottom: 14,
-    borderLeftWidth: 4,
-    borderColor: ACCENT,
-    paddingLeft: 10,
-  },
-
+  header: { paddingVertical: 24, alignItems: "center", marginTop: 10, marginBottom: 20 },
+  title: { fontSize: 24, fontWeight: "700", color: "#1F2937" },
+  subtitle: { marginTop: 6, fontSize: 14, color: "#6B7280", textAlign: "center", maxWidth: "85%" },
+  card: { backgroundColor: "#FFFFFF", borderRadius: 16, padding: 18, marginBottom: 18, shadowColor: "#000", shadowOpacity: 0.07, shadowRadius: 6, shadowOffset: { width: 0, height: 3 }, elevation: 2 },
+  cardTitle: { fontSize: 17, fontWeight: "700", color: "#111827", marginBottom: 14, borderLeftWidth: 4, borderColor: ACCENT, paddingLeft: 10 },
   block: { marginBottom: 14 },
-  label: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#374151",
-    marginBottom: 6,
-    marginLeft: 2,
-  },
-
+  label: { fontSize: 13, fontWeight: "600", color: "#374151", marginBottom: 6, marginLeft: 2 },
   row: { flexDirection: "row", justifyContent: "space-between", gap: 10 },
   col: { flex: 1 },
-
-  body: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: "#374151",
-    marginBottom: 10,
-  },
+  body: { fontSize: 15, lineHeight: 22, color: "#374151", marginBottom: 10 },
 });
