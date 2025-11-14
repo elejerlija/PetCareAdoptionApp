@@ -1,7 +1,6 @@
 import { db } from "../../firebase";
 import React, { useEffect, useState } from "react";
 import {
-  SafeAreaView,
   View,
   Text,
   FlatList,
@@ -14,7 +13,8 @@ import {
   Platform,
   KeyboardAvoidingView,
   ScrollView,
-} from "react-native-safe-area-context";
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import {
@@ -28,6 +28,7 @@ import {
   orderBy,
   serverTimestamp,
 } from "firebase/firestore";
+
 function AddEditPetModal({ visible, onClose, onSubmit, initial }) {
   const [name, setName] = useState(initial?.name ?? "");
   const [species, setSpecies] = useState(initial?.species ?? "");
