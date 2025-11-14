@@ -110,14 +110,13 @@ export function PetsProvider({ children }) {
   const getCityOfPet = (petId) =>
     pets.find((p) => p.id === petId)?.city || "Unknown";
 
-  const adoptPet = async (id) => {
-    try {
-      const ref = doc(db, "pets", id);
-      await updateDoc(ref, { available: false });
-    } catch (err) {
-      console.error("Error adopting pet:", err);
-    }
-  };
+const adoptPet = async (id) => {
+  await updateDoc(doc(db, "pets", id), {
+    status: "pending",
+    available: false,
+    requestedAt: new Date().toISOString()
+  });
+};
 
   // ✅ Toggle favorite PER USER
   const toggleFavorite = async (petId) => {

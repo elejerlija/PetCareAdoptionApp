@@ -36,21 +36,21 @@ export default function PetDetailsRoute() {
     ? { uri: pet.imageUrl }
     : require('../../assets/images/random.jpg'); 
 
-
-  const handleAdopt = () => {
-    if (Platform.OS === 'web') {
-      window.alert(`${pet.name} was successfully adopted!`);
-      adoptPet?.(pet.id);
-      return;
+const handleAdopt = async () => {
+  try {
+    if (Platform.OS === "web") {
+      window.alert("Your adoption request has been sent and is pending approval.");
+    } else {
+      Alert.alert("Request Sent", "Your adoption request is now pending.");
     }
 
-    Alert.alert(
-      'Adopted 🐾',
-      `${pet.name} was successfully adopted!`,
-      [{ text: 'OK', onPress: () => adoptPet?.(pet.id) }],
-      { cancelable: true }
-    );
-  };
+    await adoptPet?.(pet.id);
+
+  } catch (err) {
+    Alert.alert("Error", err.message);
+  }
+};
+
 
   const isAvailable = pet.available !== false; 
 
@@ -64,14 +64,25 @@ export default function PetDetailsRoute() {
 
         <Text style={styles.name}>{pet.name}</Text>
 
-        <Text
-          style={[
-            styles.status,
-            { color: isAvailable ? 'green' : 'red' },
-          ]}
-        >
-          {isAvailable ? 'Available' : 'Not available'}
-        </Text>
+ <Text
+  style={[
+    styles.status,
+    pet.status === "pending"
+      ? { color: "#e6a100" }
+      : pet.status === "approved"
+      ? { color: "green" }
+      : { color: isAvailable ? "green" : "red" },
+  ]}
+>
+  {pet.status === "pending"
+    ? "Pending approval"
+    : pet.status === "approved"
+    ? "Approved"
+    : isAvailable
+    ? "Available"
+    : "Not Available"}
+</Text>
+
 
         <Text style={styles.details}>Age: {pet.age} yr</Text>
         <Text style={styles.details}>City: {getCityOfPet(pet.id)}</Text>
@@ -123,5 +134,27 @@ const styles = StyleSheet.create({
     width: '100%',
     lineHeight: 22,
   },
-  buttonsContainer: { width: '100%', marginTop: 28, gap: 12 },
+  buttonsContainer: {
+  width: '100%',
+  marginTop: 28,
+  paddingHorizontal: 10,
+  paddingBottom: 20,
+  alignItems: 'center',
+},
+
+  status: {
+  fontSize: 16,
+  fontWeight: "600",
+  marginVertical: 6,
+},
+pendingStatus: {
+  color: "#e6a100",
+},
+approvedStatus: {
+  color: "green",
+},
+notAvailableStatus: {
+  color: "red",
+},
+
 });
