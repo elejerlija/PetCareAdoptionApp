@@ -207,4 +207,93 @@ export default function ManagePets() {
     setEditingPet(pet);
     setModalVisible(true);
   };
+  const renderItem = ({ item }) => (
+    <View style={styles.card}>
+      <View style={styles.cardLeft}>
+        <View style={styles.avatar}>
+          <Text style={styles.avatarText}>
+            {item.name ? item.name.charAt(0).toUpperCase() : "?"}
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.cardBody}>
+        <Text style={styles.petName}>{item.name}</Text>
+        <Text style={styles.petMeta}>
+          {item.species ?? "Unknown"} • {item.age ?? "-"} yrs
+        </Text>
+        <Text style={styles.petDesc} numberOfLines={2}>
+          {item.description ?? ""}
+        </Text>
+
+        <View style={styles.cardActions}>
+          <TouchableOpacity
+            style={styles.actionBtn}
+            onPress={() => toggleAdopted(item)}
+          >
+            <MaterialIcons
+              name={item.adopted ? "check-circle" : "radio-button-unchecked"}
+              size={18}
+            />
+            <Text style={styles.actionText}>
+              {item.adopted ? "Adopted" : "Mark Adopted"}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.actionBtn}
+            onPress={() => openEdit(item)}
+          >
+            <FontAwesome5 name="edit" size={14} />
+            <Text style={styles.actionText}>Edit</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.actionBtn}
+            onPress={() => handleDelete(item)}
+          >
+            <MaterialIcons name="delete" size={18} />
+            <Text style={[styles.actionText, { color: "#d33" }]}>Delete</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  );
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.headerRow}>
+        <Text style={styles.headerTitle}>Manage Pets</Text>
+        <TouchableOpacity style={styles.addBtn} onPress={openAdd}>
+          <Text style={styles.addBtnText}>+ Add Pet</Text>
+        </TouchableOpacity>
+      </View>
+
+      {loading ? (
+        <ActivityIndicator style={{ marginTop: 30 }} />
+      ) : pets.length === 0 ? (
+        <View style={styles.empty}>
+          <Text style={styles.emptyText}>No pets yet. Add one!</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={pets}
+          keyExtractor={(i) => i.id}
+          renderItem={renderItem}
+          contentContainerStyle={{ paddingBottom: 40, paddingHorizontal: 12 }}
+        />
+      )}
+
+      <AddEditPetModal
+        visible={modalVisible}
+        onClose={() => {
+          setModalVisible(false);
+          setEditingPet(null);
+        }}
+        onSubmit={editingPet ? handleUpdate : handleAdd}
+        initial={editingPet}
+      />
+    </SafeAreaView>
+  );
 }
+
