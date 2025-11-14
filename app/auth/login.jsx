@@ -44,7 +44,14 @@ export default function LoginScreen() {
       }
 
       const data = snap.data();
+         if (data.status === "inactive") {
+      alert("❌ Your account has been deactivated by the admin.");
+      await auth.signOut();
+      setLoading(false);
+      return;
+    }
       const role = data.role;
+
 
       // 3. Ndarja e rruagëve sipas rolit
       if (role === "admin") {
@@ -80,6 +87,12 @@ const handleGoogleLogin = async () => {
     const data = snap.data();
     const role = data.role;
 
+    // BLOKIMI I USERAVE INACTIVE
+    if (data.status === "inactive") {
+      alert("❌ Your account has been deactivated by the admin.");
+      await auth.signOut();
+      return;
+    }
     if (role === "admin") {
       router.replace("/dashboard");
     } else {
