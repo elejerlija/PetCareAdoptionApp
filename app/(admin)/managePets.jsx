@@ -132,7 +132,7 @@ export default function ManagePets() {
 const handleDecline = async (pet) => {
   try {
     await updateDoc(doc(db, "pets", pet.id), {
-      status: "available",
+      status: pet.status || null,
       requestedBy: null,
       requestedAt: null,
     });
