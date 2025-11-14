@@ -222,7 +222,7 @@ export default function ManagePets() {
 const renderPet = ({ item }) => (
     <View style={styles.petCard}>
       <Text style={styles.petName}>{item.name}</Text>
-      <Text style={styles.petMeta}>{item.type} • {item.age} yrs</Text>
+      <Text style={styles.petMeta}>{item.type} • {item.age} yrs • {item.city}</Text>
       <Text style={styles.petDesc}>{item.desc}</Text>
 
       <View style={styles.actions}>
