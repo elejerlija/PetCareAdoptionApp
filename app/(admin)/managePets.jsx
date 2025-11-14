@@ -358,4 +358,31 @@ const styles = StyleSheet.create({
     backgroundColor: "#ddd",
   },
   cancelBtnText: { textAlign: "center", fontSize: 16 },
+  approveBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#2b9aa0",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginRight: 10,
+  },
+  declineBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#d9534f",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  btnText: {
+    color: "#fff",
+    fontWeight: "600",
+    marginLeft: 6,
+  },
+  statusText: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginBottom: 6,
+  },
 });
