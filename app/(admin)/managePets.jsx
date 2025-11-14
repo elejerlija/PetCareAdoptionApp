@@ -119,7 +119,29 @@ export default function ManagePets() {
       available: !pet.available,
     });
   };
+  const handleApprove = async (pet) => {
+  try {
+    await updateDoc(doc(db, "pets", pet.id), {
+      status: "approved",
+    });
+  } catch (e) {
+    Alert.alert("Error", e.message);
+  }
+};
+
+const handleDecline = async (pet) => {
+  try {
+    await updateDoc(doc(db, "pets", pet.id), {
+      status: "available",
+      requestedBy: null,
+      requestedAt: null,
+    });
+  } catch (e) {
+    Alert.alert("Error", e.message);
+  }
+};
 const renderPet = ({ item }) => (
+  
     <View style={styles.petCard}>
       <Text style={styles.petName}>{item.name}</Text>
       <Text style={styles.petMeta}>{item.type} • {item.age} yrs • {item.city}</Text>
@@ -141,12 +163,31 @@ const renderPet = ({ item }) => (
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => openModal(item)} style={styles.actionBtn}>
-          <MaterialIcons name="edit" size={20} color="#007AFF" />
-          <Text style={styles.actionText}>Edit</Text>
+        <MaterialIcons name="edit" size={20} color="#007AFF" />
+        <Text style={styles.actionText}>Edit</Text>
+      </TouchableOpacity>
+    </View>
+    {item.status === "pending" && (
+      <View style={{ flexDirection: "row", marginTop: 10 }}>
+        <TouchableOpacity
+          style={styles.approveBtn}
+          onPress={() => handleApprove(item)}
+        >
+          <MaterialIcons name="check" size={18} color="#fff" />
+          <Text style={styles.btnText}>Approve</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.declineBtn}
+          onPress={() => handleDecline(item)}
+        >
+          <MaterialIcons name="close" size={18} color="#fff" />
+          <Text style={styles.btnText}>Decline</Text>
         </TouchableOpacity>
       </View>
-    </View>
-  );
+    )}
+  </View>
+);
 
   return (
     <View style={styles.container}>
