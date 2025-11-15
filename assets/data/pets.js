@@ -7,7 +7,7 @@ export const pets = [
     age: 3,
     price: 80,
     desc: 'Energetic and friendly',
-    image: require('../images/dog1.jpg'),
+    image: ('../../petImages/dog1.jpg'),
     available :true 
   },
   {
@@ -18,7 +18,7 @@ export const pets = [
     age: 2,
     price: 70,
     desc: 'Calm and loving',
-    image: require('../images/cat1.jpg'),
+    image: ('../../petImages/cat1.jpg'),
     available :true 
   },
   {
@@ -29,7 +29,7 @@ export const pets = [
     age: 5,
     price: 60,
     desc: 'Protective and lovely',
-    image: require('../images/dog2.jpg'),
+    image: ('../../petImages/dog2.jpg'),
     available :false 
   },
   {
@@ -40,7 +40,7 @@ export const pets = [
     age: 1,
     price: 90,
     desc: 'Loyal and protective',
-    image: require('../images/cat2.jpg'),
+    image: ('../../petImages/cat2.jpg'),
     available :true 
   },
   {
@@ -51,7 +51,7 @@ export const pets = [
     age: 4,
     price: 50,
     desc: 'Intelligent and loving',
-    image: require('../images/cat3.jpg'),
+    image: ('../../petImages/cat3.jpg'),
     available :false 
   },
   {
@@ -62,7 +62,7 @@ export const pets = [
     age: 2,
     price: 75,
     desc: 'Sovereign and elegant',
-    image: require('../images/cat4.jpg'),
+    image: ('../../petImages/cat4.jpg'),
     available :true 
   }
 ];

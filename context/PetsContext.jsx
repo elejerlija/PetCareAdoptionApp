@@ -1,10 +1,6 @@
 // context/PetsContext.js
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
+
 import {
   collection,
   onSnapshot,
@@ -13,23 +9,30 @@ import {
   setDoc,
   deleteDoc,
 } from "firebase/firestore";
+
 import { onAuthStateChanged } from "firebase/auth";
 import { db, auth } from "../firebase";
 
 const PetsContext = createContext();
 
 export function PetsProvider({ children }) {
+  // ===============================
+  // STATE
+  // ===============================
   const [pets, setPets] = useState([]);
+  const [stores, setStores] = useState([]);
+
   const [loadingPets, setLoadingPets] = useState(true);
 
   const [user, setUser] = useState(null);
   const [authReady, setAuthReady] = useState(false);
 
-  // favorites per-user
   const [favoriteIds, setFavoriteIds] = useState([]);
   const [loadingFavorites, setLoadingFavorites] = useState(true);
 
-  // 1) Auth listener
+  // ===============================
+  // AUTH LISTENER
+  // ===============================
   useEffect(() => {
     const unsubAuth = onAuthStateChanged(auth, (u) => {
       setUser(u);
@@ -39,7 +42,31 @@ export function PetsProvider({ children }) {
     return unsubAuth;
   }, []);
 
-  // 2) Pets listener (vetëm kur ka user)
+  // ===============================
+  // STORES LISTENER (PUBLIC)
+  // ===============================
+  useEffect(() => {
+    const unsubStores = onSnapshot(collection(db, "stores"), (snapshot) => {
+      const list = snapshot.docs.map((d) => {
+        const data = d.data();
+        return {
+          id: d.id,
+          ...data,
+
+          // For web static images
+          logoUrl: data.logo ? `/storeImages/${data.logo}` : null,
+        };
+      });
+
+      setStores(list);
+    });
+
+    return unsubStores;
+  }, []);
+
+  // ===============================
+  // PETS LISTENER (requires auth)
+  // ===============================
   useEffect(() => {
     if (!authReady) return;
 
@@ -51,15 +78,20 @@ export function PetsProvider({ children }) {
 
     setLoadingPets(true);
 
-    const colRef = collection(db, "pets");
-
     const unsubPets = onSnapshot(
-      colRef,
+      collection(db, "pets"),
       (snapshot) => {
-        const list = snapshot.docs.map((d) => ({
-          id: d.id,
-          ...d.data(),
-        }));
+        const list = snapshot.docs.map((d) => {
+          const data = d.data();
+          return {
+            id: d.id,
+            ...data,
+
+            // STATIC PET IMAGE URL
+            imageUrl: data.image ? `/petImages/${data.image}` : null,
+          };
+        });
+
         setPets(list);
         setLoadingPets(false);
       },
@@ -73,7 +105,9 @@ export function PetsProvider({ children }) {
     return unsubPets;
   }, [authReady, user]);
 
-  // 3) Favorites listener per user
+  // ===============================
+  // FAVORITES LISTENER
+  // ===============================
   useEffect(() => {
     if (!authReady) return;
 
@@ -90,7 +124,7 @@ export function PetsProvider({ children }) {
     const unsubFavs = onSnapshot(
       favCol,
       (snapshot) => {
-        const ids = snapshot.docs.map((d) => d.id); // id e dokumentit = petId
+        const ids = snapshot.docs.map((d) => d.id);
         setFavoriteIds(ids);
         setLoadingFavorites(false);
       },
@@ -104,26 +138,41 @@ export function PetsProvider({ children }) {
     return unsubFavs;
   }, [authReady, user]);
 
-  // helpers
+  // ===============================
+  // HELPERS FROM BOTH VERSIONS
+  // ===============================
   const getPetById = (id) => pets.find((p) => p.id === id);
 
-  const getCityOfPet = (petId) =>
-    pets.find((p) => p.id === petId)?.city || "Unknown";
+  const getCityOfPet = (petId) => {
+    const pet = getPetById(petId);
+    if (!pet) return null;
 
-const adoptPet = async (id) => {
-  await updateDoc(doc(db, "pets", id), {
-    status: "pending",
-    available: false,
-    requestedAt: new Date().toISOString()
-  });
-};
+    const store = stores.find((s) => s.id === pet.storeId);
+    return store?.city ?? "Unknown";
+  };
 
-  // ✅ Toggle favorite PER USER
+  const getPetsForStore = (storeId) => {
+    return pets.filter((p) => String(p.storeId) === String(storeId));
+  };
+
+  // ===============================
+  // YOUR ADOPT PET
+  // ===============================
+  const adoptPet = async (id) => {
+    await updateDoc(doc(db, "pets", id), {
+      status: "pending",
+      available: false,
+      requestedAt: new Date().toISOString(),
+    });
+  };
+
+  // ===============================
+  // TOGGLE FAVORITE
+  // ===============================
   const toggleFavorite = async (petId) => {
     if (!user) return;
 
     const favRef = doc(db, "users", user.uid, "favorites", petId);
-
     const isFav = favoriteIds.includes(petId);
 
     try {
@@ -142,18 +191,31 @@ const adoptPet = async (id) => {
 
   const isFavorite = (petId) => favoriteIds.includes(petId);
 
+  // ===============================
+  // PROVIDER RETURN
+  // ===============================
   return (
     <PetsContext.Provider
       value={{
         pets,
+        stores,
+
+        // loadings
         loadingPets,
         favoriteIds,
         loadingFavorites,
+
+        // favorites
         isFavorite,
+        toggleFavorite,
+
+        // getters
         getPetById,
         getCityOfPet,
+        getPetsForStore,
+
+        // actions
         adoptPet,
-        toggleFavorite,
       }}
     >
       {children}

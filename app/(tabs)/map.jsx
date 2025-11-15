@@ -1,204 +1,210 @@
-// import React, { useState } from "react";
-// import {
-//   View,
-//   Text,
-//   Image,
-//   StyleSheet,
-//   TouchableOpacity,
-//   Modal,
-//   FlatList,
-//   Pressable,
-//   Platform,
-// } from "react-native";
-// import MapView, { Marker } from "react-native-maps";
-// import { usePets } from "../../context/PetsContext";
-// import PetCard from "../../components/PetCard";
-// import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  Modal,
+  FlatList,
+  Pressable,
+} from "react-native";
 
-// const MODAL_ANIMATION_DELAY = 300;
+import { MapContainer, TileLayer, Marker } from "react-leaflet";
+import L from "leaflet";
 
-// export default function MapScreen() {
-//   const { stores, getPetsForStore } = usePets();
-//   const router = useRouter();
+import { usePets } from "../../context/PetsContext";
+import PetCard from "../../components/PetCard";
+import { useRouter } from "expo-router";
 
-//   const [region, setRegion] = useState({
-//     latitude: 42.6629,
-//     longitude: 21.1655,
-//     latitudeDelta: 0.8,
-//     longitudeDelta: 0.8,
-//   });
-//   const [selectedStore, setSelectedStore] = useState(null);
-//   const [modalVisible, setModalVisible] = useState(false);
+const MODAL_ANIMATION_DELAY = 300;
 
-//   const showText = region.latitudeDelta < 0.5;
+export default function MapScreen() {
+  const { stores, pets, getPetsForStore } = usePets();
+  const router = useRouter();
 
-//   const handleStorePress = (store) => {
-//     setSelectedStore(store);
-//     setModalVisible(true);
-//   };
+  const [selectedStore, setSelectedStore] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
-//   const handlePetPress = (petId) => {
-//     setModalVisible(false);
-//     setTimeout(() => router.push(`/pets/${petId}`), MODAL_ANIMATION_DELAY);
-//   };
+  const handleStorePress = (store) => {
+    setSelectedStore(store);
+    setModalVisible(true);
+  };
 
-//   const StoreMarker = ({ store }) => (
-//     <Marker key={store.id} coordinate={store.coordinate}>
-//       <TouchableOpacity
-//         activeOpacity={0.8}
-//         onPress={() => handleStorePress(store)}
-//         style={styles.markerWrapper}
-//       >
-//         <View style={styles.pin}>
-//           <Image source={store.logo} style={styles.storeLogo} />
-//           <View style={styles.pinPoint} />
-//         </View>
-//         {showText && (
-//           <View style={styles.storeLabel}>
-//             <Text style={styles.storeLabelText}>{store.name}</Text>
-//           </View>
-//         )}
-//       </TouchableOpacity>
-//     </Marker>
-//   );
+  const handlePetPress = (petId) => {
+    setModalVisible(false);
+    setTimeout(() => router.push(`/pets/${petId}`), MODAL_ANIMATION_DELAY);
+  };
 
-//   return (
-//     <View style={styles.container}>
-//       <MapView
-//         style={styles.map}
-//         initialRegion={region}
-//         onRegionChangeComplete={setRegion}
-//       >
-//         {stores.map((store) => (
-//           <StoreMarker key={store.id} store={store} />
-//         ))}
-//       </MapView>
+  // CSS FIX
+  const leafletCSS = `
+    html, body, #root {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    .leaflet-map {
+      width: 100% !important;
+      height: 100% !important;
+      position: absolute;
+      top: 0; 
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+  `;
 
-//       <Modal
-//         visible={modalVisible}
-//         transparent
-//         animationType="slide"
-//         onRequestClose={() => setModalVisible(false)}
-//       >
-//         <View style={styles.modalOverlay}>
-//           <View style={styles.modalContent}>
-//             <View style={styles.modalHeader}>
-//               {selectedStore?.logo && (
-//                 <Image
-//                   source={selectedStore.logo}
-//                   style={styles.modalStoreLogo}
-//                 />
-//               )}
-//               <Text style={styles.modalTitle}>{selectedStore?.name} Pets</Text>
-//             </View>
+  return (
+    <View style={styles.container}>
+      {/* Insert CSS */}
+      <style>{leafletCSS}</style>
 
-//             <FlatList
-//               data={selectedStore ? getPetsForStore(selectedStore.id) : []}
-//               keyExtractor={(item) => item.id}
-//               renderItem={({ item }) => (
-//                 <View style={styles.cardWrapper}>
-//                   <PetCard pet={item} onPress={() => handlePetPress(item.id)} />
-//                 </View>
-//               )}
-//               ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-//               contentContainerStyle={{ alignItems: "center" }}
-//             />
+      {/* MAP */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 0,
+        }}
+      >
+        <MapContainer
+          center={[42.6629, 21.1655]}
+          zoom={8}
+          className="leaflet-map"
+        >
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-//             <Pressable
-//               style={styles.closeButton}
-//               onPress={() => setModalVisible(false)}
-//             >
-//               <Text style={styles.closeButtonText}>Close</Text>
-//             </Pressable>
-//           </View>
-//         </View>
-//       </Modal>
-//     </View>
-//   );
-// }
+          {stores.map((store) => (
+            <Marker
+              key={store.id}
+              position={[store.coordinate.latitude, store.coordinate.longitude]}
+              icon={L.divIcon({
+                className: "",
+                html: `
+                  <div style="display:flex;flex-direction:column;align-items:center;">
+                    ${
+                      store.logoUrl
+                        ? `<img
+                             src="${store.logoUrl}"
+                             style="
+                               width:50px;
+                               height:50px;
+                               border-radius:25px;
+                               border:2px solid white;
+                               box-shadow:0px 2px 4px rgba(0,0,0,0.3);
+                             "
+                           />`
+                        : `<div
+                             style="
+                               width:50px;
+                               height:50px;
+                               border-radius:25px;
+                               background:#ccc;
+                               border:2px solid white;
+                             "
+                           ></div>`
+                    }
+                    <div style="
+                      width:0;
+                      height:0;
+                      border-left:6px solid transparent;
+                      border-right:6px solid transparent;
+                      border-top:10px solid #fffff0;
+                      margin-top:-2px;
+                    "></div>
+                  </div>
+                `,
+                iconSize: [50, 60],
+                iconAnchor: [25, 60],
+              })}
+              eventHandlers={{
+                click: () => handleStorePress(store),
+              }}
+            />
+          ))}
+        </MapContainer>
+      </div>
 
-// const styles = StyleSheet.create({
-//   container: { flex: 1 },
-//   map: { flex: 1 },
+      {/* MODAL */}
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              {selectedStore?.logoUrl && (
+                <Image
+                  source={{ uri: selectedStore.logoUrl }}
+                  style={styles.modalStoreLogo}
+                />
+              )}
+              <Text style={styles.modalTitle}>{selectedStore?.name} Pets</Text>
+            </View>
 
-//   // Marker
-//   markerWrapper: { alignItems: "center", justifyContent: "center" },
-//   pin: { alignItems: "center", justifyContent: "center" },
-//   storeLogo: {
-//     width: 50,
-//     height: 50,
-//     borderRadius: 25,
-//     borderWidth: 2,
-//     borderColor: "white",
-//     ...Platform.select({
-//       android: { elevation: 3 },
-//       ios: {
-//         shadowColor: "#000",
-//         shadowOpacity: 0.3,
-//         shadowRadius: 3,
-//         shadowOffset: { width: 0, height: 2 },
-//       },
-//     }),
-//   },
-//   pinPoint: {
-//     width: 0,
-//     height: 0,
-//     borderLeftWidth: 6,
-//     borderRightWidth: 6,
-//     borderBottomWidth: 10,
-//     borderLeftColor: "transparent",
-//     borderRightColor: "transparent",
-//     borderBottomColor: "#fffff0",
-//     transform: [{ rotate: "180deg" }],
-//     marginTop: -2,
-//   },
-//   storeLabel: {
-//     backgroundColor: "#83BAC9",
-//     paddingHorizontal: 10,
-//     paddingVertical: 5,
-//     borderRadius: 20,
-//     borderWidth: 2,
-//     borderColor: "#fffff0",
-//     marginTop: 4,
-//     ...Platform.select({
-//       android: { elevation: 2 },
-//       ios: {
-//         shadowColor: "#000",
-//         shadowOpacity: 0.2,
-//         shadowRadius: 2,
-//         shadowOffset: { width: 0, height: 1 },
-//       },
-//     }),
-//   },
-//   storeLabelText: { color: "white", fontWeight: "bold", textAlign: "center" },
+            <FlatList
+              data={selectedStore ? getPetsForStore(selectedStore.id) : []}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <View style={styles.cardWrapper}>
+                  <PetCard pet={item} onPress={() => handlePetPress(item.id)} />
+                </View>
+              )}
+              ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+              contentContainerStyle={{ paddingBottom: 20 }}
+            />
 
-//   // Modal
-//   modalOverlay: {
-//     flex: 1,
-//     backgroundColor: "rgba(0,0,0,0.5)",
-//     justifyContent: "center",
-//   },
-//   modalContent: {
-//     backgroundColor: "white",
-//     margin: 20,
-//     borderRadius: 20,
-//     padding: 20,
-//     maxHeight: "80%",
-//   },
-//   modalHeader: { flexDirection: "row", alignItems: "center", marginBottom: 12 },
-//   modalStoreLogo: { width: 40, height: 40, borderRadius: 20, marginRight: 10 },
-//   modalTitle: { fontSize: 18, fontWeight: "bold" },
-//   cardWrapper: { width: "85%", alignItems: "center" },
-//   closeButton: {
-//     marginTop: 10,
-//     backgroundColor: "#83BAC9",
-//     borderRadius: 10,
-//     paddingVertical: 10,
-//   },
-//   closeButtonText: {
-//     color: "white",
-//     textAlign: "center",
-//     fontWeight: "bold",
-//     fontSize: 16,
-//   },
-// });
+            <Pressable
+              style={styles.closeButton}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={styles.closeButtonText}>Close</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    margin: 20,
+    borderRadius: 20,
+    padding: 20,
+    maxHeight: "80%",
+    width: "90%", // ← ADD THIS
+    alignSelf: "center", // ← CENTER IT
+  },
+  cardWrapper: {
+    width: "100%",
+    alignItems: "stretch",
+  },
+  modalHeader: { flexDirection: "row", alignItems: "center", marginBottom: 12 },
+  modalStoreLogo: { width: 40, height: 40, borderRadius: 20, marginRight: 10 },
+  modalTitle: { fontSize: 18, fontWeight: "bold" },
+  closeButton: {
+    marginTop: 10,
+    backgroundColor: "#83BAC9",
+    borderRadius: 10,
+    paddingVertical: 10,
+  },
+  closeButtonText: {
+    color: "white",
+    textAlign: "center",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+});
