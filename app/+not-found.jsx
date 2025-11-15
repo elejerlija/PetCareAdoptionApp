@@ -21,8 +21,11 @@ export default function NotFound() {
         </Text>
 
         <PrimaryButton
-          label="Go Home"
-          onPress={() => router.push("/")}
+          title="Go Back"
+          onPress={() => {
+            if (router.canGoBack()) router.back();
+            else router.replace("/"); // go home instead
+          }}
           style={styles.button}
         />
       </View>
