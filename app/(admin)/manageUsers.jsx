@@ -12,28 +12,67 @@ import {
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";  
+import { useRouter } from "expo-router";
+
 import {
   collection,
   onSnapshot,
   updateDoc,
-  
-  doc,
+   doc,
+  getDoc
 } from "firebase/firestore";
-import { db } from "../../firebase";
+
+import { auth, db } from "../../firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 const THEME = "#83BAC9";
 const LIGHT = "#FFFFF0";
 
 export default function ManageUsers() {
-  const router = useRouter(); 
 
- 
+  const router = useRouter();
+
   const [users, setUsers] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(false);
+
 
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        console.log(" No logged user in ManageUsers");
+        router.replace("/");
+        return;
+      }
+
+      console.log(" LOGGED USER:", user.email);
+
+      const snap = await getDoc(doc(db, "users", user.uid));
+
+      if (!snap.exists()) {
+        alert("User profile missing.");
+        router.replace("/");
+        return;
+      }
+
+      const role = snap.data().role;
+
+      if (role !== "admin") {
+        alert("Admins only.");
+        router.replace("/");
+        return;
+      }
+
+      setIsAdmin(true);
+    });
+
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    const unsub = onSnapshot(collection(db, "users"), (snapshot) => {
       const usersData = snapshot.docs.map((d) => ({
         id: d.id,
         ...d.data(),
@@ -42,30 +81,31 @@ export default function ManageUsers() {
       setUsers(usersData);
     });
 
-    return () => unsubscribe();
-
-  }, []);
-
+    return () => unsub();
+  }, [isAdmin]);
 
 
+  // ============================================
+  // TOGGLE STATUS
+  // ============================================
   const toggleStatus = async (id, currentStatus) => {
     const newStatus = currentStatus === "active" ? "inactive" : "active";
 
     try {
       await updateDoc(doc(db, "users", id), { status: newStatus });
+
       if (Platform.OS === "android") {
-        ToastAndroid.show(
-          `Status updated to ${newStatus}`,
-          ToastAndroid.SHORT
-        );
+        ToastAndroid.show(`Status updated to ${newStatus}`, ToastAndroid.SHORT);
       } else {
         Alert.alert("Success", `Status updated to ${newStatus}`);
       }
+
     } catch (error) {
       console.error("Error updating status:", error);
       Alert.alert("Error", "Failed to update user status.");
     }
   };
+
 
   const renderUser = ({ item }) => (
     <View style={styles.userCard}>
@@ -85,8 +125,7 @@ export default function ManageUsers() {
         style={[
           styles.statusBtn,
           {
-            backgroundColor:
-              item.status === "active" ? "#4CAF50" : "#E53935",
+            backgroundColor: item.status === "active" ? "#4CAF50" : "#E53935",
           },
         ]}
       >
@@ -97,13 +136,13 @@ export default function ManageUsers() {
     </View>
   );
 
+
   return (
     <SafeAreaView style={styles.safe}>
-
-
+ 
       <TouchableOpacity
         style={styles.backButton}
-        onPress={() => router.push("/(admin)/dashboard")}
+        onPress={() => router.back()}
       >
         <Ionicons name="arrow-back" size={24} color="#fff" />
       </TouchableOpacity>
@@ -124,14 +163,13 @@ export default function ManageUsers() {
   );
 }
 
+
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
     backgroundColor: "#fff",
   },
-
-
-  backButton: {
+   backButton: {
     position: "absolute",
     top: 16,
     left: 16,
@@ -141,8 +179,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     elevation: 4,
   },
-
-  header: {
+   header: {
     fontSize: 24,
     fontWeight: "700",
     color: THEME,
@@ -150,14 +187,12 @@ const styles = StyleSheet.create({
     marginTop: 60,
     marginBottom: 16,
   },
-
-  empty: {
+   empty: {
     textAlign: "center",
     color: "#777",
     marginTop: 40,
   },
-
-  userCard: {
+   userCard: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: LIGHT,
@@ -170,34 +205,28 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-
-  name: {
+   name: {
     fontSize: 16,
     fontWeight: "700",
     color: "#222",
-  },
-
+   },
   email: {
     color: "#666",
     fontSize: 14,
   },
-
-  status: {
+   status: {
     color: "#333",
     fontSize: 13,
     marginTop: 4,
-  },
-
+   },
   statusBtn: {
     paddingVertical: 6,
     paddingHorizontal: 14,
     borderRadius: 8,
-  },
-
+   },
   statusBtnText: {
     color: "#fff",
     fontWeight: "700",
     fontSize: 13,
- 
-  },
+   },
 });

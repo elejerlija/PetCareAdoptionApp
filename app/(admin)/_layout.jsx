@@ -6,48 +6,26 @@ const THEME = "#83BAC9";
 const LIGHT = "#F9FCFD";
 
 export const unstable_settings = {
-  showRouteInfo: false, 
+  showRouteInfo: false,
 };
 
 export default function AdminLayout() {
   return (
     <SafeAreaView style={styles.safe}>
+
+      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerText}>🐾 Admin Panel</Text>
       </View>
 
+      {/* VALID ROUTES ONLY */}
       <Stack>
-        <Stack.Screen
-          name="dashboard"
-          options={{
-            headerShown: false, 
-          }}
-        />
-        <Stack.Screen
-          name="managePets"
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="manageRequests"
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="manageStores"
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="manageUsers"
-          options={{
-            headerShown: false,
-          }}
-        />
+        <Stack.Screen name="dashboard" options={{ headerShown: false }} />
+        <Stack.Screen name="managePets" options={{ headerShown: false }} />
+        <Stack.Screen name="manageUsers" options={{ headerShown: false }} />
+        <Stack.Screen name="manageStoresMap" options={{ headerShown: false }} />
       </Stack>
+
     </SafeAreaView>
   );
 }
