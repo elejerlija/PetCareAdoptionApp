@@ -1,9 +1,16 @@
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { signOut } from "firebase/auth";
-import { auth } from "../../firebase";
+import { auth, db } from "../../firebase";
+import {
+  collection,
+  getDocs,
+  query,
+  where
+} from "firebase/firestore";
 
 import PrimaryButton from "../../components/PrimaryButton";
 
@@ -11,10 +18,38 @@ const THEME = "#83BAC9";
 const LIGHT = "#F9FCFD";
 
 export default function AdminDashboard() {
+
+  const [totalPets, setTotalPets] = useState(0);
+  const [pendingRequests, setPendingRequests] = useState(0);
+  const [totalUsers, setTotalUsers] = useState(0);
+
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const petsSnap = await getDocs(collection(db, "pets"));
+        setTotalPets(petsSnap.size);
+
+        const reqSnap = await getDocs(
+          query(collection(db, "adoptionRequests"), where("status", "==", "pending"))
+        );
+        setPendingRequests(reqSnap.size);
+
+
+        const usersSnap = await getDocs(collection(db, "users"));
+        setTotalUsers(usersSnap.size);
+      } catch (err) {
+        console.log("Error fetching stats:", err);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      window.location.href = "/"; 
+      router.replace("/");  
     } catch (error) {
       alert("Logout failed: " + error.message);
     }
@@ -23,37 +58,36 @@ export default function AdminDashboard() {
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        {/* Header */}
+
         <View style={styles.header}>
           <Text style={styles.title}>ADMIN DASHBOARD</Text>
           <Text style={styles.subtitle}>PetAdoption Care</Text>
         </View>
 
-        {/* Statistics */}
-        <View style={styles.statsContainer}>
+         <View style={styles.statsContainer}>
           <View style={styles.statCard}>
             <Ionicons name="paw" size={26} color={THEME} style={styles.iconTop} />
             <Text style={styles.statTitle}>Total Pets</Text>
-            <Text style={styles.statValue}>24</Text>
+            <Text style={styles.statValue}>{totalPets}</Text>
             <Text style={styles.statSub}>Currently in the system</Text>
           </View>
 
           <View style={styles.statCard}>
             <Ionicons name="hourglass-outline" size={26} color={THEME} style={styles.iconTop} />
             <Text style={styles.statTitle}>Pending Requests</Text>
-            <Text style={styles.statValue}>7</Text>
+            <Text style={styles.statValue}>{pendingRequests}</Text>
             <Text style={styles.statSub}>Awaiting your approval</Text>
           </View>
 
           <View style={styles.statCard}>
             <Ionicons name="people-outline" size={26} color={THEME} style={styles.iconTop} />
             <Text style={styles.statTitle}>Users</Text>
-            <Text style={styles.statValue}>56</Text>
+            <Text style={styles.statValue}>{totalUsers}</Text>
             <Text style={styles.statSub}>Registered adopters</Text>
           </View>
         </View>
 
-         <Text style={styles.sectionTitle}>Management</Text>
+        <Text style={styles.sectionTitle}>Management</Text>
 
         <TouchableOpacity
           style={styles.manageItem}
@@ -64,28 +98,24 @@ export default function AdminDashboard() {
           </View>
           <View style={styles.textContainer}>
             <Text style={styles.manageTitle}>Manage Pets</Text>
-            <Text style={styles.manageDesc}>
-              Add, edit, delete pets or update adoption status.
-            </Text>
+            <Text style={styles.manageDesc}>Add, edit, delete pets or update adoption status.</Text>
           </View>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
 
-      <TouchableOpacity
-      style={styles.manageItem}
-      onPress={() => router.push("/(admin)/manageUsers")}
-    >
-      <View style={styles.iconCircle}>
-        <Ionicons name="people" size={22} color="#fff" /> 
-      </View>
-      <View style={styles.textContainer}>
-        <Text style={styles.manageTitle}>Manage Users</Text>
-        <Text style={styles.manageDesc}>
-          View, deactivate or delete registered users.
-        </Text>
-      </View>
-      <Ionicons name="chevron-forward" size={20} color="#999" />
-    </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.manageItem}
+          onPress={() => router.push("/(admin)/manageUsers")}
+        >
+          <View style={styles.iconCircle}>
+            <Ionicons name="people" size={22} color="#fff" />
+          </View>
+          <View style={styles.textContainer}>
+            <Text style={styles.manageTitle}>Manage Users</Text>
+            <Text style={styles.manageDesc}>View, deactivate or delete registered users.</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color="#999" />
+        </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.manageItem}
@@ -96,15 +126,12 @@ export default function AdminDashboard() {
           </View>
           <View style={styles.textContainer}>
             <Text style={styles.manageTitle}>Manage Stores</Text>
-            <Text style={styles.manageDesc}>
-              Add or update pet supply store information.
-            </Text>
+            <Text style={styles.manageDesc}>Add or update pet supply store information.</Text>
           </View>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
-
-
-        <View style={styles.logoutContainer}>
+ 
+         <View style={styles.logoutContainer}>
           <PrimaryButton title="Logout" onPress={handleLogout} style={styles.logoutBtn} />
         </View>
       </ScrollView>
@@ -142,7 +169,7 @@ const styles = StyleSheet.create({
     marginBottom: 25,
   },
   statCard: {
-    
+
     flex: 1,
     backgroundColor: "#fff",
     borderRadius: 16,
