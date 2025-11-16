@@ -12,6 +12,7 @@ import {
 
 import { onAuthStateChanged } from "firebase/auth";
 import { db, auth } from "../firebase";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 
 const PetsContext = createContext();
 
@@ -158,13 +159,16 @@ export function PetsProvider({ children }) {
   // ===============================
   // YOUR ADOPT PET
   // ===============================
-  const adoptPet = async (id) => {
-    await updateDoc(doc(db, "pets", id), {
-      status: "pending",
-      available: false,
-      requestedAt: new Date().toISOString(),
-    });
-  };
+const adoptPet = async (id) => {
+  if (!user) throw new Error("User not logged in");
+
+  await addDoc(collection(db, "adoptionRequests"), {
+    petId: id,
+    userId: user.uid,
+    status: "pending",
+    createdAt: serverTimestamp(),
+  });
+};
 
   // ===============================
   // TOGGLE FAVORITE
