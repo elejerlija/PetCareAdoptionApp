@@ -8,11 +8,14 @@ import {
   updateDoc,
   setDoc,
   deleteDoc,
+  addDoc,
+  serverTimestamp,
 } from "firebase/firestore";
+
 
 import { onAuthStateChanged } from "firebase/auth";
 import { db, auth } from "../firebase";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+
 
 const PetsContext = createContext();
 
@@ -30,7 +33,7 @@ export function PetsProvider({ children }) {
 
   const [favoriteIds, setFavoriteIds] = useState([]);
   const [loadingFavorites, setLoadingFavorites] = useState(true);
-
+  const [requests, setRequests] = useState([]);
   // ===============================
   // AUTH LISTENER
   // ===============================
@@ -139,6 +142,30 @@ export function PetsProvider({ children }) {
     return unsubFavs;
   }, [authReady, user]);
 
+
+    // ===============================
+  // ADOPTION REQUESTS LISTENER
+  // ===============================
+  useEffect(() => {
+    if (!user) {
+      setRequests([]);
+      return;
+    }
+
+    const unsub = onSnapshot(
+      collection(db, "adoptionRequests"),
+      (snapshot) => {
+        const list = snapshot.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
+        }));
+        setRequests(list);
+      }
+    );
+
+    return unsub;
+  }, [user]);
+
   // ===============================
   // HELPERS FROM BOTH VERSIONS
   // ===============================
@@ -154,6 +181,19 @@ export function PetsProvider({ children }) {
 
   const getPetsForStore = (storeId) => {
     return pets.filter((p) => String(p.storeId) === String(storeId));
+  };
+
+    // ***********************
+  // GET PET ADOPTION STATUS
+  // ***********************
+  const getAdoptionStatus = (petId) => {
+    if (!user) return null;
+
+    const req = requests.find(
+      (r) => r.petId === petId && r.userId === user.uid
+    );
+
+    return req?.status ?? null;
   };
 
   // ===============================
@@ -217,6 +257,7 @@ const adoptPet = async (id) => {
         getPetById,
         getCityOfPet,
         getPetsForStore,
+        getAdoptionStatus,
 
         // actions
         adoptPet,

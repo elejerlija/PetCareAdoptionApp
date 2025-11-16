@@ -18,8 +18,10 @@ export default function PetDetailsRoute() {
   const rawId = Array.isArray(params.id) ? params.id[0] : params.id;
   const id = rawId; 
 
-  const { getPetById, adoptPet, getCityOfPet } = usePets();
+  const { getPetById, adoptPet, getCityOfPet, getAdoptionStatus } = usePets();
   const pet = getPetById?.(id);
+  const adoptionStatus = getAdoptionStatus?.(id);
+
 
   if (!pet) {
     return (
@@ -38,18 +40,24 @@ export default function PetDetailsRoute() {
 
 const handleAdopt = async () => {
   try {
+    console.log("CALLING ADOPT WITH ID:", pet.id);
+
+    await adoptPet?.(pet.id);
+
+    console.log("ADOPT SUCCESS");
+
     if (Platform.OS === "web") {
       window.alert("Your adoption request has been sent and is pending approval.");
     } else {
       Alert.alert("Request Sent", "Your adoption request is now pending.");
     }
 
-    await adoptPet?.(pet.id);
-
   } catch (err) {
-    Alert.alert("Error", err.message);
+    console.log("ADOPT ERROR:", err);
+    Alert.alert("ERROR", err.message);
   }
 };
+
 
 
   const isAvailable = pet.available !== false; 
@@ -64,24 +72,27 @@ const handleAdopt = async () => {
 
         <Text style={styles.name}>{pet.name}</Text>
 
- <Text
+<Text
   style={[
     styles.status,
-    pet.status === "pending"
+    adoptionStatus === "pending"
       ? { color: "#e6a100" }
-      : pet.status === "approved"
+      : adoptionStatus === "approved"
       ? { color: "green" }
-      : { color: isAvailable ? "green" : "red" },
+      : isAvailable
+      ? { color: "green" }
+      : { color: "red" },
   ]}
 >
-  {pet.status === "pending"
+  {adoptionStatus === "pending"
     ? "Pending approval"
-    : pet.status === "approved"
+    : adoptionStatus === "approved"
     ? "Approved"
     : isAvailable
     ? "Available"
     : "Not Available"}
 </Text>
+
 
 
         <Text style={styles.details}>Age: {pet.age} yr</Text>
