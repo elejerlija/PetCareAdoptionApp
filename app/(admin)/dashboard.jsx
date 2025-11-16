@@ -5,13 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { signOut } from "firebase/auth";
 import { auth, db } from "../../firebase";
-import {
-  collection,
-  getDocs,
-  query,
-  where
-} from "firebase/firestore";
-
+import { collection, getDocs, query, where } from "firebase/firestore";
 import PrimaryButton from "../../components/PrimaryButton";
 
 const THEME = "#83BAC9";
@@ -27,17 +21,20 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
+        // Total pets
         const petsSnap = await getDocs(collection(db, "pets"));
         setTotalPets(petsSnap.size);
 
-        const reqSnap = await getDocs(
-          query(collection(db, "adoptionRequests"), where("status", "==", "pending"))
+        // Pending requests = pets where status == "pending"
+        const pendingSnap = await getDocs(
+          query(collection(db, "pets"), where("status", "==", "pending"))
         );
-        setPendingRequests(reqSnap.size);
+        setPendingRequests(pendingSnap.size);
 
-
+        // Total users
         const usersSnap = await getDocs(collection(db, "users"));
         setTotalUsers(usersSnap.size);
+
       } catch (err) {
         console.log("Error fetching stats:", err);
       }
@@ -49,7 +46,7 @@ export default function AdminDashboard() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      router.replace("/");  
+      router.replace("/");
     } catch (error) {
       alert("Logout failed: " + error.message);
     }
@@ -64,7 +61,7 @@ export default function AdminDashboard() {
           <Text style={styles.subtitle}>PetAdoption Care</Text>
         </View>
 
-         <View style={styles.statsContainer}>
+        <View style={styles.statsContainer}>
           <View style={styles.statCard}>
             <Ionicons name="paw" size={26} color={THEME} style={styles.iconTop} />
             <Text style={styles.statTitle}>Total Pets</Text>
@@ -130,47 +127,25 @@ export default function AdminDashboard() {
           </View>
           <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
- 
-         <View style={styles.logoutContainer}>
+
+        <View style={styles.logoutContainer}>
           <PrimaryButton title="Logout" onPress={handleLogout} style={styles.logoutBtn} />
         </View>
+
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: LIGHT,
-  },
-  scroll: {
-    padding: 20,
-    paddingBottom: 40,
-  },
-  header: {
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    color: "#1a1a1a",
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 18,
-    color: THEME,
-    fontWeight: "600",
-  },
-  statsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 25,
-  },
+  safe: { flex: 1, backgroundColor: LIGHT },
+  scroll: { padding: 20, paddingBottom: 40 },
+  header: { alignItems: "center", marginBottom: 16 },
+  title: { fontSize: 26, fontWeight: "bold", color: "#1a1a1a", marginBottom: 4 },
+  subtitle: { fontSize: 18, color: THEME, fontWeight: "600" },
+  statsContainer: { flexDirection: "row", justifyContent: "space-between", marginBottom: 25 },
   statCard: {
-
-    flex: 1,
+     flex: 1,
     backgroundColor: "#fff",
     borderRadius: 16,
     alignItems: "center",
@@ -183,32 +158,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#e8eef0",
   },
-  iconTop: {
-    marginBottom: 6,
-  },
-  statTitle: {
-    fontSize: 13,
-    color: "#555",
-    fontWeight: "600",
-  },
-  statValue: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: THEME,
-    marginVertical: 3,
-  },
-  statSub: {
-    fontSize: 12,
-    color: "#777",
-    textAlign: "center",
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#222",
-    marginBottom: 12,
-    marginTop: 5,
-  },
+  iconTop: { marginBottom: 6 },
+  statTitle: { fontSize: 13, color: "#555", fontWeight: "600" },
+  statValue: { fontSize: 22, fontWeight: "bold", color: THEME, marginVertical: 3 },
+  statSub: { fontSize: 12, color: "#777", textAlign: "center" },
+  sectionTitle: { fontSize: 20, fontWeight: "700", color: "#222", marginBottom: 12, marginTop: 5 },
   manageItem: {
     backgroundColor: "#fff",
     flexDirection: "row",
@@ -224,34 +178,13 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   iconCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: THEME,
-    justifyContent: "center",
-    alignItems: "center",
+    width: 44, height: 44, borderRadius: 22,
+    backgroundColor: THEME, justifyContent: "center", alignItems: "center",
     marginRight: 12,
   },
-  textContainer: {
-    flex: 1,
-  },
-  manageTitle: {
-    fontWeight: "700",
-    fontSize: 15,
-    color: "#111",
-  },
-  manageDesc: {
-    fontSize: 13,
-    color: "#555",
-    marginTop: 2,
-  },
-  logoutContainer: {
-    marginTop: 25,
-    alignItems: "center",
-  },
-  logoutBtn: {
-    width: "60%",
-    backgroundColor: THEME,
-    borderRadius: 14,
-  },
+  textContainer: { flex: 1 },
+  manageTitle: { fontWeight: "700", fontSize: 15, color: "#111" },
+  manageDesc: { fontSize: 13, color: "#555", marginTop: 2 },
+  logoutContainer: { marginTop: 25, alignItems: "center" },
+  logoutBtn: { width: "60%", backgroundColor: THEME, borderRadius: 14 },
 });
