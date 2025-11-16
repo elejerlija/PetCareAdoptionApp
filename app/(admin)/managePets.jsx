@@ -14,10 +14,10 @@ import {
   KeyboardAvoidingView,
   ScrollView,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
-import { collection,
+import {
+  collection,
   addDoc,
   updateDoc,
   deleteDoc,
@@ -26,16 +26,16 @@ import { collection,
   serverTimestamp,
 } from "firebase/firestore";
 
-// IMPORTO KETU COMPONENTIN E RI
-import ManageRequests from "./manageRequests";
-
 export default function ManagePets() {
   const router = useRouter();
+
+  
   const [pets, setPets] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  
   const [modalVisible, setModalVisible] = useState(false);
   const [editingPet, setEditingPet] = useState(null);
-
   const [name, setName] = useState("");
   const [type, setType] = useState("");
   const [age, setAge] = useState("");
@@ -44,7 +44,10 @@ export default function ManagePets() {
   const [desc, setDesc] = useState("");
   const [image, setImage] = useState("");
 
-  // LISTO PETET
+  
+  const [requests, setRequests] = useState([]);
+
+  
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "pets"), (snapshot) => {
       const petList = snapshot.docs.map((doc) => ({
@@ -59,8 +62,23 @@ export default function ManagePets() {
     return unsubscribe;
   }, []);
 
+  
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, "adoptionRequests"), (snapshot) => {
+      const list = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setRequests(list);
+    });
+
+    return unsub;
+  }, []);
+
+ 
+  const getRequestForPet = (petId) => {
+    return requests.find((r) => r.petId === petId) || null;
+  };
+
   const resetForm = () => {
-     setName("");
+    setName("");
     setType("");
     setAge("");
     setCity("");
@@ -83,9 +101,11 @@ export default function ManagePets() {
       setEditingPet(null);
       resetForm();
     }
+
     setModalVisible(true);
   };
 
+  
   const savePet = async () => {
     if (!name.trim()) {
       Alert.alert("Error", "Pet name is required.");
@@ -101,9 +121,9 @@ export default function ManagePets() {
       desc,
       image,
       available: editingPet?.available ?? true,
-      favorite: editingPet?.favorite ?? false,
     };
- try {
+
+    try {
       if (editingPet) {
         await updateDoc(doc(db, "pets", editingPet.id), data);
       } else {
@@ -120,69 +140,120 @@ export default function ManagePets() {
     }
   };
 
-  const toggleAvailable = async (pet) => {
-    await updateDoc(doc(db, "pets", pet.id), {
-      available: !pet.available,
-    });
-  };
-    // RENDER PET CARD (PA APPROVE/DECLINE — SEPSE TANI I MENAXHON ManageRequests)
-  const renderPet = ({ item }) => (
-    <View style={styles.petCard}>
-      <Text style={styles.petName}>{item.name}</Text>
-      <Text style={styles.petMeta}>
-        {item.type} • {item.age} yrs • {item.city}
-      </Text>
-      <Text style={styles.petDesc}>{item.desc}</Text>
+  
+  const handleApprove = async (req) => {
+    try {
+      await updateDoc(doc(db, "pets", req.petId), {
+        available: false,
+        status: "approved",
+      });
 
-      <View style={styles.actions}>
-        <TouchableOpacity
-          onPress={() => toggleAvailable(item)}
-          style={styles.actionBtn}
-        >
-          <MaterialIcons
-            name={item.available ? "check-circle" : "radio-button-unchecked"}
-            size={20}
-            color={item.available ? "green" : "gray"}
-          />
-          <Text style={styles.actionText}>
-            {item.available ? "Available" : "Unavailable"}
-          </Text>
-        </TouchableOpacity>
-          <TouchableOpacity onPress={() => openModal(item)} style={styles.actionBtn}>
-          <MaterialIcons name="edit" size={20} color="#007AFF" />
-          <Text style={styles.actionText}>Edit</Text>
-        </TouchableOpacity>
+      await deleteDoc(doc(db, "adoptionRequests", req.id));
+    } catch (e) {
+      Alert.alert("Error", e.message);
+    }
+  };
+
+  const handleDecline = async (req) => {
+    try {
+      await updateDoc(doc(db, "pets", req.petId), {
+        available: true,
+        status: "available",
+      });
+
+      await deleteDoc(doc(db, "adoptionRequests", req.id));
+    } catch (e) {
+      Alert.alert("Error", e.message);
+    }
+  };
+
+ 
+  const renderPet = ({ item }) => {
+    const request = getRequestForPet(item.id);
+
+    return (
+      <View style={styles.petCard}>
+        <Text style={styles.petName}>{item.name}</Text>
+        <Text style={styles.petMeta}>
+          {item.type} • {item.age} yrs • {item.city}
+        </Text>
+        <Text style={styles.petDesc}>{item.desc}</Text>
+
+        
+        <View style={styles.actions}>
+          <TouchableOpacity
+            onPress={() =>
+              updateDoc(doc(db, "pets", item.id), {
+                available: !item.available,
+              })
+            }
+            style={styles.actionBtn}
+          >
+            <MaterialIcons
+              name={item.available ? "check-circle" : "radio-button-unchecked"}
+              size={20}
+              color={item.available ? "green" : "gray"}
+            />
+            <Text style={styles.actionText}>
+              {item.available ? "Available" : "Unavailable"}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => openModal(item)}
+            style={styles.actionBtn}
+          >
+            <MaterialIcons name="edit" size={20} color="#007AFF" />
+            <Text style={styles.actionText}>Edit</Text>
+          </TouchableOpacity>
+        </View>
+
+        
+        {request && request.status === "pending" && (
+          <View style={styles.requestRow}>
+            <TouchableOpacity
+              style={styles.approveBtn}
+              onPress={() => handleApprove(request)}
+            >
+              <MaterialIcons name="check" size={18} color="#fff" />
+              <Text style={styles.btnText}>Approve</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.declineBtn}
+              onPress={() => handleDecline(request)}
+            >
+              <MaterialIcons name="close" size={18} color="#fff" />
+              <Text style={styles.btnText}>Decline</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
-    </View>
-  );
+    );
+  };
+
 
   return (
-    <ScrollView style={styles.container}>
-      
+    <View style={styles.container}>
       <View style={styles.headerRow}>
-        <TouchableOpacity
-          onPress={() => router.push("/(admin)")}
-          style={styles.backBtn}
-        >
+        <TouchableOpacity onPress={() => router.push("/(admin)")}>
           <MaterialIcons name="arrow-back" size={22} />
         </TouchableOpacity>
-
         <Text style={styles.title}>Manage Pets</Text>
       </View>
- {loading ? (
+
+      {loading ? (
         <ActivityIndicator size="large" style={{ marginTop: 40 }} />
       ) : (
         <FlatList
           data={pets}
           keyExtractor={(item) => item.id}
           renderItem={renderPet}
-          contentContainerStyle={{ paddingBottom: 20 }}
+          contentContainerStyle={{ paddingBottom: 100 }}
         />
       )}
 
-      {/* == KËTU SHFAQEN KËRKESAT === */}
-      <ManageRequests />
-
+      
       <TouchableOpacity
         style={styles.addBtn}
         onPress={() => openModal(null)}
@@ -190,8 +261,8 @@ export default function ManagePets() {
         <Text style={styles.addBtnText}>+ Add New Pet</Text>
       </TouchableOpacity>
 
-      {/* === MODAL === */}
-       <Modal visible={modalVisible} animationType="slide" transparent>
+     
+      <Modal visible={modalVisible} animationType="slide" transparent>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           style={styles.modalContainer}
@@ -215,7 +286,8 @@ export default function ManagePets() {
                 onChangeText={setType}
                 style={styles.input}
               />
-               <TextInput
+
+              <TextInput
                 placeholder="Age (years)"
                 value={age}
                 keyboardType="number-pad"
@@ -237,7 +309,8 @@ export default function ManagePets() {
                 onChangeText={setPrice}
                 style={styles.input}
               />
- <TextInput
+
+              <TextInput
                 placeholder="Image URL"
                 value={image}
                 onChangeText={setImage}
@@ -268,12 +341,19 @@ export default function ManagePets() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
-    </ScrollView>
+    </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: "#fff" },
-  title: { fontSize: 26, fontWeight: "700", marginBottom: 10 },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+    gap: 10,
+  },
+  title: { fontSize: 26, fontWeight: "700" },
   petCard: {
     padding: 15,
     marginVertical: 8,
@@ -284,14 +364,48 @@ const styles = StyleSheet.create({
   petMeta: { fontSize: 14, color: "#666" },
   petDesc: { marginTop: 5, color: "#444" },
   actions: { flexDirection: "row", marginTop: 10 },
-  actionBtn: { flexDirection: "row", alignItems: "center", marginRight: 20 },
+  actionBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: 20,
+  },
   actionText: { marginLeft: 4 },
+  requestRow: {
+    flexDirection: "row",
+    marginTop: 12,
+  },
+  approveBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#2b9aa0",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginRight: 10,
+  },
+  declineBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#d9534f",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  btnText: {
+    color: "#fff",
+    fontWeight: "600",
+    marginLeft: 6,
+  },
   addBtn: {
-    marginTop: 20,
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    right: 20,
     backgroundColor: "#007AFF",
     padding: 15,
     borderRadius: 10,
-  }, addBtnText: { color: "#fff", textAlign: "center", fontSize: 18 },
+  },
+  addBtnText: { color: "#fff", textAlign: "center", fontSize: 18 },
   modalContainer: {
     flex: 1,
     justifyContent: "flex-end",
@@ -311,7 +425,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 10,
   },
-   saveBtn: {
+  saveBtn: {
     backgroundColor: "#007AFF",
     padding: 14,
     borderRadius: 8,
