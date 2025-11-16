@@ -27,7 +27,7 @@ import { collection,
 } from "firebase/firestore";
 
 // IMPORTO KETU COMPONENTIN E RI
-import ManageRequests from "./ManageRequests";
+import ManageRequests from "./manageRequests";
 
 export default function ManagePets() {
   const router = useRouter();
