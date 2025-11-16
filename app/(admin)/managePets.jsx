@@ -16,9 +16,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
-import {
-  collection,
+import { MaterialIcons } from "@expo/vector-icons";
+import { collection,
   addDoc,
   updateDoc,
   deleteDoc,
@@ -26,12 +25,17 @@ import {
   onSnapshot,
   serverTimestamp,
 } from "firebase/firestore";
+
+// IMPORTO KETU COMPONENTIN E RI
+import ManageRequests from "./ManageRequests";
+
 export default function ManagePets() {
   const router = useRouter();
   const [pets, setPets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingPet, setEditingPet] = useState(null);
+
   const [name, setName] = useState("");
   const [type, setType] = useState("");
   const [age, setAge] = useState("");
@@ -40,6 +44,7 @@ export default function ManagePets() {
   const [desc, setDesc] = useState("");
   const [image, setImage] = useState("");
 
+  // LISTO PETET
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "pets"), (snapshot) => {
       const petList = snapshot.docs.map((doc) => ({
@@ -55,7 +60,7 @@ export default function ManagePets() {
   }, []);
 
   const resetForm = () => {
-    setName("");
+     setName("");
     setType("");
     setAge("");
     setCity("");
@@ -63,6 +68,7 @@ export default function ManagePets() {
     setDesc("");
     setImage("");
   };
+
   const openModal = (pet = null) => {
     if (pet) {
       setEditingPet(pet);
@@ -77,9 +83,9 @@ export default function ManagePets() {
       setEditingPet(null);
       resetForm();
     }
-
     setModalVisible(true);
   };
+
   const savePet = async () => {
     if (!name.trim()) {
       Alert.alert("Error", "Pet name is required.");
@@ -97,8 +103,7 @@ export default function ManagePets() {
       available: editingPet?.available ?? true,
       favorite: editingPet?.favorite ?? false,
     };
-
-    try {
+ try {
       if (editingPet) {
         await updateDoc(doc(db, "pets", editingPet.id), data);
       } else {
@@ -114,37 +119,19 @@ export default function ManagePets() {
       Alert.alert("Error", error.message);
     }
   };
+
   const toggleAvailable = async (pet) => {
     await updateDoc(doc(db, "pets", pet.id), {
       available: !pet.available,
     });
   };
-  const handleApprove = async (pet) => {
-  try {
-    await updateDoc(doc(db, "pets", pet.id), {
-      status: "approved",
-    });
-  } catch (e) {
-    Alert.alert("Error", e.message);
-  }
-};
-
-const handleDecline = async (pet) => {
-  try {
-    await updateDoc(doc(db, "pets", pet.id), {
-      status: "available",
-      requestedBy: null,
-      requestedAt: null,
-    });
-  } catch (e) {
-    Alert.alert("Error", e.message);
-  }
-};
-const renderPet = ({ item }) => (
-  
+    // RENDER PET CARD (PA APPROVE/DECLINE — SEPSE TANI I MENAXHON ManageRequests)
+  const renderPet = ({ item }) => (
     <View style={styles.petCard}>
       <Text style={styles.petName}>{item.name}</Text>
-      <Text style={styles.petMeta}>{item.type} • {item.age} yrs • {item.city}</Text>
+      <Text style={styles.petMeta}>
+        {item.type} • {item.age} yrs • {item.city}
+      </Text>
       <Text style={styles.petDesc}>{item.desc}</Text>
 
       <View style={styles.actions}>
@@ -161,55 +148,40 @@ const renderPet = ({ item }) => (
             {item.available ? "Available" : "Unavailable"}
           </Text>
         </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => openModal(item)} style={styles.actionBtn}>
-        <MaterialIcons name="edit" size={20} color="#007AFF" />
-        <Text style={styles.actionText}>Edit</Text>
-      </TouchableOpacity>
-    </View>
-    {item.status === "pending" && (
-      <View style={{ flexDirection: "row", marginTop: 10 }}>
-        <TouchableOpacity
-          style={styles.approveBtn}
-          onPress={() => handleApprove(item)}
-        >
-          <MaterialIcons name="check" size={18} color="#fff" />
-          <Text style={styles.btnText}>Approve</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.declineBtn}
-          onPress={() => handleDecline(item)}
-        >
-          <MaterialIcons name="close" size={18} color="#fff" />
-          <Text style={styles.btnText}>Decline</Text>
+          <TouchableOpacity onPress={() => openModal(item)} style={styles.actionBtn}>
+          <MaterialIcons name="edit" size={20} color="#007AFF" />
+          <Text style={styles.actionText}>Edit</Text>
         </TouchableOpacity>
       </View>
-    )}
-  </View>
-);
+    </View>
+  );
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
+      
       <View style={styles.headerRow}>
         <TouchableOpacity
           onPress={() => router.push("/(admin)")}
-          style={styles.backBtn}>
+          style={styles.backBtn}
+        >
           <MaterialIcons name="arrow-back" size={22} />
         </TouchableOpacity>
-      <Text style={styles.title}>Manage Pets</Text>
-      </View>
 
-      {loading ? (
+        <Text style={styles.title}>Manage Pets</Text>
+      </View>
+ {loading ? (
         <ActivityIndicator size="large" style={{ marginTop: 40 }} />
       ) : (
         <FlatList
           data={pets}
           keyExtractor={(item) => item.id}
           renderItem={renderPet}
-          contentContainerStyle={{ paddingBottom: 120 }}
+          contentContainerStyle={{ paddingBottom: 20 }}
         />
       )}
+
+      {/* == KËTU SHFAQEN KËRKESAT === */}
+      <ManageRequests />
 
       <TouchableOpacity
         style={styles.addBtn}
@@ -218,7 +190,8 @@ const renderPet = ({ item }) => (
         <Text style={styles.addBtnText}>+ Add New Pet</Text>
       </TouchableOpacity>
 
-      <Modal visible={modalVisible} animationType="slide" transparent>
+      {/* === MODAL === */}
+       <Modal visible={modalVisible} animationType="slide" transparent>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           style={styles.modalContainer}
@@ -242,8 +215,7 @@ const renderPet = ({ item }) => (
                 onChangeText={setType}
                 style={styles.input}
               />
-
-              <TextInput
+               <TextInput
                 placeholder="Age (years)"
                 value={age}
                 keyboardType="number-pad"
@@ -265,8 +237,7 @@ const renderPet = ({ item }) => (
                 onChangeText={setPrice}
                 style={styles.input}
               />
-
-              <TextInput
+ <TextInput
                 placeholder="Image URL"
                 value={image}
                 onChangeText={setImage}
@@ -297,11 +268,11 @@ const renderPet = ({ item }) => (
           </View>
         </KeyboardAvoidingView>
       </Modal>
-    </View>
+    </ScrollView>
   );
 }
 const styles = StyleSheet.create({
-  container: { flex: 1,padding: 20, backgroundColor: "#fff" },
+  container: { flex: 1, padding: 20, backgroundColor: "#fff" },
   title: { fontSize: 26, fontWeight: "700", marginBottom: 10 },
   petCard: {
     padding: 15,
@@ -316,15 +287,11 @@ const styles = StyleSheet.create({
   actionBtn: { flexDirection: "row", alignItems: "center", marginRight: 20 },
   actionText: { marginLeft: 4 },
   addBtn: {
-    position: "absolute",
-    bottom: 20,
-    left: 20,
-    right: 20,
+    marginTop: 20,
     backgroundColor: "#007AFF",
     padding: 15,
     borderRadius: 10,
-  },
-  addBtnText: { color: "#fff", textAlign: "center", fontSize: 18 },
+  }, addBtnText: { color: "#fff", textAlign: "center", fontSize: 18 },
   modalContainer: {
     flex: 1,
     justifyContent: "flex-end",
@@ -344,7 +311,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 10,
   },
-  saveBtn: {
+   saveBtn: {
     backgroundColor: "#007AFF",
     padding: 14,
     borderRadius: 8,
@@ -358,31 +325,4 @@ const styles = StyleSheet.create({
     backgroundColor: "#ddd",
   },
   cancelBtnText: { textAlign: "center", fontSize: 16 },
-  approveBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#2b9aa0",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    marginRight: 10,
-  },
-  declineBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#d9534f",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-  },
-  btnText: {
-    color: "#fff",
-    fontWeight: "600",
-    marginLeft: 6,
-  },
-  statusText: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 6,
-  },
 });
