@@ -20,7 +20,6 @@ import PrimaryButton from "../../components/PrimaryButton";
 
 import {
   collection,
-  addDoc,
   updateDoc,
   deleteDoc,
   doc,
@@ -48,7 +47,7 @@ export default function ManageStores() {
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [image, setImage] = useState("");
+  const [logo, setLogo] = useState("");
 
   const [errors, setErrors] = useState({});
 
@@ -68,13 +67,11 @@ export default function ManageStores() {
     setAddress("");
     setPhone("");
     setEmail("");
-    setImage("");
+    setLogo("");
     setErrors({});
   };
 
-  // ------------------------------
-  // AUTO INCREMENT: s1, s2, s3...
-  // ------------------------------
+  // AUTO INCREMENT ID: s1, s2, s3…
   const getNextStoreId = () => {
     if (stores.length === 0) return "s1";
 
@@ -129,11 +126,11 @@ export default function ManageStores() {
       newErrors.phone = "Invalid phone number";
 
     if (
-      image &&
-      !image.trim().endsWith(".jpg") &&
-      !image.trim().endsWith(".png")
+      logo &&
+      !logo.trim().endsWith(".jpg") &&
+      !logo.trim().endsWith(".png")
     ) {
-      newErrors.image = "Image must be .jpg or .png";
+      newErrors.logo = "Logo must be .jpg or .png";
     }
 
     setErrors(newErrors);
@@ -148,7 +145,7 @@ export default function ManageStores() {
       setAddress(store.address);
       setPhone(store.phone || "");
       setEmail(store.email || "");
-      setImage(store.image || "");
+      setLogo(store.logo || "");
     } else {
       resetForm();
       setEditingStore(null);
@@ -167,16 +164,14 @@ export default function ManageStores() {
       address,
       phone,
       email,
-      image,
+      logo,
       coordinate: coords ? new GeoPoint(coords.lat, coords.lng) : null,
     };
 
     try {
       if (editingStore) {
-        // UPDATE MODE
         await updateDoc(doc(db, "stores", editingStore.id), data);
       } else {
-        // ADD MODE WITH AUTO ID
         const newId = getNextStoreId();
 
         await setDoc(doc(db, "stores", newId), {
@@ -194,9 +189,6 @@ export default function ManageStores() {
     }
   };
 
-  // -----------------------
-  // DELETE STORE
-  // -----------------------
   const deleteStore = (id) => {
     setStoreToDelete(id);
     setConfirmVisible(true);
@@ -325,10 +317,10 @@ export default function ManageStores() {
                 error={errors.email}
               />
               <InputField
-                label="Store Image URL (optional)"
-                value={image}
-                setValue={setImage}
-                error={errors.image}
+                label="Logo File Name (.jpg/.png)"
+                value={logo}
+                setValue={setLogo}
+                error={errors.logo}
               />
 
               <PrimaryButton
