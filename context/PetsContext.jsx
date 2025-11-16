@@ -1,4 +1,4 @@
-// context/PetsContext.js
+
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 import {
@@ -20,9 +20,7 @@ import { db, auth } from "../firebase";
 const PetsContext = createContext();
 
 export function PetsProvider({ children }) {
-  // ===============================
-  // STATE
-  // ===============================
+  
   const [pets, setPets] = useState([]);
   const [stores, setStores] = useState([]);
 
@@ -34,9 +32,7 @@ export function PetsProvider({ children }) {
   const [favoriteIds, setFavoriteIds] = useState([]);
   const [loadingFavorites, setLoadingFavorites] = useState(true);
   const [requests, setRequests] = useState([]);
-  // ===============================
-  // AUTH LISTENER
-  // ===============================
+ 
   useEffect(() => {
     const unsubAuth = onAuthStateChanged(auth, (u) => {
       setUser(u);
@@ -46,9 +42,7 @@ export function PetsProvider({ children }) {
     return unsubAuth;
   }, []);
 
-  // ===============================
-  // STORES LISTENER (PUBLIC)
-  // ===============================
+  
   useEffect(() => {
     const unsubStores = onSnapshot(collection(db, "stores"), (snapshot) => {
       const list = snapshot.docs.map((d) => {
@@ -57,7 +51,7 @@ export function PetsProvider({ children }) {
           id: d.id,
           ...data,
 
-          // For web static images
+          
           logoUrl: data.logo ? `/storeImages/${data.logo}` : null,
         };
       });
@@ -68,9 +62,7 @@ export function PetsProvider({ children }) {
     return unsubStores;
   }, []);
 
-  // ===============================
-  // PETS LISTENER (requires auth)
-  // ===============================
+ 
   useEffect(() => {
     if (!authReady) return;
 
@@ -91,7 +83,7 @@ export function PetsProvider({ children }) {
             id: d.id,
             ...data,
 
-            // STATIC PET IMAGE URL
+            
             imageUrl: data.image ? `/petImages/${data.image}` : null,
           };
         });
@@ -109,9 +101,7 @@ export function PetsProvider({ children }) {
     return unsubPets;
   }, [authReady, user]);
 
-  // ===============================
-  // FAVORITES LISTENER
-  // ===============================
+ 
   useEffect(() => {
     if (!authReady) return;
 
@@ -143,9 +133,7 @@ export function PetsProvider({ children }) {
   }, [authReady, user]);
 
 
-    // ===============================
-  // ADOPTION REQUESTS LISTENER
-  // ===============================
+  
   useEffect(() => {
     if (!user) {
       setRequests([]);
@@ -166,9 +154,7 @@ export function PetsProvider({ children }) {
     return unsub;
   }, [user]);
 
-  // ===============================
-  // HELPERS FROM BOTH VERSIONS
-  // ===============================
+ 
   const getPetById = (id) => pets.find((p) => p.id === id);
 
   const getCityOfPet = (petId) => {
@@ -183,9 +169,7 @@ export function PetsProvider({ children }) {
     return pets.filter((p) => String(p.storeId) === String(storeId));
   };
 
-    // ***********************
-  // GET PET ADOPTION STATUS
-  // ***********************
+ 
   const getAdoptionStatus = (petId) => {
     if (!user) return null;
 
@@ -196,9 +180,7 @@ export function PetsProvider({ children }) {
     return req?.status ?? null;
   };
 
-  // ===============================
-  // YOUR ADOPT PET
-  // ===============================
+  
 const adoptPet = async (id) => {
   if (!user) throw new Error("User not logged in");
 
@@ -210,9 +192,7 @@ const adoptPet = async (id) => {
   });
 };
 
-  // ===============================
-  // TOGGLE FAVORITE
-  // ===============================
+  
   const toggleFavorite = async (petId) => {
     if (!user) return;
 
@@ -235,31 +215,29 @@ const adoptPet = async (id) => {
 
   const isFavorite = (petId) => favoriteIds.includes(petId);
 
-  // ===============================
-  // PROVIDER RETURN
-  // ===============================
+ 
   return (
     <PetsContext.Provider
       value={{
         pets,
         stores,
 
-        // loadings
+        
         loadingPets,
         favoriteIds,
         loadingFavorites,
 
-        // favorites
+        
         isFavorite,
         toggleFavorite,
 
-        // getters
+       
         getPetById,
         getCityOfPet,
         getPetsForStore,
         getAdoptionStatus,
 
-        // actions
+        
         adoptPet,
       }}
     >
