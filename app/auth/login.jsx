@@ -4,10 +4,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import PrimaryButton from "../../components/PrimaryButton";
 import { useRouter } from "expo-router";
 
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import { Ionicons } from "@expo/vector-icons";
-
 import { auth, db } from "../../firebase";
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
@@ -30,16 +26,6 @@ export default function LoginScreen() {
     setLoading(true);
 
     try {
-
-    
-      const userCred = await signInWithEmailAndPassword(auth, email, password);
-      const uid = userCred.user.uid;
-
-     
-      const ref = doc(db, "users", uid);
-      const snap = await getDoc(ref);
-     
-
       // 1. Firebase Authentication
       const userCred = await signInWithEmailAndPassword(auth, email, password);
       const uid = userCred.user.uid;
@@ -47,7 +33,6 @@ export default function LoginScreen() {
       // 2. Get user profile from Firestore
       const ref = doc(db, "users", uid);
       const snap = await getDoc(ref);
-
 
 
       if (!snap.exists()) {
@@ -68,8 +53,6 @@ export default function LoginScreen() {
       const role = data.role;
 
 
-
-     
       await Notifications.scheduleNotificationAsync({
         content: {
           title: "Login successful! 🎉",
@@ -79,7 +62,6 @@ export default function LoginScreen() {
       });
 
       // 3. Redirect based on role
-
       if (role === "admin") {
         router.replace("/dashboard");
       } else {
@@ -94,43 +76,6 @@ export default function LoginScreen() {
   };
  
   const googleProvider = new GoogleAuthProvider();
-
-const handleGoogleLogin = async () => {
-  try {
-  
-    const result = await signInWithPopup(auth, googleProvider);
-    const user = result.user;
-
-    
-    const ref = doc(db, "users", user.uid);
-    const snap = await getDoc(ref);
-
-    if (!snap.exists()) {
-      alert("❌ Ky përdorues NUK është i regjistruar. Bëni Sign Up më parë.");
-      return; 
-    }
-
-  
-    const data = snap.data();
-    const role = data.role;
-
- 
-    if (data.status === "inactive") {
-      alert("❌ Your account has been deactivated by the admin.");
-      await auth.signOut();
-      return;
-    }
-    if (role === "admin") {
-      router.replace("/dashboard");
-    } else {
-      router.replace("/(tabs)/");
-    }
-
-  } catch (error) {
-    console.log("GOOGLE LOGIN ERROR:", error);
-    alert("Error: " + error.message);
-  }
-};
 
   const handleGoogleLogin = async () => {
     try {
@@ -174,7 +119,6 @@ const handleGoogleLogin = async () => {
       alert("Error: " + error.message);
     }
   };
-
 
 
   return (
