@@ -3,12 +3,15 @@ import { Stack } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar, View } from "react-native";
 import { PetsProvider } from "../context/PetsContext";
+import GlobalSetup from "./GlobalSetup";
 
 export default function RootLayout() {
   return (
     <PetsProvider>
       <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
         <StatusBar barStyle="dark-content" />
+         <GlobalSetup />  
+
         <View style={{ flex: 1 }}>
           <Stack
             screenOptions={{

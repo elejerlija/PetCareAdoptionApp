@@ -2,15 +2,12 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PrimaryButton from "../../components/PrimaryButton";
-import { useRouter } from "expo-router";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router"; 
 
 
 import { auth, db } from "../../firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
-
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -19,41 +16,45 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [loading, setLoading]   = useState(false);
 
+  // --------------------------------------------
+  // HANDLE EMAIL / PASSWORD LOGIN
+  // --------------------------------------------
   const handleLogin = async () => {
     if (!email || !password) {
-      alert("Ju lutem plotësoni të gjitha fushat.");
+      alert("Please fill all fields.");
       return;
     }
 
     setLoading(true);
 
     try {
-      // 1. Login me Firebase Authentication
+      // 1. Firebase Authentication
       const userCred = await signInWithEmailAndPassword(auth, email, password);
       const uid = userCred.user.uid;
 
-      // 2. Merr dokumentin e Firestore (profile + role)
+      // 2. Get user profile from Firestore
       const ref = doc(db, "users", uid);
       const snap = await getDoc(ref);
-      //test/test
+
 
       if (!snap.exists()) {
-        alert("Profili nuk u gjet në Firestore.");
+        alert("User profile not found in Firestore.");
         setLoading(false);
         return;
       }
 
       const data = snap.data();
-         if (data.status === "inactive") {
-      alert("❌ Your account has been deactivated by the admin.");
-      await auth.signOut();
-      setLoading(false);
-      return;
-    }
+
+      if (data.status === "inactive") {
+        alert("Your account has been deactivated by the admin.");
+        await auth.signOut();
+        setLoading(false);
+        return;
+      }
+
       const role = data.role;
 
-
-      // 3. Ndarja e rruagëve sipas rolit
+      // 3. Redirect according to role
       if (role === "admin") {
         router.replace("/dashboard");
       } else {
@@ -66,47 +67,50 @@ export default function LoginScreen() {
 
     setLoading(false);
   };
+
+  // --------------------------------------------
+  // GOOGLE LOGIN
+  // --------------------------------------------
   const googleProvider = new GoogleAuthProvider();
 
-const handleGoogleLogin = async () => {
-  try {
-    // 1. Hape Google popup
-    const result = await signInWithPopup(auth, googleProvider);
-    const user = result.user;
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
 
-    // 2. Kontrollo nëse ekziston në Firestore
-    const ref = doc(db, "users", user.uid);
-    const snap = await getDoc(ref);
+      const ref = doc(db, "users", user.uid);
+      const snap = await getDoc(ref);
 
-    if (!snap.exists()) {
-      alert("❌ Ky përdorues NUK është i regjistruar. Bëni Sign Up më parë.");
-      return; // STOP — mos e lejo login
+      if (!snap.exists()) {
+        alert("This user is NOT registered. Please sign up first.");
+        return;
+      }
+
+      const data = snap.data();
+
+      if (data.status === "inactive") {
+        alert("Your account has been deactivated by the admin.");
+        await auth.signOut();
+        return;
+      }
+
+      const role = data.role;
+
+      if (role === "admin") {
+        router.replace("/dashboard");
+      } else {
+        router.replace("/(tabs)/");
+      }
+
+    } catch (error) {
+      console.log("GOOGLE LOGIN ERROR:", error);
+      alert("Error: " + error.message);
     }
+  };
 
-    // 3. Merr të dhënat dhe vazhdo login
-    const data = snap.data();
-    const role = data.role;
-
-    // BLOKIMI I USERAVE INACTIVE
-    if (data.status === "inactive") {
-      alert("❌ Your account has been deactivated by the admin.");
-      await auth.signOut();
-      return;
-    }
-    if (role === "admin") {
-      router.replace("/dashboard");
-    } else {
-      router.replace("/(tabs)/");
-    }
-
-  } catch (error) {
-    console.log("GOOGLE LOGIN ERROR:", error);
-    alert("Error: " + error.message);
-  }
-};
-
-
-
+  // --------------------------------------------
+  // UI
+  // --------------------------------------------
   return (
     <SafeAreaView style={styles.container}>
       
@@ -115,6 +119,7 @@ const handleGoogleLogin = async () => {
 
       <TextInput
         placeholder="Email"
+        placeholderTextColor="#555"
         style={styles.input}
         value={email}
         onChangeText={setEmail}
@@ -122,6 +127,7 @@ const handleGoogleLogin = async () => {
 
       <TextInput
         placeholder="Password"
+        placeholderTextColor="#555"
         secureTextEntry
         style={styles.input}
         value={password}
@@ -140,33 +146,65 @@ const handleGoogleLogin = async () => {
         </Text>
       </TouchableOpacity>
 
-<button
-  onClick={handleGoogleLogin}
-  style={{
-    marginTop: 30,
-    width: "100%",
-    padding: 14,
-    borderRadius: 12,
-    backgroundColor: "#83BAC9",
-    color: "white",
-    fontWeight: 700,
-    fontSize: 16,
-    cursor: "pointer"
-  }}
->
-  Continue with Google
-</button>
-
+      {/* GOOGLE LOGIN BUTTON (React Native Compatible) */}
+      <TouchableOpacity
+        onPress={handleGoogleLogin}
+        style={styles.googleButton}
+      >
+        <Text style={styles.googleText}>Continue with Google</Text>
+      </TouchableOpacity>
 
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 24, alignItems: "center", backgroundColor: "#fff" },
-  title: { fontSize: 22, fontWeight: "bold", color: "#457b9d", marginTop: 10 },
-  subtitle: { textAlign: "center", color: "gray", marginBottom: 20 },
-  input: { width: "100%", borderWidth: 1, borderColor: "#ccc", borderRadius: 10, padding: 10, marginBottom: 12 },
-  switchText: { marginTop: 15, color: "#555" },
-  link: { color: "#457b9d", fontWeight: "bold" },
+  container: { 
+    flex: 1, 
+    padding: 24, 
+    alignItems: "center", 
+    backgroundColor: "#fff" 
+  },
+  title: { 
+    fontSize: 22, 
+    fontWeight: "bold", 
+    color: "#457b9d", 
+    marginTop: 10 
+  },
+  subtitle: { 
+    textAlign: "center", 
+    color: "gray", 
+    marginBottom: 20 
+  },
+  input: { 
+    width: "100%", 
+    borderWidth: 1, 
+    borderColor: "#ccc", 
+    borderRadius: 10, 
+    padding: 12, 
+    marginBottom: 12, 
+    backgroundColor: "#f9f9f9" 
+  },
+  switchText: { 
+    marginTop: 15, 
+    color: "#555" 
+  },
+  link: { 
+    color: "#457b9d", 
+    fontWeight: "bold" 
+  },
+  googleButton: {
+    marginTop: 30,
+    width: "100%",
+    padding: 14,
+    borderRadius: 12,
+    backgroundColor: "#83BAC9",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  googleText: {
+    color: "white",
+    fontWeight: "700",
+    fontSize: 16,
+  },
 });
