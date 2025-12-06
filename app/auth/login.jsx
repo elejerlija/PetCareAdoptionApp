@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PrimaryButton from "../../components/PrimaryButton";
-import { useRouter } from "expo-router"; 
-
+import { useRouter } from "expo-router";
 
 import { auth, db } from "../../firebase";
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
+import * as Notifications from "expo-notifications";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -16,9 +16,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [loading, setLoading]   = useState(false);
 
-  // --------------------------------------------
-  // HANDLE EMAIL / PASSWORD LOGIN
-  // --------------------------------------------
+
   const handleLogin = async () => {
     if (!email || !password) {
       alert("Please fill all fields.");
@@ -54,7 +52,16 @@ export default function LoginScreen() {
 
       const role = data.role;
 
-      // 3. Redirect according to role
+
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Login successful! 🎉",
+          body: "Welcome back to PetCare Adoption!",
+        },
+        trigger: null, // instantly
+      });
+
+      // 3. Redirect based on role
       if (role === "admin") {
         router.replace("/dashboard");
       } else {
@@ -67,10 +74,7 @@ export default function LoginScreen() {
 
     setLoading(false);
   };
-
-  // --------------------------------------------
-  // GOOGLE LOGIN
-  // --------------------------------------------
+ 
   const googleProvider = new GoogleAuthProvider();
 
   const handleGoogleLogin = async () => {
@@ -95,6 +99,14 @@ export default function LoginScreen() {
       }
 
       const role = data.role;
+ 
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Welcome! 🎉",
+          body: "Google login successful!",
+        },
+        trigger: null,
+      });
 
       if (role === "admin") {
         router.replace("/dashboard");
@@ -108,9 +120,7 @@ export default function LoginScreen() {
     }
   };
 
-  // --------------------------------------------
-  // UI
-  // --------------------------------------------
+
   return (
     <SafeAreaView style={styles.container}>
       
@@ -146,7 +156,7 @@ export default function LoginScreen() {
         </Text>
       </TouchableOpacity>
 
-      {/* GOOGLE LOGIN BUTTON (React Native Compatible) */}
+      {/* GOOGLE LOGIN BUTTON */}
       <TouchableOpacity
         onPress={handleGoogleLogin}
         style={styles.googleButton}

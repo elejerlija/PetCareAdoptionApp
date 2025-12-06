@@ -4,6 +4,7 @@ import { Platform } from "react-native";
 import * as Notifications from "expo-notifications";
 import * as Location from "expo-location";
 
+
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -17,7 +18,7 @@ async function registerPushNotifications() {
     const { status } = await Notifications.requestPermissionsAsync();
 
     if (status !== "granted") {
-      alert("Permission for notifications is required.");
+      alert("Notification permission is required.");
       return;
     }
 
@@ -29,12 +30,13 @@ async function registerPushNotifications() {
     }
 
     const token = await Notifications.getExpoPushTokenAsync();
-    console.log("PUSH TOKEN:", token.data);
+    console.log("Expo Push Token:", token.data);
 
   } catch (err) {
-    console.log("Error in registerPushNotifications:", err);
+    console.log("Error registering notifications:", err);
   }
 }
+
 
 async function requestLocationPermission() {
   try {
@@ -46,15 +48,26 @@ async function requestLocationPermission() {
     }
 
   } catch (err) {
-    console.log("Error in requestLocationPermission:", err);
+    console.log("Error requesting location:", err);
   }
 }
 
 
 export default function GlobalSetup() {
   useEffect(() => {
+  
     registerPushNotifications();
     requestLocationPermission();
+
+
+    Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Welcome to PetCare Adoption! 🐾",
+        body: "Thanks for using our app!",
+      },
+      trigger: { seconds: 2 },
+    });
+
   }, []);
 
   return null; 
