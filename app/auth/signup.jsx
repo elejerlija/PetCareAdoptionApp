@@ -3,6 +3,8 @@ import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Platfo
 import { SafeAreaView } from "react-native-safe-area-context";
 import PrimaryButton from "../../components/PrimaryButton";
 import { useRouter } from "expo-router";
+import { registerPushNotifications } from "../../notifications";
+import * as Notifications from "expo-notifications";
 
 
 
@@ -80,7 +82,14 @@ export default function SignUpScreen() {
         role: "user"
       });
 
-      alert("Llogaria u krijua me sukses!");
+     await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Account Created 🎉",
+        body: "Your PetCare account was successfully created!",
+      },
+      trigger: null,
+    });
+
       router.replace("/auth/login"); // ose /home nese e ke ashtu
 
     } catch (error) {
@@ -198,8 +207,8 @@ const HandleGoogleSignUp = async () => {
  <PrimaryButton
   onPress={HandleGoogleSignUp}
   style={{
-    marginTop: 30,        // 👈 zbret më poshtë
-    width: "100%",        // 👈 e bën më të gjatë
+    marginTop: 30,        
+    width: "100%",        
   }}
   title={
     <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
