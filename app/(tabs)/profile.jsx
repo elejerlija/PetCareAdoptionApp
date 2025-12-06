@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 
+import ProfileHeader from "../../components/ProfileHeader";
 import InputField from "../../components/InputField";
 import PrimaryButton from "../../components/PrimaryButton";
 
@@ -195,17 +196,11 @@ export default function ProfileScreen() {
         <ScrollView contentContainerStyle={styles.scroll}>
 
           {/* FOTO PROFILI */}
-          <TouchableOpacity style={styles.photoContainer} onPress={pickImage}>
-            <Image
-              source={
-                photoURL
-                  ? { uri: photoURL }
-                  : require("../../assets/images/pets.jpg")
-              }
-              style={styles.avatar}
-            />
-            <Text style={styles.changePhoto}>Change Photo</Text>
-          </TouchableOpacity>
+         <TouchableOpacity onPress={pickImage}>
+  <ProfileHeader photoURL={photoURL} name={name} />
+  <Text style={styles.changePhoto}>Change Photo</Text>
+</TouchableOpacity>
+
 
           {/* KARTA PERSONAL INFO — ANIMUAR */}
           <Animated.View style={[styles.card, { opacity: fadeAnim }]}>
