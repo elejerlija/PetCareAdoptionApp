@@ -7,21 +7,32 @@
       "expo-router"
     ]
   },
+  "jest": {
+    "preset": "jest-expo",
+    "setupFilesAfterEnv": [
+      "@testing-library/jest-native/extend-expect"
+    ],
+    "transformIgnorePatterns": [
+      "node_modules/(?!(jest-)?react-native|@react-native|@expo|expo|expo-router|react-navigation|@react-navigation)"
+    ]
+  },
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web"
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",
     "@expo/vector-icons": "^15.0.3",
     "@react-native-async-storage/async-storage": "^2.2.0",
-    "expo": "54.0.13",
+    "expo": "^54.0.13",
     "expo-blur": "~15.0.7",
     "expo-constants": "~18.0.9",
     "expo-font": "~14.0.9",
     "expo-linking": "~8.0.8",
+    "expo-location": "~19.0.8",
+    "expo-notifications": "~0.32.14",
     "expo-router": "~6.0.8",
     "expo-splash-screen": "~31.0.10",
     "expo-status-bar": "~3.0.8",
@@ -31,10 +42,18 @@
     "react-dom": "19.1.0",
     "react-leaflet": "^5.0.0",
     "react-native": "0.81.4",
-    "react-native-maps": "^1.20.1",
+    "react-native-maps": "1.20.1",
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0",
     "react-native-web": "^0.21.0"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "@testing-library/jest-native": "^5.4.3",
+    "@testing-library/react-native": "^13.3.3",
+    "baseline-browser-mapping": "^2.9.3",
+    "jest": "^30.2.0",
+    "jest-expo": "^54.0.14",
+    "react-test-renderer": "^19.1.0"
+  }
 }
