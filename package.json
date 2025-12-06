@@ -7,6 +7,15 @@
       "expo-router"
     ]
   },
+  "jest": {
+    "preset": "jest-expo",
+    "setupFilesAfterEnv": [
+      "@testing-library/jest-native/extend-expect"
+    ],
+    "transformIgnorePatterns": [
+      "node_modules/(?!(jest-)?react-native|@react-native|@expo|expo|expo-router|react-navigation|@react-navigation)"
+    ]
+  },
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
@@ -40,6 +49,11 @@
   },
   "private": true,
   "devDependencies": {
-    "baseline-browser-mapping": "^2.9.3"
+    "@testing-library/jest-native": "^5.4.3",
+    "@testing-library/react-native": "^13.3.3",
+    "baseline-browser-mapping": "^2.9.3",
+    "jest": "^30.2.0",
+    "jest-expo": "^54.0.14",
+    "react-test-renderer": "^19.1.0"
   }
 }
