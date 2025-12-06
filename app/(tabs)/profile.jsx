@@ -7,6 +7,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  TouchableOpacity,
+  Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
@@ -14,8 +16,11 @@ import { StatusBar } from "expo-status-bar";
 import InputField from "../../components/InputField";
 import PrimaryButton from "../../components/PrimaryButton";
 
-import { auth, db } from "../../firebase";
+import { auth, db, storage } from "../../firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
+import { Animated } from "react-native";
+
+
 import {
   updatePassword,
   reauthenticateWithCredential,
@@ -23,12 +28,18 @@ import {
   signOut,
 } from "firebase/auth";
 
+import * as ImagePicker from "expo-image-picker";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
 import { useRouter } from "expo-router";
 
 const ACCENT = "#83BAC9";
 
 export default function ProfileScreen() {
   const router = useRouter();
+
+  // FOTO E PROFILIT
+  const [photoURL, setPhotoURL] = useState("");
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -52,11 +63,13 @@ export default function ProfileScreen() {
         const snap = await getDoc(doc(db, "users", uid));
         if (snap.exists()) {
           const data = snap.data();
+
           setName(data.fullName || "");
           setEmail(data.email || "");
           setCity(data.city || "");
           setPhone(data.phone || "");
           setBio(data.bio || "");
+          setPhotoURL(data.photoURL || "");
         }
       } catch (err) {}
 
@@ -65,6 +78,47 @@ export default function ProfileScreen() {
 
     loadProfile();
   }, []);
+
+  // ============================
+  //      FOTO E PROFILIT
+  // ============================
+
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.7,
+    });
+
+    if (!result.canceled) {
+      try {
+        const imageUri = result.assets[0].uri;
+
+        const response = await fetch(imageUri);
+        const blob = await response.blob();
+
+        const uid = auth.currentUser.uid;
+        const storageRef = ref(storage, `profileImages/${uid}.jpg`);
+
+        await uploadBytes(storageRef, blob);
+
+        const url = await getDownloadURL(storageRef);
+
+        await setDoc(
+          doc(db, "users", uid),
+          { photoURL: url },
+          { merge: true }
+        );
+
+        setPhotoURL(url);
+
+      } catch (err) {
+        console.log("Error uploading image:", err);
+      }
+    }
+  };
+
+  // ==============================
 
   const handleSaveProfile = async () => {
     try {
@@ -134,9 +188,19 @@ export default function ProfileScreen() {
         style={{ flex: 1 }}
       >
         <ScrollView contentContainerStyle={styles.scroll}>
-          <View style={styles.header}>
-            <Text style={styles.title}>My Profile</Text>
-          </View>
+
+          {/* FOTO PROFILI */}
+          <TouchableOpacity style={styles.photoContainer} onPress={pickImage}>
+            <Image
+              source={
+                photoURL
+                  ? { uri: photoURL }
+                  : require("../../assets/images/pets.jpg")
+              }
+              style={styles.avatar}
+            />
+            <Text style={styles.changePhoto}>Change Photo</Text>
+          </TouchableOpacity>
 
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Personal Information</Text>
@@ -190,6 +254,25 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#F9FAFB" },
   scroll: { padding: 18, paddingBottom: 40 },
   centered: { flex: 1, justifyContent: "center", alignItems: "center" },
+
+  photoContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+
+  avatar: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "#ddd",
+  },
+
+  changePhoto: {
+    marginTop: 6,
+    color: ACCENT,
+    fontWeight: "600",
+  },
+
   header: { alignItems: "center", marginBottom: 20 },
   title: { fontSize: 24, fontWeight: "700" },
   card: {
