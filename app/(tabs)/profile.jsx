@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Image,
+  Animated,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
@@ -18,8 +19,6 @@ import PrimaryButton from "../../components/PrimaryButton";
 
 import { auth, db, storage } from "../../firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { Animated } from "react-native";
-
 
 import {
   updatePassword,
@@ -38,9 +37,7 @@ const ACCENT = "#83BAC9";
 export default function ProfileScreen() {
   const router = useRouter();
 
-  // FOTO E PROFILIT
   const [photoURL, setPhotoURL] = useState("");
-
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [city, setCity] = useState("");
@@ -54,6 +51,10 @@ export default function ProfileScreen() {
   const [savingPass, setSavingPass] = useState(false);
   const [loadingProfile, setLoadingProfile] = useState(true);
 
+  // ANIMACION FADE-IN PËR KARTAT
+  const fadeAnim = useState(new Animated.Value(0))[0];
+
+  // NGARKO PROFILIN
   useEffect(() => {
     const loadProfile = async () => {
       try {
@@ -79,6 +80,17 @@ export default function ProfileScreen() {
     loadProfile();
   }, []);
 
+  // ANIMACION FADE-IN – aktivizohet pasi mbaron loading
+  useEffect(() => {
+    if (!loadingProfile) {
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [loadingProfile]);
+
   // ============================
   //      FOTO E PROFILIT
   // ============================
@@ -92,26 +104,19 @@ export default function ProfileScreen() {
 
     if (!result.canceled) {
       try {
-        const imageUri = result.assets[0].uri;
-
-        const response = await fetch(imageUri);
+        const uri = result.assets[0].uri;
+        const response = await fetch(uri);
         const blob = await response.blob();
 
         const uid = auth.currentUser.uid;
         const storageRef = ref(storage, `profileImages/${uid}.jpg`);
 
         await uploadBytes(storageRef, blob);
-
         const url = await getDownloadURL(storageRef);
 
-        await setDoc(
-          doc(db, "users", uid),
-          { photoURL: url },
-          { merge: true }
-        );
+        await setDoc(doc(db, "users", uid), { photoURL: url }, { merge: true });
 
         setPhotoURL(url);
-
       } catch (err) {
         console.log("Error uploading image:", err);
       }
@@ -202,7 +207,8 @@ export default function ProfileScreen() {
             <Text style={styles.changePhoto}>Change Photo</Text>
           </TouchableOpacity>
 
-          <View style={styles.card}>
+          {/* KARTA PERSONAL INFO — ANIMUAR */}
+          <Animated.View style={[styles.card, { opacity: fadeAnim }]}>
             <Text style={styles.cardTitle}>Personal Information</Text>
 
             <InputField placeholder="Full name" value={name} onChangeText={setName} />
@@ -216,9 +222,10 @@ export default function ProfileScreen() {
               onPress={handleSaveProfile}
               isLoading={saving}
             />
-          </View>
+          </Animated.View>
 
-          <View style={styles.card}>
+          {/* KARTA PASSWORD — ANIMUAR */}
+          <Animated.View style={[styles.card, { opacity: fadeAnim }]}>
             <Text style={styles.cardTitle}>Change Password</Text>
 
             <InputField
@@ -239,11 +246,12 @@ export default function ProfileScreen() {
               onPress={handlePasswordChange}
               isLoading={savingPass}
             />
-          </View>
+          </Animated.View>
 
           <View style={styles.logoutContainer}>
             <PrimaryButton title="Logout" onPress={handleLogout} />
           </View>
+
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -273,8 +281,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 
-  header: { alignItems: "center", marginBottom: 20 },
-  title: { fontSize: 24, fontWeight: "700" },
   card: {
     backgroundColor: "#fff",
     padding: 16,
@@ -282,6 +288,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     elevation: 2,
   },
+
   cardTitle: {
     fontSize: 18,
     fontWeight: "700",
@@ -290,6 +297,7 @@ const styles = StyleSheet.create({
     borderLeftColor: ACCENT,
     paddingLeft: 10,
   },
+
   logoutContainer: {
     alignItems: "center",
     marginBottom: 20,
