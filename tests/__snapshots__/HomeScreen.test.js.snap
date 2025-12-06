@@ -1,0 +1,266 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`HomeScreen Tests matches snapshot 1`] = `
+<RNCSafeAreaView
+  edges={
+    {
+      "bottom": "additive",
+      "left": "additive",
+      "right": "additive",
+      "top": "additive",
+    }
+  }
+  style={
+    {
+      "backgroundColor": "#fff",
+      "flex": 1,
+    }
+  }
+>
+  <View
+    collapsable={false}
+    style={
+      {
+        "flex": 1,
+        "opacity": 0,
+        "transform": [
+          {
+            "translateY": 60,
+          },
+        ],
+      }
+    }
+  >
+    <RCTScrollView
+      contentContainerStyle={
+        {
+          "padding": 16,
+          "paddingBottom": 50,
+        }
+      }
+    >
+      <View>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "marginBottom": 10,
+              "marginTop": 8,
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "color": "#83BAC9",
+                "fontSize": 26,
+                "fontWeight": "800",
+              }
+            }
+          >
+            PetCare Adoption
+          </Text>
+          <Text
+            style={
+              {
+                "color": "#667",
+                "fontSize": 15,
+                "marginTop": 4,
+                "paddingHorizontal": 12,
+                "textAlign": "center",
+              }
+            }
+          >
+            Welcome to the world of four-pawed friends. 🐾
+          </Text>
+        </View>
+        <Image
+          collapsable={false}
+          resizeMode="cover"
+          source={
+            {
+              "testUri": "../../../assets/images/pets.jpg",
+            }
+          }
+          style={
+            {
+              "borderRadius": 24,
+              "height": 200,
+              "marginVertical": 10,
+              "transform": [
+                {
+                  "scale": 0.75,
+                },
+              ],
+              "width": "100%",
+            }
+          }
+        />
+        <View
+          style={
+            {
+              "backgroundColor": "#83BAC9",
+              "borderRadius": 20,
+              "marginVertical": 12,
+              "padding": 14,
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "color": "#FFFFF0",
+                "fontSize": 16,
+                "fontWeight": "800",
+              }
+            }
+          >
+            Adoptathon this weekend!
+          </Text>
+          <Text
+            style={
+              {
+                "color": "#FFFFF0",
+                "fontSize": 13,
+                "marginTop": 4,
+                "opacity": 0.95,
+              }
+            }
+          >
+            Discounts on vaccinations for new adoptions. Visit your nearest center!
+          </Text>
+        </View>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "marginBottom": 6,
+              "marginTop": 18,
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "color": "#83BAC9",
+                "fontSize": 22,
+                "marginRight": 8,
+              }
+            }
+          >
+            📰
+          </Text>
+          <Text
+            style={
+              {
+                "color": "#2A3A3F",
+                "fontSize": 19,
+                "fontWeight": "700",
+              }
+            }
+          >
+            PetCare News
+          </Text>
+        </View>
+        <View
+          style={
+            {
+              "backgroundColor": "#E8F5F7",
+              "borderColor": "#D4EBEF",
+              "borderRadius": 20,
+              "borderWidth": 1,
+              "marginBottom": 22,
+              "padding": 18,
+            }
+          }
+        >
+          <View
+            collapsable={false}
+            style={
+              {
+                "backgroundColor": "#DDECEF",
+                "borderRadius": 8,
+                "height": 18,
+                "marginBottom": 12,
+                "opacity": 0.3,
+              }
+            }
+          />
+          <View
+            collapsable={false}
+            style={
+              {
+                "backgroundColor": "#DDECEF",
+                "borderRadius": 8,
+                "height": 18,
+                "marginBottom": 12,
+                "opacity": 0.3,
+              }
+            }
+          />
+          <View
+            collapsable={false}
+            style={
+              {
+                "backgroundColor": "#DDECEF",
+                "borderRadius": 8,
+                "height": 18,
+                "marginBottom": 12,
+                "opacity": 0.3,
+              }
+            }
+          />
+        </View>
+        <View
+          style={
+            {
+              "alignItems": "center",
+              "backgroundColor": "#FFFFF0",
+              "borderTopColor": "#eef2f3",
+              "borderTopWidth": 1,
+              "marginTop": 20,
+              "paddingVertical": 20,
+            }
+          }
+        >
+          <Text
+            style={
+              {
+                "color": "#444",
+                "fontSize": 13,
+                "marginBottom": 4,
+              }
+            }
+          >
+            Need help or want to get in touch?
+          </Text>
+          <Text
+            onPress={[Function]}
+            style={
+              {
+                "color": "#83BAC9",
+                "fontSize": 14,
+                "fontWeight": "700",
+              }
+            }
+          >
+            📧 contact@petcareapp.com
+          </Text>
+          <Text
+            style={
+              {
+                "color": "#888",
+                "fontSize": 12,
+                "marginTop": 6,
+              }
+            }
+          >
+            © 2025 PetCare Adoption
+          </Text>
+        </View>
+      </View>
+    </RCTScrollView>
+  </View>
+</RNCSafeAreaView>
+`;
