@@ -3,26 +3,21 @@ import { render, fireEvent } from "@testing-library/react-native";
 import HomeScreen from "../app/(tabs)/index";
 import { Linking } from "react-native";
 
-// -----------------------------------------------------------
-// MOCK ANIMATED (Zgjidh errorin që shfaqej më parë te Jest)
-// -----------------------------------------------------------
+
 jest.mock("react-native/Libraries/Animated/Animated", () => {
   const ActualAnimated = jest.requireActual("react-native/Libraries/Animated/Animated");
 
   return {
     ...ActualAnimated,
     timing: () => ({
-      start: (cb) => cb && cb(),   // mbaron menjëherë
+      start: (cb) => cb && cb(),  
     }),
     parallel: () => ({
-      start: (cb) => cb && cb(),   // mos priti animacion
+      start: (cb) => cb && cb(),  
     }),
   };
 });
 
-// -----------------------------------------------------------
-// MOCK LINKING (për testim të klikimit të emailit)
-// -----------------------------------------------------------
 jest.spyOn(Linking, "openURL").mockImplementation(() => Promise.resolve());
 
 describe("HomeScreen Tests", () => {
@@ -50,6 +45,6 @@ describe("HomeScreen Tests", () => {
   test("shows skeleton loading before news", () => {
     const { queryByText } = render(<HomeScreen />);
     const bullet = queryByText("•");
-    expect(bullet).toBeNull();  // skeleton, not actual news yet
+    expect(bullet).toBeNull(); 
   });
 });
