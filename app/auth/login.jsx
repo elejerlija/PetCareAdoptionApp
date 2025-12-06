@@ -6,8 +6,6 @@ import { useRouter } from "expo-router";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { Ionicons } from "@expo/vector-icons";
-
-
 import { auth, db } from "../../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 
@@ -28,14 +26,14 @@ export default function LoginScreen() {
     setLoading(true);
 
     try {
-      // 1. Login me Firebase Authentication
+    
       const userCred = await signInWithEmailAndPassword(auth, email, password);
       const uid = userCred.user.uid;
 
-      // 2. Merr dokumentin e Firestore (profile + role)
+     
       const ref = doc(db, "users", uid);
       const snap = await getDoc(ref);
-      //test/test
+     
 
       if (!snap.exists()) {
         alert("Profili nuk u gjet në Firestore.");
@@ -53,7 +51,7 @@ export default function LoginScreen() {
       const role = data.role;
 
 
-      // 3. Ndarja e rruagëve sipas rolit
+     
       if (role === "admin") {
         router.replace("/dashboard");
       } else {
@@ -70,24 +68,24 @@ export default function LoginScreen() {
 
 const handleGoogleLogin = async () => {
   try {
-    // 1. Hape Google popup
+  
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
 
-    // 2. Kontrollo nëse ekziston në Firestore
+    
     const ref = doc(db, "users", user.uid);
     const snap = await getDoc(ref);
 
     if (!snap.exists()) {
       alert("❌ Ky përdorues NUK është i regjistruar. Bëni Sign Up më parë.");
-      return; // STOP — mos e lejo login
+      return; 
     }
 
-    // 3. Merr të dhënat dhe vazhdo login
+  
     const data = snap.data();
     const role = data.role;
 
-    // BLOKIMI I USERAVE INACTIVE
+ 
     if (data.status === "inactive") {
       alert("❌ Your account has been deactivated by the admin.");
       await auth.signOut();

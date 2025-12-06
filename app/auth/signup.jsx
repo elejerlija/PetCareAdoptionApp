@@ -25,7 +25,7 @@ export default function SignUpScreen() {
    
   const googleProvider = new GoogleAuthProvider();
 
-  // States për inputet
+ 
   const [fullName, setFullName] = useState("");
   const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
@@ -33,7 +33,7 @@ export default function SignUpScreen() {
 
   const [loading, setLoading]   = useState(false);
 
-  // Funksioni kryesor Sign Up
+
   const handleSignup = async () => {
     const nameRegex = /^[A-Za-z\s]{3,}$/; 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
@@ -69,11 +69,11 @@ export default function SignUpScreen() {
     setLoading(true);
 
     try {
-      // 1. Krijo user në Firebase Authentication
+      
       const userCred = await createUserWithEmailAndPassword(auth, email, password);
       const uid = userCred.user.uid;
 
-      // 2. Shto dokument në Firestore me role = user
+     
       await setDoc(doc(db, "users", uid), {
         fullName: fullName,
         email: email,
