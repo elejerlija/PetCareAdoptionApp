@@ -8,6 +8,7 @@ import { auth, db } from "../../firebase";
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import * as Notifications from "expo-notifications";
+import { registerPushNotifications } from "../../notifications";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -107,6 +108,7 @@ export default function LoginScreen() {
         },
         trigger: null,
       });
+         await registerPushNotifications();
 
       if (role === "admin") {
         router.replace("/dashboard");
