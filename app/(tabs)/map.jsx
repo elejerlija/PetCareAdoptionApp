@@ -15,6 +15,7 @@ import { usePets } from "../../context/PetsContext";
 import PetCard from "../../components/PetCard";
 import { useRouter } from "expo-router";
 
+const placeholderLogo = require("../../public/storeImages/placeholder.jpg");
 const MODAL_ANIMATION_DELAY = 300;
 
 export default function MapScreen() {
@@ -56,21 +57,21 @@ export default function MapScreen() {
             onPress={() => handleStorePress(store)}
           >
             <View style={styles.markerContainer}>
-              {store.logo ? (
-                <Image
-                  source={{ uri: store.logo }}
-                  style={styles.markerImage}
-                />
-              ) : (
-                <View style={styles.markerPlaceholder} />
-              )}
+              <Image
+                source={
+                  store.logo
+                    ? { uri: store.logo } // Firestore GitHub URL
+                    : placeholderLogo // Local fallback
+                }
+                style={styles.markerImage}
+              />
               <View style={styles.markerArrow} />
             </View>
           </Marker>
         ))}
       </MapView>
 
-      {/* MODAL WITH PETS */}
+      {/* MODAL */}
       <Modal
         visible={modalVisible}
         transparent
@@ -80,12 +81,15 @@ export default function MapScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              {selectedStore?.logo && (
-                <Image
-                  source={{ uri: selectedStore.logo }}
-                  style={styles.modalStoreLogo}
-                />
-              )}
+              <Image
+                source={
+                  selectedStore?.logo
+                    ? { uri: selectedStore.logo }
+                    : placeholderLogo
+                }
+                style={styles.modalStoreLogo}
+              />
+
               <Text style={styles.modalTitle}>{selectedStore?.name} Pets</Text>
             </View>
 
@@ -113,26 +117,19 @@ export default function MapScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-
   map: { flex: 1 },
 
   markerContainer: { alignItems: "center" },
+
   markerImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 55,
+    height: 55,
+    borderRadius: 28,
     borderWidth: 2,
-    borderColor: "white",
-    backgroundColor: "#fff",
+    borderColor: "#fff",
+    backgroundColor: "#eee",
   },
-  markerPlaceholder: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: "#ccc",
-    borderWidth: 2,
-    borderColor: "white",
-  },
+
   markerArrow: {
     width: 0,
     height: 0,
@@ -150,6 +147,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "center",
   },
+
   modalContent: {
     backgroundColor: "white",
     margin: 20,
@@ -157,27 +155,32 @@ const styles = StyleSheet.create({
     padding: 20,
     maxHeight: "80%",
   },
+
   modalHeader: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 12,
   },
+
   modalStoreLogo: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 45,
+    height: 45,
+    borderRadius: 22,
     marginRight: 10,
   },
+
   modalTitle: {
     fontSize: 18,
     fontWeight: "bold",
   },
+
   closeButton: {
     backgroundColor: "#83BAC9",
     borderRadius: 10,
     paddingVertical: 12,
     marginTop: 15,
   },
+
   closeButtonText: {
     color: "white",
     fontSize: 16,
