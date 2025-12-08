@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -7,9 +7,11 @@ import {
   Modal,
   FlatList,
   Pressable,
+  ActivityIndicator,
 } from "react-native";
 
 import MapView, { Marker } from "react-native-maps";
+import * as Location from "expo-location";
 import { usePets } from "../../context/PetsContext";
 import PetCard from "../../components/PetCard";
 import { useRouter } from "expo-router";
@@ -24,6 +26,55 @@ export default function MapScreen() {
   const [selectedStore, setSelectedStore] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
+  const [userLocation, setUserLocation] = useState(null);
+  const [loadingLocation, setLoadingLocation] = useState(true);
+
+  const mapRef = useRef(null);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+
+      if (status !== "granted") {
+        console.log("Permission denied");
+        setLoadingLocation(false);
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      const coords = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
+
+      setUserLocation(coords);
+      setLoadingLocation(false);
+    })();
+  }, []);
+
+  const centerOnUser = async () => {
+    try {
+      let location = await Location.getCurrentPositionAsync({});
+      const coords = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
+
+      setUserLocation(coords);
+
+      mapRef.current?.animateToRegion(
+        {
+          ...coords,
+          latitudeDelta: 0.1,
+          longitudeDelta: 0.1,
+        },
+        700
+      );
+    } catch (error) {
+      console.log("Error getting location:", error);
+    }
+  };
+
   const handleStorePress = (store) => {
     setSelectedStore(store);
     setModalVisible(true);
@@ -34,18 +85,31 @@ export default function MapScreen() {
     setTimeout(() => router.push(`/pets/${petId}`), MODAL_ANIMATION_DELAY);
   };
 
+  if (loadingLocation) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#83BAC9" />
+        <Text>Getting your location...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       {/* MAP */}
       <MapView
+        ref={mapRef}
         style={styles.map}
+        showsUserLocation={true}
+        followsUserLocation={false}
         initialRegion={{
-          latitude: 42.6629,
-          longitude: 21.1655,
-          latitudeDelta: 0.4,
-          longitudeDelta: 0.4,
+          latitude: userLocation.latitude,
+          longitude: userLocation.longitude,
+          latitudeDelta: 0.2,
+          longitudeDelta: 0.2,
         }}
       >
+        {/* STORE MARKERS */}
         {stores.map((store) => (
           <Marker
             key={store.id}
@@ -57,11 +121,7 @@ export default function MapScreen() {
           >
             <View style={styles.markerContainer}>
               <Image
-                source={
-                  store.logo
-                    ? { uri: store.logo } // Firestore GitHub URL
-                    : placeholderLogo // Local fallback
-                }
+                source={store.logo ? { uri: store.logo } : placeholderLogo}
                 style={styles.markerImage}
               />
               <View style={styles.markerArrow} />
@@ -70,7 +130,10 @@ export default function MapScreen() {
         ))}
       </MapView>
 
-      {/* MODAL */}
+      <Pressable style={styles.locateBtn} onPress={centerOnUser}>
+        <Text style={styles.locateBtnText}>📍</Text>
+      </Pressable>
+
       <Modal
         visible={modalVisible}
         transparent
@@ -88,7 +151,6 @@ export default function MapScreen() {
                 }
                 style={styles.modalStoreLogo}
               />
-
               <Text style={styles.modalTitle}>{selectedStore?.name} Pets</Text>
             </View>
 
@@ -118,6 +180,12 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   map: { flex: 1 },
 
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
   markerContainer: { alignItems: "center" },
 
   markerImage: {
@@ -139,6 +207,26 @@ const styles = StyleSheet.create({
     borderRightColor: "transparent",
     borderTopColor: "white",
     marginTop: -2,
+  },
+
+  locateBtn: {
+    position: "absolute",
+    bottom: 90,
+    right: 15,
+    backgroundColor: "#FFFFF0",
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+  },
+  locateBtnText: {
+    fontSize: 24,
   },
 
   modalOverlay: {
