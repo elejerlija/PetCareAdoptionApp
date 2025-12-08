@@ -8,10 +8,7 @@ import GlobalSetup from "./GlobalSetup";
 export default function RootLayout() {
   return (
     <PetsProvider>
-      <SafeAreaView
-        style={{ flex: 1, backgroundColor: "#83BAC9" }}
-        edges={["bottom"]}
-      >
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#83BAC9" }} edges={[]}>
         <StatusBar
           barStyle="dark-content"
           translucent
