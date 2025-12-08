@@ -10,7 +10,6 @@ import {
 } from "react-native";
 
 import MapView, { Marker } from "react-native-maps";
-
 import { usePets } from "../../context/PetsContext";
 import PetCard from "../../components/PetCard";
 import { useRouter } from "expo-router";
