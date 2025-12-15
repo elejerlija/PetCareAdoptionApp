@@ -2,7 +2,7 @@ import { Tabs } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import "leaflet/dist/leaflet.css";
+
 
 const THEME_COLOR = "#83BAC9";
 const ICON_ACTIVE = "#FFFFF0";
