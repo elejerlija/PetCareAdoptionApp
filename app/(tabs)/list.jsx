@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState ,useCallback} from 'react';
 import {
   View,
   Text,
@@ -13,10 +13,19 @@ import PetCard from '../../components/PetCard';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
+
+
 export default function PetList() {
   const router = useRouter();
   const { pets, loadingPets, isFavorite, loadingFavorites } = usePets();
   const [showFavorites, setShowFavorites] = useState(false);
+
+  const handlePress = useCallback(
+  (id) => {
+    router.push(`/pets/${id}`);
+  },
+  [router]
+);
 
   const filteredList = Array.isArray(pets)
     ? pets
@@ -81,7 +90,7 @@ export default function PetList() {
           renderItem={({ item }) => (
             <PetCard
               pet={item}
-              onPress={() => router.push(`/pets/${item.id}`)}
+              onPress={() =>  handlePress(item.id)}
             />
           )}
           ListEmptyComponent={
