@@ -16,11 +16,16 @@ import { usePets } from '../../context/PetsContext';
 export default function PetDetailsRoute() {
   const params = useLocalSearchParams();
   const rawId = Array.isArray(params.id) ? params.id[0] : params.id;
-  const id = rawId; 
+  const id = rawId;
 
   const { getPetById, adoptPet, getCityOfPet, getAdoptionStatus } = usePets();
   const pet = getPetById?.(id);
   const adoptionStatus = getAdoptionStatus?.(id);
+  const aboutText = pet.description ?? pet.desc ?? "";
+  const isAvailable = pet.available !== false;
+  const isPending = adoptionStatus === "pending";
+  const isApproved = adoptionStatus === "approved";
+  const canAdopt = isAvailable && !isPending && !isApproved;
 
 
   if (!pet) {
@@ -33,34 +38,35 @@ export default function PetDetailsRoute() {
     );
   }
 
-  const imgSource =
-  pet.imageUrl
+const imgSource =
+  typeof pet.imageUrl === "string" && (pet.imageUrl.startsWith("http") || pet.imageUrl.startsWith("data:image"))
     ? { uri: pet.imageUrl }
-    : require('../../assets/images/random.jpg'); 
+    : require("../../assets/images/random.jpg");
 
-const handleAdopt = async () => {
-  try {
-    console.log("CALLING ADOPT WITH ID:", pet.id);
 
-    await adoptPet?.(pet.id);
+  const handleAdopt = async () => {
+    try {
+      console.log("CALLING ADOPT WITH ID:", pet.id);
 
-    console.log("ADOPT SUCCESS");
+      await adoptPet?.(pet.id);
 
-    if (Platform.OS === "web") {
-      window.alert("Your adoption request has been sent and is pending approval.");
-    } else {
-      Alert.alert("Request Sent", "Your adoption request is now pending.");
+      console.log("ADOPT SUCCESS");
+
+      if (Platform.OS === "web") {
+        window.alert("Your adoption request has been sent and is pending approval.");
+      } else {
+        Alert.alert("Request Sent", "Your adoption request is now pending.");
+      }
+
+    } catch (err) {
+      console.log("ADOPT ERROR:", err);
+      Alert.alert("ERROR", err.message);
     }
-
-  } catch (err) {
-    console.log("ADOPT ERROR:", err);
-    Alert.alert("ERROR", err.message);
-  }
-};
+  };
 
 
 
-  const isAvailable = pet.available !== false; 
+
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -72,38 +78,38 @@ const handleAdopt = async () => {
 
         <Text style={styles.name}>{pet.name}</Text>
 
-<Text
-  style={[
-    styles.status,
-    adoptionStatus === "pending"
-      ? { color: "#e6a100" }
-      : adoptionStatus === "approved"
-      ? { color: "green" }
-      : isAvailable
-      ? { color: "green" }
-      : { color: "red" },
-  ]}
->
-  {adoptionStatus === "pending"
-    ? "Pending approval"
-    : adoptionStatus === "approved"
-    ? "Approved"
-    : isAvailable
-    ? "Available"
-    : "Not Available"}
-</Text>
-
-
+        <Text
+          style={[
+            styles.status,
+            adoptionStatus === "pending"
+              ? { color: "#e6a100" }
+              : adoptionStatus === "approved"
+                ? { color: "green" }
+                : isAvailable
+                  ? { color: "green" }
+                  : { color: "red" },
+          ]}
+        >
+          {adoptionStatus === "pending"
+            ? "Pending approval"
+            : adoptionStatus === "approved"
+              ? "Approved"
+              : isAvailable
+                ? "Available"
+                : "Not Available"}
+        </Text>
 
         <Text style={styles.details}>Age: {pet.age} yr</Text>
         <Text style={styles.details}>City: {getCityOfPet(pet.id)}</Text>
 
         <Text style={styles.aboutTitle}>About</Text>
-        <Text style={styles.aboutText}>{pet.desc}</Text>
+        <Text style={styles.aboutText}>{aboutText}</Text>
 
         <View style={styles.buttonsContainer}>
           <PrimaryButton
-            title={isAvailable ? 'Adopt' : 'Not available'}
+            title={
+              isPending ? "Pending..." : isApproved ? "Approved" : isAvailable ? "Adopt" : "Not available"
+            }
             onPress={handleAdopt}
             disabled={!isAvailable}
           />
@@ -129,9 +135,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     resizeMode: 'cover',
   },
-  name: { fontSize: 26, fontWeight: 'bold' },
-  status: { fontSize: 16, marginVertical: 6 },
-  details: { fontSize: 16, color: 'gray' },
+  name: {
+    fontSize: 26,
+    fontWeight: 'bold'
+  },
+  details: {
+    fontSize: 16,
+    color: 'gray'
+  },
   aboutTitle: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -146,26 +157,25 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   buttonsContainer: {
-  width: '100%',
-  marginTop: 28,
-  paddingHorizontal: 10,
-  paddingBottom: 20,
-  alignItems: 'center',
-},
-
+    width: '100%',
+    marginTop: 28,
+    paddingHorizontal: 10,
+    paddingBottom: 20,
+    alignItems: 'center',
+  },
   status: {
-  fontSize: 16,
-  fontWeight: "600",
-  marginVertical: 6,
-},
-pendingStatus: {
-  color: "#e6a100",
-},
-approvedStatus: {
-  color: "green",
-},
-notAvailableStatus: {
-  color: "red",
-},
+    fontSize: 16,
+    fontWeight: "600",
+    marginVertical: 6,
+  },
+  pendingStatus: {
+    color: "#e6a100",
+  },
+  approvedStatus: {
+    color: "green",
+  },
+  notAvailableStatus: {
+    color: "red",
+  },
 
 });

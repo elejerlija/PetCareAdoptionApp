@@ -3,20 +3,30 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { usePets } from "../context/PetsContext";
 import { Ionicons } from "@expo/vector-icons";
 
+
+ const fallbackImg = require("../assets/images/random.jpg");
+
+function resolveImageSource(pet) {
+  const u = pet?.imageUrl;
+
+  if (typeof u === "string" && (u.startsWith("http") || u.startsWith("data:image"))) {
+    return { uri: u };
+  }
+
+  return fallbackImg;
+}
+
 export default function PetCard({ pet, onPress }) {
   const { getCityOfPet, isFavorite, toggleFavorite } = usePets();
   const city = getCityOfPet?.(pet.id);
-
   const fav = isFavorite(pet.id);
+  const imgSource=resolveImageSource(pet);
+
 
   return (
     <TouchableOpacity style={styles.card} onPress={() => onPress?.(pet)}>
       <Image
-        source={
-          pet.imageUrl
-            ? { uri: pet.imageUrl }
-            : require("../assets/images/random.jpg")
-        }
+        source={imgSource}
         style={styles.image}
       />
 
