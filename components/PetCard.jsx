@@ -24,7 +24,7 @@ function PetCard({ pet, onPress }) {
 
 
   return (
-    <TouchableOpacity style={styles.card} onPress={() => onPress?.(pet)}>
+    <TouchableOpacity style={styles.card} onPress={() => onPress?.(pet.id)}>
       <Image
         source={imgSource}
         style={styles.image}

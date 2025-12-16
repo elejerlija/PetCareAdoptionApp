@@ -1,4 +1,4 @@
-import React, { useState ,useCallback} from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -21,22 +21,26 @@ export default function PetList() {
   const [showFavorites, setShowFavorites] = useState(false);
 
   const handlePress = useCallback(
-  (id) => {
-    router.push(`/pets/${id}`);
-  },
-  [router]
-);
+    (id) => {
+      router.push(`/pets/${id}`);
+    },
+    [router]
+  );
 
-  const filteredList = Array.isArray(pets)
-    ? pets
-        .filter((p) => p.available !== false)
-        .filter((p) => (showFavorites ? isFavorite(p.id) : true))
-    : [];
+  const filteredList = useMemo(() => {
+    if (!Array.isArray(pets)) return [];
+
+    return pets
+      .filter(p => p.available !== false)
+      .filter(p => (showFavorites ? isFavorite(p.id) : true));
+  }, [pets, showFavorites, isFavorite]);
+
 
   const isLoading = loadingPets || loadingFavorites;
 
   return (
     <SafeAreaView style={styles.container}>
+
       <View
         style={{
           marginTop: 50,
@@ -90,7 +94,7 @@ export default function PetList() {
           renderItem={({ item }) => (
             <PetCard
               pet={item}
-              onPress={() =>  handlePress(item.id)}
+              onPress={handlePress}
             />
           )}
           ListEmptyComponent={
