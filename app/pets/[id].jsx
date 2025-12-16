@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Alert,
   ScrollView,
   Platform,
+  Animated
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PrimaryButton from '../../components/PrimaryButton';
@@ -26,6 +27,22 @@ export default function PetDetailsRoute() {
   const isPending = adoptionStatus === "pending";
   const isApproved = adoptionStatus === "approved";
   const canAdopt = isAvailable && !isPending && !isApproved;
+  const scaleAdopt = useRef(new Animated.Value(1)).current;
+
+  const animateAdoptPress = () => {
+    Animated.sequence([
+      Animated.timing(scaleAdopt, {
+        toValue: 0.96,
+        duration: 80,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAdopt, {
+        toValue: 1,
+        duration: 80,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
 
 
   if (!pet) {
@@ -38,10 +55,10 @@ export default function PetDetailsRoute() {
     );
   }
 
-const imgSource =
-  typeof pet.imageUrl === "string" && (pet.imageUrl.startsWith("http") || pet.imageUrl.startsWith("data:image"))
-    ? { uri: pet.imageUrl }
-    : require("../../assets/images/random.jpg");
+  const imgSource =
+    typeof pet.imageUrl === "string" && (pet.imageUrl.startsWith("http") || pet.imageUrl.startsWith("data:image"))
+      ? { uri: pet.imageUrl }
+      : require("../../assets/images/random.jpg");
 
 
   const handleAdopt = async () => {
@@ -63,10 +80,6 @@ const imgSource =
       Alert.alert("ERROR", err.message);
     }
   };
-
-
-
-
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -106,14 +119,26 @@ const imgSource =
         <Text style={styles.aboutText}>{aboutText}</Text>
 
         <View style={styles.buttonsContainer}>
-          <PrimaryButton
-            title={
-              isPending ? "Pending..." : isApproved ? "Approved" : isAvailable ? "Adopt" : "Not available"
-            }
-            onPress={handleAdopt}
-            disabled={!isAvailable}
-          />
+          <Animated.View style={{ transform: [{ scale: scaleAdopt }] }}>
+            <PrimaryButton
+              title={
+                isPending
+                  ? "Pending..."
+                  : isApproved
+                    ? "Approved"
+                    : isAvailable
+                      ? "Adopt"
+                      : "Not available"
+              }
+              onPress={() => {
+                animateAdoptPress();
+                handleAdopt();
+              }}
+              disabled={!canAdopt}
+            />
+          </Animated.View>
         </View>
+
       </ScrollView>
     </SafeAreaView>
   );

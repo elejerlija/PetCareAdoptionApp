@@ -1,10 +1,9 @@
-import React from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import React,{useEffect,useRef} from "react";
+import { View, Text, Image, StyleSheet, TouchableOpacity,Animated,Easing } from "react-native";
 import { usePets } from "../context/PetsContext";
 import { Ionicons } from "@expo/vector-icons";
 
-
- const fallbackImg = require("../assets/images/random.jpg");
+const fallbackImg = require("../assets/images/random.jpg");
 
 function resolveImageSource(pet) {
   const u = pet?.imageUrl;
@@ -16,15 +15,52 @@ function resolveImageSource(pet) {
   return fallbackImg;
 }
 
-function PetCard({ pet, onPress }) {
+function PetCard({ pet, onPress ,index}) {
   const { getCityOfPet, isFavorite, toggleFavorite } = usePets();
   const city = getCityOfPet?.(pet.id);
   const fav = isFavorite(pet.id);
   const imgSource=resolveImageSource(pet);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(16)).current;
+
+  
+ useEffect(() => {
+  fadeAnim.setValue(0);
+  slideAnim.setValue(16);
+
+  Animated.parallel([
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 900,
+      delay:index*25,
+      useNativeDriver: true,
+    }),
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration:  900,
+      delay:index*25,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }),
+  ]).start();
+}, [pet.id]);
 
 
   return (
-    <TouchableOpacity style={styles.card} onPress={() => onPress?.(pet.id)}>
+   <Animated.View
+    style={[
+      styles.card,
+      {
+        opacity: fadeAnim,
+        transform: [{ translateY: slideAnim }],
+      },
+    ]}
+  >
+        <TouchableOpacity
+      style={{ flexDirection: "row", alignItems: "center" }}
+      activeOpacity={0.8}
+      onPress={() => onPress(pet.id)}
+    >
       <Image
         source={imgSource}
         style={styles.image}
@@ -48,6 +84,7 @@ function PetCard({ pet, onPress }) {
         </Text>
       </View>
     </TouchableOpacity>
+    </Animated.View>
   );
 }
 export default React.memo(PetCard);
