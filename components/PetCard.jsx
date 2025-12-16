@@ -16,7 +16,7 @@ function resolveImageSource(pet) {
   return fallbackImg;
 }
 
-export default function PetCard({ pet, onPress }) {
+function PetCard({ pet, onPress }) {
   const { getCityOfPet, isFavorite, toggleFavorite } = usePets();
   const city = getCityOfPet?.(pet.id);
   const fav = isFavorite(pet.id);
@@ -50,6 +50,7 @@ export default function PetCard({ pet, onPress }) {
     </TouchableOpacity>
   );
 }
+export default React.memo(PetCard);
 
 const styles = StyleSheet.create({
   card: {
