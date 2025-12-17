@@ -89,7 +89,8 @@ export default function HomeScreen() {
           transform: [{ translateY: slideAnim }],
         }}
       >
-        <ScrollView contentContainerStyle={styles.scroll}>
+        <ScrollView contentContainerStyle={[styles.scroll, { flexGrow: 1 }]}>
+
 
           <View style={styles.header}>
             <Text style={styles.appTitle}>PetCare Adoption</Text>
@@ -182,7 +183,9 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#fff" },
-  scroll: { padding: 16, paddingBottom: 50 },
+scroll: { padding: 16, paddingBottom: 50, flexGrow: 1 },
+
+
 
   header: { alignItems: "center", marginTop: 8, marginBottom: 10 },
   appTitle: { fontSize: 26, fontWeight: "800", color: THEME },

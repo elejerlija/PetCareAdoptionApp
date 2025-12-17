@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
-
+import { query, where } from "firebase/firestore";
 import {
   collection,
   onSnapshot,
@@ -49,9 +49,7 @@ export function PetsProvider({ children }) {
         const data = d.data();
         return {
           id: d.id,
-          ...data,
-
-          
+          ...data,          
           logoUrl: data.logo ? `/storeImages/${data.logo}` : null,
         };
       });
@@ -82,9 +80,9 @@ export function PetsProvider({ children }) {
           return {
             id: d.id,
             ...data,
-
+            imageUrl: data.imageUrl ?? null,
+            image:data.image ?? null,
             
-            imageUrl: data.image ? `/petImages/${data.image}` : null,
           };
         });
 
@@ -140,8 +138,12 @@ export function PetsProvider({ children }) {
       return;
     }
 
-    const unsub = onSnapshot(
-      collection(db, "adoptionRequests"),
+    const q = query(
+    collection(db, "adoptionRequests"),
+    where("userId", "==", user.uid)
+  );
+
+    const unsub = onSnapshot(q,
       (snapshot) => {
         const list = snapshot.docs.map((d) => ({
           id: d.id,

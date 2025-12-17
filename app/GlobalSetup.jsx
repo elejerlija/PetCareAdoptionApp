@@ -1,9 +1,7 @@
-// GlobalSetup.jsx
 import React, { useEffect } from "react";
 import { Platform } from "react-native";
 import * as Notifications from "expo-notifications";
 import * as Location from "expo-location";
-
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -18,7 +16,7 @@ async function registerPushNotifications() {
     const { status } = await Notifications.requestPermissionsAsync();
 
     if (status !== "granted") {
-      alert("Notification permission is required.");
+      alert("Permission for notifications is required.");
       return;
     }
 
@@ -30,13 +28,12 @@ async function registerPushNotifications() {
     }
 
     const token = await Notifications.getExpoPushTokenAsync();
-    console.log("Expo Push Token:", token.data);
+    console.log("PUSH TOKEN:", token.data);
 
   } catch (err) {
-    console.log("Error registering notifications:", err);
+    console.log("Error in registerPushNotifications:", err);
   }
 }
-
 
 async function requestLocationPermission() {
   try {
@@ -48,14 +45,14 @@ async function requestLocationPermission() {
     }
 
   } catch (err) {
-    console.log("Error requesting location:", err);
+    console.log("Error in requestLocationPermission:", err);
   }
 }
 
 
 export default function GlobalSetup() {
-  useEffect(() => {
-  
+ useEffect(() => {
+ 
     registerPushNotifications();
     requestLocationPermission();
 
@@ -67,8 +64,8 @@ export default function GlobalSetup() {
       },
       trigger: { seconds: 2 },
     });
+}, []);
 
-  }, []);
 
   return null; 
 }

@@ -10,9 +10,8 @@ const firebaseConfig = {
   storageBucket: "pet-care-adoption.firebasestorage.app",
   messagingSenderId: "206997293389",
   appId: "1:206997293389:web:c49a074876195a46618f04",
-  measurementId: "G-GRV1DKDJP2"
+  measurementId: "G-GRV1DKDJP2",
 };
-
 
 const app = initializeApp(firebaseConfig);
 

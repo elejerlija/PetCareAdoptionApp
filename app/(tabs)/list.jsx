@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   FlatList,
   ActivityIndicator,
   TouchableOpacity,
+  Animated
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { usePets } from '../../context/PetsContext';
@@ -13,21 +14,52 @@ import PetCard from '../../components/PetCard';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
+
+
 export default function PetList() {
   const router = useRouter();
   const { pets, loadingPets, isFavorite, loadingFavorites } = usePets();
   const [showFavorites, setShowFavorites] = useState(false);
+  const scaleAll = useRef(new Animated.Value(1)).current;
+  const scaleFav = useRef(new Animated.Value(1)).current;
 
-  const filteredList = Array.isArray(pets)
-    ? pets
-        .filter((p) => p.available !== false)
-        .filter((p) => (showFavorites ? isFavorite(p.id) : true))
-    : [];
+  const animatePress = (anim) => {
+    Animated.sequence([
+      Animated.timing(anim, {
+        toValue: 0.95,
+        duration: 80,
+        useNativeDriver: true,
+      }),
+      Animated.timing(anim, {
+        toValue: 1,
+        duration: 80,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+
+  const handlePress = useCallback(
+    (id) => {
+      router.push(`/pets/${id}`);
+    },
+    [router]
+  );
+
+  const filteredList = useMemo(() => {
+    if (!Array.isArray(pets)) return [];
+
+    return pets
+      .filter(p => p.available !== false)
+      .filter(p => (showFavorites ? isFavorite(p.id) : true));
+  }, [pets, showFavorites, isFavorite]);
+
 
   const isLoading = loadingPets || loadingFavorites;
 
   return (
     <SafeAreaView style={styles.container}>
+
       <View
         style={{
           marginTop: 50,
@@ -37,37 +69,47 @@ export default function PetList() {
           marginBottom: 30,
         }}
       >
-        <TouchableOpacity
-          style={{
-            backgroundColor: showFavorites ? '#E5E7EB' : '#D1D5DB',
-            paddingVertical: 6,
-            paddingHorizontal: 18,
-            borderRadius: 20,
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 6,
-          }}
-          onPress={() => setShowFavorites(false)}
-        >
-          <Ionicons name="paw-outline" size={18} color="#6B7280" />
-          <Text style={{ color: '#374151', fontWeight: '600' }}>All Pets</Text>
-        </TouchableOpacity>
+        <Animated.View style={{ transform: [{ scale: scaleAll }] }}>
+          <TouchableOpacity
+            style={{
+              backgroundColor: showFavorites ? '#E5E7EB' : '#D1D5DB',
+              paddingVertical: 6,
+              paddingHorizontal: 18,
+              borderRadius: 20,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 6,
+            }}
+            onPress={() => {
+              animatePress(scaleAll);
+              setShowFavorites(false);
+            }}
+          >
+            <Ionicons name="paw-outline" size={18} color="#6B7280" />
+            <Text style={{ color: '#374151', fontWeight: '600' }}>All Pets</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={{
-            backgroundColor: showFavorites ? '#FFE4EC' : '#F9DDE7',
-            paddingVertical: 6,
-            paddingHorizontal: 18,
-            borderRadius: 20,
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 6,
-          }}
-          onPress={() => setShowFavorites(true)}
-        >
-          <Ionicons name="heart" size={18} color="#E11D48" />
-          <Text style={{ color: '#E11D48', fontWeight: '600' }}>Favorites</Text>
-        </TouchableOpacity>
+        </Animated.View>
+        <Animated.View style={{ transform: [{ scale: scaleFav }] }}>
+          <TouchableOpacity
+            style={{
+              backgroundColor: showFavorites ? '#FFE4EC' : '#F9DDE7',
+              paddingVertical: 6,
+              paddingHorizontal: 18,
+              borderRadius: 20,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 6,
+            }}
+            onPress={() => {
+              animatePress(scaleFav);
+              setShowFavorites(true);
+            }}
+          >
+            <Ionicons name="heart" size={18} color="#E11D48" />
+            <Text style={{ color: '#E11D48', fontWeight: '600' }}>Favorites</Text>
+          </TouchableOpacity>
+        </Animated.View>
       </View>
 
       {isLoading ? (
@@ -78,10 +120,11 @@ export default function PetList() {
           contentContainerStyle={styles.scrollContent}
           data={filteredList}
           keyExtractor={(item, i) => item?.id ?? `pet-${i}`}
-          renderItem={({ item }) => (
+          renderItem={({ item,index }) => (
             <PetCard
               pet={item}
-              onPress={() => router.push(`/pets/${item.id}`)}
+              index={index}
+              onPress={handlePress}
             />
           )}
           ListEmptyComponent={
