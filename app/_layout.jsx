@@ -29,8 +29,8 @@ export default function RootLayout() {
           >
             <Stack.Screen name="(tabs)" />
              <Stack.Screen name="(admin)" />
-            <Stack.Screen name="auth/login" />
-            <Stack.Screen name="auth/signup" />
+            <Stack.Screen name="(auth)/login" />
+            <Stack.Screen name="(auth)/signup" />
                <Stack.Screen
               name="pets/[id]"
               options={{ headerShown: true, title: "Pet Details" }}

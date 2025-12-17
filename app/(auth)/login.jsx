@@ -249,7 +249,7 @@ export default function LoginScreen() {
           />
         </Animated.View>
 
-        <TouchableOpacity onPress={() => router.push("/auth/signup")}>
+        <TouchableOpacity onPress={() => router.push("/(auth)/signup")}>
           <Text style={styles.switchText}>
             Don’t have an account? <Text style={styles.link}>Sign up</Text>
           </Text>

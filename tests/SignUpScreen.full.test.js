@@ -39,7 +39,7 @@ jest.mock("expo-notifications", () => ({
 import React from "react";
 import renderer from "react-test-renderer";
 import { render, fireEvent, waitFor } from "@testing-library/react-native";
-import SignUpScreen from "../app/auth/signup";
+import SignUpScreen from "../app/(auth)/signup";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { router } from "expo-router";
 
@@ -67,7 +67,7 @@ describe("SignUpScreen – Inline Full Test", () => {
     fireEvent.press(getByText("Sign Up"));
 
     await waitFor(() => {
-      expect(router.replace).toHaveBeenCalledWith("/auth/login");
+      expect(router.replace).toHaveBeenCalledWith("/(auth)/login");
     });
   });
 

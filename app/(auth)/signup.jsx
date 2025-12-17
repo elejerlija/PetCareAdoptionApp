@@ -165,7 +165,7 @@ export default function SignUpScreen() {
 
       await registerPushNotifications();
 
-      router.replace("/auth/login");
+      router.replace("/(auth)/login");
 
     } catch (error) {
       shakeInputs();
@@ -192,7 +192,7 @@ export default function SignUpScreen() {
         });
       }
 
-      router.replace("/auth/login");
+      router.replace("/(auth)/login");
 
     } catch (error) {
       alert(error.message);
@@ -272,7 +272,7 @@ export default function SignUpScreen() {
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>Already have an account? </Text>
-            <TouchableOpacity onPress={() => router.push("/auth/login")}>
+            <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
               <Text style={styles.link}>Log in</Text>
             </TouchableOpacity>
           </View>
