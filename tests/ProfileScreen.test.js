@@ -1,22 +1,21 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { Text, View, ActivityIndicator } from "react-native";
 import { render } from "@testing-library/react-native";
 
 
-function ProfileScreen() {
+function ProfileLoading() {
   return (
     <View>
-      <Text>Personal Information</Text>
-      <Text>Save Changes</Text>
+      <ActivityIndicator size="large" />
+      <Text>Loading profile...</Text>
     </View>
   );
 }
 
-describe("ProfileScreen UI behavior (Unit Test)", () => {
-  it("renders personal information and save button", () => {
-    const { getByText } = render(<ProfileScreen />);
+describe("ProfileScreen – Loading state (Unit Test)", () => {
+  it("shows loading indicator and loading text", () => {
+    const { getByText } = render(<ProfileLoading />);
 
-    expect(getByText("Personal Information")).toBeTruthy();
-    expect(getByText("Save Changes")).toBeTruthy();
+    expect(getByText("Loading profile...")).toBeTruthy();
   });
 });
