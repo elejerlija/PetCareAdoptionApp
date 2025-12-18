@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, Image, ScrollView, Linking, Animated } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Linking,
+  Animated,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useState, useRef } from "react";
 
@@ -17,21 +24,23 @@ export default function HomeScreen() {
   ];
 
   const [randomNews, setRandomNews] = useState([]);
+  const [loadingNews, setLoadingNews] = useState(true);
 
+  // Animations
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(60)).current;
   const imageScale = useRef(new Animated.Value(0.75)).current;
   const newsFade = useRef(new Animated.Value(0)).current;
   const newsSlide = useRef(new Animated.Value(40)).current;
-
+  
   const shimmerAnim = useRef(new Animated.Value(0)).current;
-  const [loadingNews, setLoadingNews] = useState(true);
+
 
   useEffect(() => {
     const shuffled = [...NEWS_LIST].sort(() => 0.5 - Math.random());
     setRandomNews(shuffled.slice(0, 3));
 
-    setTimeout(() => {
+    const animationTimeout = setTimeout(() => {
       Animated.parallel([
         Animated.timing(fadeAnim, {
           toValue: 1,
@@ -66,7 +75,10 @@ export default function HomeScreen() {
       ]).start();
     }, 150);
 
-    
+    const loadingTimeout = setTimeout(() => {
+      setLoadingNews(false);
+    }, 1500);
+
     Animated.loop(
       Animated.timing(shimmerAnim, {
         toValue: 1,
@@ -75,9 +87,11 @@ export default function HomeScreen() {
       })
     ).start();
 
-    setTimeout(() => {
-      setLoadingNews(false);
-    }, 1500);
+    // ✅ CLEANUP – ky e zhduk error-in e Jest
+    return () => {
+      clearTimeout(animationTimeout);
+      clearTimeout(loadingTimeout);
+    };
   }, []);
 
   return (
@@ -90,8 +104,7 @@ export default function HomeScreen() {
         }}
       >
         <ScrollView contentContainerStyle={[styles.scroll, { flexGrow: 1 }]}>
-
-
+          {/* Header */}
           <View style={styles.header}>
             <Text style={styles.appTitle}>PetCare Adoption</Text>
             <Text style={styles.subtitle}>
@@ -99,32 +112,34 @@ export default function HomeScreen() {
             </Text>
           </View>
 
-       
+          {/* Hero image */}
           <Animated.Image
             source={require("../../assets/images/pets.jpg")}
             style={[
               styles.heroImg,
-              {
-                transform: [{ scale: imageScale }],
-              },
+              { transform: [{ scale: imageScale }] },
             ]}
             resizeMode="cover"
           />
 
+          {/* Banner */}
           <View style={styles.banner}>
-            <Text style={styles.bannerTitle}>Adoptathon this weekend!</Text>
+            <Text style={styles.bannerTitle}>
+              Adoptathon this weekend!
+            </Text>
             <Text style={styles.bannerSub}>
-              Discounts on vaccinations for new adoptions. Visit your nearest center!
+              Discounts on vaccinations for new adoptions. Visit your nearest
+              center!
             </Text>
           </View>
 
-          
+          {/* News title */}
           <View style={styles.newsRow}>
             <Text style={styles.newsIcon}>📰</Text>
             <Text style={styles.newsTitle}>PetCare News</Text>
           </View>
 
-      
+          {/* Skeleton loader */}
           {loadingNews && (
             <View style={styles.skeletonBox}>
               {[1, 2, 3].map((_, i) => (
@@ -144,6 +159,7 @@ export default function HomeScreen() {
             </View>
           )}
 
+          {/* News */}
           {!loadingNews && (
             <Animated.View
               style={[
@@ -162,11 +178,16 @@ export default function HomeScreen() {
             </Animated.View>
           )}
 
+          {/* Footer */}
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Need help or want to get in touch?</Text>
+            <Text style={styles.footerText}>
+              Need help or want to get in touch?
+            </Text>
             <Text
               style={styles.footerEmail}
-              onPress={() => Linking.openURL("mailto:contact@petcareapp.com")}
+              onPress={() =>
+                Linking.openURL("mailto:contact@petcareapp.com")
+              }
             >
               📧 contact@petcareapp.com
             </Text>
@@ -174,7 +195,7 @@ export default function HomeScreen() {
               © 2025 PetCare Adoption
             </Text>
           </View>
-
+  
         </ScrollView>
       </Animated.View>
     </SafeAreaView>
@@ -183,9 +204,7 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#fff" },
-scroll: { padding: 16, paddingBottom: 50, flexGrow: 1 },
-
-
+  scroll: { padding: 16, paddingBottom: 50, flexGrow: 1 },
 
   header: { alignItems: "center", marginTop: 8, marginBottom: 10 },
   appTitle: { fontSize: 26, fontWeight: "800", color: THEME },
@@ -220,6 +239,7 @@ scroll: { padding: 16, paddingBottom: 50, flexGrow: 1 },
     marginBottom: 6,
   },
   newsIcon: { fontSize: 22, marginRight: 8, color: THEME },
+  
   newsTitle: { fontSize: 19, fontWeight: "700", color: "#2A3A3F" },
 
 
@@ -238,16 +258,17 @@ scroll: { padding: 16, paddingBottom: 50, flexGrow: 1 },
     marginBottom: 12,
   },
 
-
+  
   newsBox: {
     backgroundColor: "#E8F5F7",
     padding: 18,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: "#D4EBEF",
-    marginBottom: 22, 
+    marginBottom: 22,
     elevation: 3,
-  }, 
+  },
+  
   newsItem: {
     fontSize: 16,
     color: "#2A3A3F",
@@ -263,8 +284,9 @@ scroll: { padding: 16, paddingBottom: 50, flexGrow: 1 },
     borderTopColor: "#eef2f3",
     alignItems: "center",
     backgroundColor: LIGHT,
-  }, 
+  },
   footerText: { color: "#444", fontSize: 13, marginBottom: 4 },
   footerEmail: { color: THEME, fontWeight: "700", fontSize: 14 },
   footerCopyright: { color: "#888", fontSize: 12, marginTop: 6 },
 });
+
