@@ -33,10 +33,16 @@ exports[`HomeScreen Tests matches snapshot 1`] = `
   >
     <RCTScrollView
       contentContainerStyle={
-        {
-          "padding": 16,
-          "paddingBottom": 50,
-        }
+        [
+          {
+            "flexGrow": 1,
+            "padding": 16,
+            "paddingBottom": 50,
+          },
+          {
+            "flexGrow": 1,
+          },
+        ]
       }
     >
       <View>
