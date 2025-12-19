@@ -1,0 +1,320 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LoginScreen – Snapshot renders correctly 1`] = `
+<RNCSafeAreaView
+  edges={
+    {
+      "bottom": "additive",
+      "left": "additive",
+      "right": "additive",
+      "top": "additive",
+    }
+  }
+  style={
+    {
+      "backgroundColor": "#fff",
+      "flex": 1,
+      "justifyContent": "center",
+      "padding": 24,
+    }
+  }
+>
+  <View
+    collapsable={false}
+    style={
+      {
+        "alignItems": "center",
+        "opacity": 0,
+        "transform": [
+          {
+            "translateY": 30,
+          },
+        ],
+        "width": "100%",
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#457b9d",
+          "fontSize": 22,
+          "fontWeight": "bold",
+          "marginBottom": 6,
+        }
+      }
+    >
+      Welcome back 🐾
+    </Text>
+    <Text
+      style={
+        {
+          "color": "gray",
+          "marginBottom": 24,
+          "textAlign": "center",
+        }
+      }
+    >
+      Login to continue adopting your favorite pets!
+    </Text>
+    <View
+      collapsable={false}
+      style={
+        {
+          "transform": [
+            {
+              "translateX": 0,
+            },
+          ],
+          "width": "100%",
+        }
+      }
+    >
+      <View
+        collapsable={false}
+        style={
+          {
+            "transform": [
+              {
+                "scale": 1,
+              },
+            ],
+          }
+        }
+      >
+        <TextInput
+          onBlur={[Function]}
+          onChangeText={[Function]}
+          onFocus={[Function]}
+          placeholder="Email"
+          placeholderTextColor="#555"
+          style={
+            {
+              "backgroundColor": "#f9f9f9",
+              "borderColor": "#ccc",
+              "borderRadius": 10,
+              "borderWidth": 1,
+              "marginBottom": 12,
+              "padding": 12,
+              "width": "100%",
+            }
+          }
+          value=""
+        />
+      </View>
+      <View
+        collapsable={false}
+        style={
+          {
+            "transform": [
+              {
+                "scale": 1,
+              },
+            ],
+          }
+        }
+      >
+        <TextInput
+          onBlur={[Function]}
+          onChangeText={[Function]}
+          onFocus={[Function]}
+          placeholder="Password"
+          placeholderTextColor="#555"
+          secureTextEntry={true}
+          style={
+            {
+              "backgroundColor": "#f9f9f9",
+              "borderColor": "#ccc",
+              "borderRadius": 10,
+              "borderWidth": 1,
+              "marginBottom": 12,
+              "padding": 12,
+              "width": "100%",
+            }
+          }
+          value=""
+        />
+      </View>
+    </View>
+    <View
+      collapsable={false}
+      style={
+        {
+          "transform": [
+            {
+              "scale": 1,
+            },
+          ],
+          "width": "100%",
+        }
+      }
+    >
+      <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": false,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          [
+            {
+              "alignItems": "center",
+              "backgroundColor": "#83BAC9",
+              "borderRadius": 12,
+              "justifyContent": "center",
+              "opacity": 1,
+              "paddingHorizontal": 20,
+              "paddingVertical": 14,
+            },
+            undefined,
+          ]
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#FFFFFF",
+              "fontSize": 16,
+              "fontWeight": "700",
+              "letterSpacing": 0.3,
+            }
+          }
+        >
+          Login
+        </Text>
+      </View>
+    </View>
+    <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "opacity": 1,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#555",
+            "marginTop": 16,
+          }
+        }
+      >
+        Don’t have an account? 
+        <Text
+          style={
+            {
+              "color": "#457b9d",
+              "fontWeight": "bold",
+            }
+          }
+        >
+          Sign up
+        </Text>
+      </Text>
+    </View>
+    <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "#83BAC9",
+          "borderRadius": 12,
+          "marginTop": 28,
+          "opacity": 1,
+          "padding": 14,
+          "width": "100%",
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "white",
+            "fontSize": 16,
+            "fontWeight": "700",
+          }
+        }
+      >
+        Continue with Google
+      </Text>
+    </View>
+  </View>
+</RNCSafeAreaView>
+`;
