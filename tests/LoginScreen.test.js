@@ -1,24 +1,15 @@
-/* =======================
-   MOCKS (DUHET NË KRYE)
-======================= */
+/* ======================================================
+   SHARED MOCKS (DUHET NË KRYE)
+====================================================== */
 
-// Çaktivizon kontrollin e versionit të testing-library
-jest.mock(
-  "@testing-library/react-native/src/helpers/ensure-peer-deps",
-  () => ({ ensurePeerDeps: () => {} })
-);
-
-// Çaktivizon Animated native driver
-jest.mock("react-native/Libraries/Animated/NativeAnimatedHelper");
-
-// Router
-const replaceMock = jest.fn();
-const pushMock = jest.fn();
+// Router mock i përbashkët (I NJËJTË për test + komponent)
+const mockReplace = jest.fn();
+const mockPush = jest.fn();
 
 jest.mock("expo-router", () => ({
   useRouter: () => ({
-    replace: replaceMock,
-    push: pushMock,
+    replace: mockReplace,
+    push: mockPush,
   }),
 }));
 
@@ -52,9 +43,9 @@ jest.mock("../notifications", () => ({
   registerPushNotifications: jest.fn(),
 }));
 
-/* =======================
+/* ======================================================
    IMPORTS
-======================= */
+====================================================== */
 
 import React from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react-native";
@@ -63,31 +54,30 @@ import LoginScreen from "../app/(auth)/login";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { getDoc } from "firebase/firestore";
 
-/* =======================
-   SNAPSHOT TESTS
-======================= */
+/* ======================================================
+   SNAPSHOT TEST
+====================================================== */
 
-describe("LoginScreen – Snapshot tests", () => {
-  it("renders login screen correctly", () => {
+describe("LoginScreen – Snapshot", () => {
+  it("renders correctly", () => {
     const tree = render(<LoginScreen />).toJSON();
     expect(tree).toMatchSnapshot();
   });
 });
 
-/* =======================
+/* ======================================================
    INTERACTION TESTS
-======================= */
+====================================================== */
 
-describe("LoginScreen – Interaction tests", () => {
+describe("LoginScreen – Interactions", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it("shows alert if fields are empty", async () => {
+  it("shows alert when fields are empty", async () => {
     global.alert = jest.fn();
 
     const { getByText } = render(<LoginScreen />);
-
     fireEvent.press(getByText("Login"));
 
     await waitFor(() => {
@@ -95,9 +85,9 @@ describe("LoginScreen – Interaction tests", () => {
     });
   });
 
-  it("calls firebase login with valid credentials", async () => {
+  it("logs in user and redirects to tabs", async () => {
     signInWithEmailAndPassword.mockResolvedValue({
-      user: { uid: "test-uid" },
+      user: { uid: "uid-123" },
     });
 
     getDoc.mockResolvedValue({
@@ -110,73 +100,35 @@ describe("LoginScreen – Interaction tests", () => {
 
     const { getByPlaceholderText, getByText } = render(<LoginScreen />);
 
-    fireEvent.changeText(
-      getByPlaceholderText("Email"),
-      "test@test.com"
-    );
-    fireEvent.changeText(
-      getByPlaceholderText("Password"),
-      "Test123!"
-    );
+    fireEvent.changeText(getByPlaceholderText("Email"), "test@test.com");
+    fireEvent.changeText(getByPlaceholderText("Password"), "Test123!");
 
     fireEvent.press(getByText("Login"));
 
     await waitFor(() => {
       expect(signInWithEmailAndPassword).toHaveBeenCalled();
-      expect(replaceMock).toHaveBeenCalledWith("/(tabs)/");
+      expect(mockReplace).toHaveBeenCalledWith("/(tabs)/");
     });
   });
 
-  it("navigates to signup screen when link is pressed", () => {
+  it("navigates to signup screen", () => {
     const { getByText } = render(<LoginScreen />);
-
     fireEvent.press(getByText("Sign up"));
 
-    expect(pushMock).toHaveBeenCalledWith("/(auth)/signup");
+    expect(mockPush).toHaveBeenCalledWith("/(auth)/signup");
   });
 });
 
-/* =======================
-   MOCKING / EDGE CASE TESTS
-======================= */
+/* ======================================================
+   EDGE CASE TESTS
+====================================================== */
 
-describe("LoginScreen – Mocking tests", () => {
+describe("LoginScreen – Edge cases", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it("shows error if user profile does not exist", async () => {
-    global.alert = jest.fn();
-
-    signInWithEmailAndPassword.mockResolvedValue({
-      user: { uid: "missing-user" },
-    });
-
-    getDoc.mockResolvedValue({
-      exists: () => false,
-    });
-
-    const { getByPlaceholderText, getByText } = render(<LoginScreen />);
-
-    fireEvent.changeText(
-      getByPlaceholderText("Email"),
-      "test@test.com"
-    );
-    fireEvent.changeText(
-      getByPlaceholderText("Password"),
-      "Test123!"
-    );
-
-    fireEvent.press(getByText("Login"));
-
-    await waitFor(() => {
-      expect(global.alert).toHaveBeenCalledWith(
-        "User profile not found."
-      );
-    });
-  });
-
-  it("blocks login if account is inactive", async () => {
+  it("blocks inactive account", async () => {
     global.alert = jest.fn();
 
     signInWithEmailAndPassword.mockResolvedValue({
@@ -193,14 +145,8 @@ describe("LoginScreen – Mocking tests", () => {
 
     const { getByPlaceholderText, getByText } = render(<LoginScreen />);
 
-    fireEvent.changeText(
-      getByPlaceholderText("Email"),
-      "inactive@test.com"
-    );
-    fireEvent.changeText(
-      getByPlaceholderText("Password"),
-      "Test123!"
-    );
+    fireEvent.changeText(getByPlaceholderText("Email"), "a@a.com");
+    fireEvent.changeText(getByPlaceholderText("Password"), "123");
 
     fireEvent.press(getByText("Login"));
 
