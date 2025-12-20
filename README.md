@@ -163,20 +163,16 @@ npx expo start
 
 ## Ekranet e aplikacionit
 
-### Home Screen
-![Home Screen](assets/screenshots/home.jpg)
 
-### Profile Screen
-![Profile Screen](assets/screenshots/profile.jpg)
 
-### SignUp
-![Sign Up](assets/screenshots/signup.png)
+<p align="center">
+    <img src="assets/screenshots/login.png" width="230"/>
+    <img src="assets/screenshots/signup.png" width="230"/>
+    <img src="assets/screenshots/home.jpg" width="230"/>
+</p>
 
-### LogIn
-![Log In](assets/screenshots/login.png)
-
-### Pet List
-![Pet List](assets/screenshots/pets.jpg)
-
-### Map
-![Map Store](assets/screenshots/map.jpg)
+<p align="center">
+    <img src="assets/screenshots/pets.jpg" width="230"/>
+    <img src="assets/screenshots/profile.jpg" width="230"/>
+    <img src="assets/screenshots/map.jpg" width="230"/>
+</p>
