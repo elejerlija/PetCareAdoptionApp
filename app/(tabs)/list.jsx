@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -6,13 +6,17 @@ import {
   FlatList,
   ActivityIndicator,
   TouchableOpacity,
-  Animated
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { usePets } from '../../context/PetsContext';
 import PetCard from '../../components/PetCard';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+} from 'react-native-reanimated';
 
 
 
@@ -20,24 +24,28 @@ export default function PetList() {
   const router = useRouter();
   const { pets, loadingPets, isFavorite, loadingFavorites } = usePets();
   const [showFavorites, setShowFavorites] = useState(false);
-  const scaleAll = useRef(new Animated.Value(1)).current;
-  const scaleFav = useRef(new Animated.Value(1)).current;
+  const scaleAll = useSharedValue(1);
+  const scaleFav = useSharedValue(1);
 
-  const animatePress = (anim) => {
-    Animated.sequence([
-      Animated.timing(anim, {
-        toValue: 0.95,
-        duration: 80,
-        useNativeDriver: true,
-      }),
-      Animated.timing(anim, {
-        toValue: 1,
-        duration: 80,
-        useNativeDriver: true,
-      }),
-    ]).start();
+  const allStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scaleAll.value }],
+  }));
+
+  const favStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scaleFav.value }],
+  }));
+
+  const press = (scale) => {
+    scale.value = withSpring(0.92, {
+      stiffness: 300,
+      damping: 18,
+    });
+
+    scale.value = withSpring(1, {
+      stiffness: 300,
+      damping: 18,
+    });
   };
-
 
   const handlePress = useCallback(
     (id) => {
@@ -69,7 +77,7 @@ export default function PetList() {
           marginBottom: 30,
         }}
       >
-        <Animated.View style={{ transform: [{ scale: scaleAll }] }}>
+        <Animated.View style={allStyle}>
           <TouchableOpacity
             style={{
               backgroundColor: showFavorites ? '#E5E7EB' : '#D1D5DB',
@@ -81,16 +89,15 @@ export default function PetList() {
               gap: 6,
             }}
             onPress={() => {
-              animatePress(scaleAll);
+              press(scaleAll);
               setShowFavorites(false);
             }}
           >
             <Ionicons name="paw-outline" size={18} color="#6B7280" />
             <Text style={{ color: '#374151', fontWeight: '600' }}>All Pets</Text>
           </TouchableOpacity>
-
         </Animated.View>
-        <Animated.View style={{ transform: [{ scale: scaleFav }] }}>
+        <Animated.View style={favStyle}>
           <TouchableOpacity
             style={{
               backgroundColor: showFavorites ? '#FFE4EC' : '#F9DDE7',
@@ -102,7 +109,7 @@ export default function PetList() {
               gap: 6,
             }}
             onPress={() => {
-              animatePress(scaleFav);
+              press(scaleFav);
               setShowFavorites(true);
             }}
           >
@@ -120,7 +127,7 @@ export default function PetList() {
           contentContainerStyle={styles.scrollContent}
           data={filteredList}
           keyExtractor={(item, i) => item?.id ?? `pet-${i}`}
-          renderItem={({ item,index }) => (
+          renderItem={({ item, index }) => (
             <PetCard
               pet={item}
               index={index}

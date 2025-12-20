@@ -1,5 +1,5 @@
-import React,{useEffect,useRef} from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity,Animated,Easing } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { View, Text, Image, StyleSheet, TouchableOpacity, Animated, Easing } from "react-native";
 import { usePets } from "../context/PetsContext";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -15,75 +15,75 @@ function resolveImageSource(pet) {
   return fallbackImg;
 }
 
-function PetCard({ pet, onPress ,index}) {
+function PetCard({ pet, onPress, index }) {
   const { getCityOfPet, isFavorite, toggleFavorite } = usePets();
   const city = getCityOfPet?.(pet.id);
   const fav = isFavorite(pet.id);
-  const imgSource=resolveImageSource(pet);
+  const imgSource = resolveImageSource(pet);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(16)).current;
 
-  
- useEffect(() => {
-  fadeAnim.setValue(0);
-  slideAnim.setValue(16);
 
-  Animated.parallel([
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 900,
-      delay:index*25,
-      useNativeDriver: true,
-    }),
-    Animated.timing(slideAnim, {
-      toValue: 0,
-      duration:  900,
-      delay:index*25,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
-    }),
-  ]).start();
-}, [pet.id]);
+  useEffect(() => {
+    fadeAnim.setValue(0);
+    slideAnim.setValue(16);
+
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 900,
+        delay: index * 25,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 900,
+        delay: index * 25,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
 
 
   return (
-   <Animated.View
-    style={[
-      styles.card,
-      {
-        opacity: fadeAnim,
-        transform: [{ translateY: slideAnim }],
-      },
-    ]}
-  >
-        <TouchableOpacity
-      style={{ flexDirection: "row", alignItems: "center" }}
-      activeOpacity={0.8}
-      onPress={() => onPress(pet.id)}
+    <Animated.View
+      style={[
+        styles.card,
+        {
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }],
+        },
+      ]}
     >
-      <Image
-        source={imgSource}
-        style={styles.image}
-      />
+      <TouchableOpacity
+        style={{ flexDirection: "row", alignItems: "center" }}
+        activeOpacity={0.8}
+        onPress={() => onPress(pet.id)}
+      >
+        <Image
+          source={imgSource}
+          style={styles.image}
+        />
 
-      <View style={styles.infoContainer}>
-        <View style={styles.row}>
-          <Text style={styles.name}>{pet.name}</Text>
+        <View style={styles.infoContainer}>
+          <View style={styles.row}>
+            <Text style={styles.name}>{pet.name}</Text>
 
-          <TouchableOpacity onPress={() => toggleFavorite(pet.id)}>
-            <Ionicons
-              name={fav ? "heart" : "heart-outline"}
-              size={25}
-              color={fav ? "red" : "#777"}
-            />
-          </TouchableOpacity>
+            <TouchableOpacity onPress={() => toggleFavorite(pet.id)}>
+              <Ionicons
+                name={fav ? "heart" : "heart-outline"}
+                size={25}
+                color={fav ? "red" : "#777"}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.details}>
+            {pet.age} yr{pet.age === 1 ? "" : "s"} · {city}
+          </Text>
         </View>
-
-        <Text style={styles.details}>
-          {pet.age} yr{pet.age === 1 ? "" : "s"} · {city}
-        </Text>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
     </Animated.View>
   );
 }
