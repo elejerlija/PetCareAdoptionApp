@@ -141,6 +141,35 @@ export default function ManagePets() {
       });
     }
   };
+  const takePhoto = async () => {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert("Permission required", "Camera access is needed");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      quality: 0.7,
+      base64: true,
+    });
+
+    if (!result.canceled) {
+      const base64Img = `data:image/jpg;base64,${result.assets[0].base64}`;
+      setImage(base64Img);
+
+      Animated.spring(imageScale, {
+        toValue: 1.05,
+        friction: 3,
+        useNativeDriver: true,
+      }).start(() => {
+        Animated.spring(imageScale, {
+          toValue: 1,
+          useNativeDriver: true,
+        }).start();
+      });
+    }
+  };
 
   
   const savePet = async () => {
