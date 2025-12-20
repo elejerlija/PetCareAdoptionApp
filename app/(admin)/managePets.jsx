@@ -47,6 +47,10 @@ export default function ManagePets() {
   const [desc, setDesc] = useState("");
   const [image, setImage] = useState("");
 
+  const [successVisible, setSuccessVisible] = useState(false);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const imageScale = useRef(new Animated.Value(1)).current;
+
   
   const [requests, setRequests] = useState([]);
 
@@ -106,6 +110,36 @@ export default function ManagePets() {
     }
 
     setModalVisible(true);
+  };
+   const pickImage = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert("Permission required", "Gallery access is needed");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.7,
+      base64: true,
+    });
+
+    if (!result.canceled) {
+      const base64Img = `data:image/jpg;base64,${result.assets[0].base64}`;
+      setImage(base64Img);
+
+      Animated.spring(imageScale, {
+        toValue: 1.05,
+        friction: 3,
+        useNativeDriver: true,
+      }).start(() => {
+        Animated.spring(imageScale, {
+          toValue: 1,
+          useNativeDriver: true,
+        }).start();
+      });
+    }
   };
 
   
