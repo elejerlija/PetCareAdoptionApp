@@ -163,7 +163,7 @@ npx expo start
 
 ## Ekranet e aplikacionit
 
-
+# Export e aplikacionit
 
 <p align="center">
     <img src="assets/screenshots/login.png" width="230"/>
