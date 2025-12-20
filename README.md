@@ -160,3 +160,23 @@ npm install
 ``` bash
 npx expo start
 ```
+
+## Ekranet e aplikacionit
+
+### Home Screen
+![Home Screen](screenshots/home.jpg)
+
+### Profile Screen
+![Profile Screen](screenshots/profile.jpg)
+
+### SignUp
+![Sign Up](screenshots/signup.png)
+
+### LogIn
+![Log In](screenshots/login.png)
+
+### Pet List
+![Pet List](screenshots/pets.jpg)
+
+### Map
+![Map Store](screenshots/map.jpg)
