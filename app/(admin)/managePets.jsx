@@ -1,5 +1,5 @@
 import { db } from "../../firebase";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
@@ -13,9 +13,12 @@ import {
   Platform,
   KeyboardAvoidingView,
   ScrollView,
+  Image,
+  Animated,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 import {
   collection,
   addDoc,
