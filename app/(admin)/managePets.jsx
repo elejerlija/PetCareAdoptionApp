@@ -1,5 +1,5 @@
 import { db } from "../../firebase";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
@@ -13,9 +13,12 @@ import {
   Platform,
   KeyboardAvoidingView,
   ScrollView,
+  Image,
+  Animated,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 import {
   collection,
   addDoc,
@@ -43,6 +46,10 @@ export default function ManagePets() {
   const [price, setPrice] = useState("");
   const [desc, setDesc] = useState("");
   const [image, setImage] = useState("");
+
+  const [successVisible, setSuccessVisible] = useState(false);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const imageScale = useRef(new Animated.Value(1)).current;
 
   
   const [requests, setRequests] = useState([]);
@@ -104,6 +111,81 @@ export default function ManagePets() {
 
     setModalVisible(true);
   };
+   const pickImage = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert("Permission required", "Gallery access is needed");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.7,
+      base64: true,
+    });
+
+    if (!result.canceled) {
+      const base64Img = `data:image/jpg;base64,${result.assets[0].base64}`;
+      setImage(base64Img);
+
+      Animated.spring(imageScale, {
+        toValue: 1.05,
+        friction: 3,
+        useNativeDriver: true,
+      }).start(() => {
+        Animated.spring(imageScale, {
+          toValue: 1,
+          useNativeDriver: true,
+        }).start();
+      });
+    }
+  };
+  const takePhoto = async () => {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert("Permission required", "Camera access is needed");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      quality: 0.7,
+      base64: true,
+    });
+
+    if (!result.canceled) {
+      const base64Img = `data:image/jpg;base64,${result.assets[0].base64}`;
+      setImage(base64Img);
+
+      Animated.spring(imageScale, {
+        toValue: 1.05,
+        friction: 3,
+        useNativeDriver: true,
+      }).start(() => {
+        Animated.spring(imageScale, {
+          toValue: 1,
+          useNativeDriver: true,
+        }).start();
+      });
+    }
+  };
+  const showSuccess = () => {
+    setSuccessVisible(true);
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+
+    setTimeout(() => {
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start(() => setSuccessVisible(false));
+    }, 1500);
+  };
 
   
   const savePet = async () => {
@@ -135,6 +217,7 @@ export default function ManagePets() {
 
       setModalVisible(false);
       resetForm();
+      showSuccess();
     } catch (error) {
       Alert.alert("Error", error.message);
     }
@@ -170,14 +253,34 @@ export default function ManagePets() {
  
   const renderPet = ({ item }) => {
     const request = getRequestForPet(item.id);
+    const imageUri = item.image || item.imageUrl;
 
     return (
       <View style={styles.petCard}>
-        <Text style={styles.petName}>{item.name}</Text>
-        <Text style={styles.petMeta}>
-          {item.type} • {item.age} yrs • {item.city}
-        </Text>
-        <Text style={styles.petDesc}>{item.desc}</Text>
+      <View style={styles.petRow}>
+          {imageUri ? (
+            <Image
+              source={{ uri: imageUri }}
+              style={styles.petImage}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={styles.petImagePlaceholder}>
+              <MaterialIcons name="pets" size={28} color="#aaa" />
+            </View>
+          )}
+        <View style={styles.petInfo}>
+            <Text style={styles.petName}>{item.name}</Text>
+            <Text style={styles.petMeta}>
+              {item.type} • {item.age} yrs • {item.city}
+            </Text>
+            {item.desc ? (
+              <Text numberOfLines={2} style={styles.petDesc}>
+                {item.desc}
+              </Text>
+            ) : null}
+          </View>
+        </View>
 
         
         <View style={styles.actions}>
@@ -256,8 +359,7 @@ export default function ManagePets() {
       
       <TouchableOpacity
         style={styles.addBtn}
-        onPress={() => openModal(null)}
-      >
+        onPress={() => openModal(null)}>
         <Text style={styles.addBtnText}>+ Add New Pet</Text>
       </TouchableOpacity>
 
@@ -273,57 +375,91 @@ export default function ManagePets() {
                 {editingPet ? "Edit Pet" : "Add Pet"}
               </Text>
 
+              <Text style={styles.label}>Pet Name *</Text>
               <TextInput
-                placeholder="Name"
+                placeholder="e.g. Bella"
+                placeholderTextColor="#999"
                 value={name}
                 onChangeText={setName}
                 style={styles.input}
               />
 
+              <Text style={styles.label}>Type</Text>
               <TextInput
-                placeholder="Type (dog, cat...)"
+                placeholder="Dog, Cat, etc."
+                placeholderTextColor="#999"
                 value={type}
                 onChangeText={setType}
                 style={styles.input}
               />
-
+              <Text style={styles.label}>Age (years)</Text>
               <TextInput
-                placeholder="Age (years)"
+                placeholder="e.g. 2"
+                placeholderTextColor="#999"
                 value={age}
                 keyboardType="number-pad"
                 onChangeText={setAge}
                 style={styles.input}
               />
 
+              <Text style={styles.label}>City</Text>
               <TextInput
-                placeholder="City"
+                placeholder="e.g. Prishtina"
+                placeholderTextColor="#999"
                 value={city}
                 onChangeText={setCity}
                 style={styles.input}
               />
 
+              <Text style={styles.label}>Price (€)</Text>
               <TextInput
-                placeholder="Price"
+                placeholder="0 for adoption"
+                placeholderTextColor="#999"
                 value={price}
                 keyboardType="number-pad"
                 onChangeText={setPrice}
                 style={styles.input}
               />
 
+              <Text style={styles.label}>Description</Text>
               <TextInput
-                placeholder="Image URL"
-                value={image}
-                onChangeText={setImage}
-                style={styles.input}
-              />
-
-              <TextInput
-                placeholder="Description"
+                placeholder="Short description about the pet"
+                placeholderTextColor="#999"
                 value={desc}
                 onChangeText={setDesc}
                 multiline
                 style={[styles.input, { height: 80 }]}
               />
+
+              <TouchableOpacity
+                onPress={() =>
+                  Alert.alert("Add Image", "Choose an option", [
+                    { text: "Gallery", onPress: pickImage },
+                    { text: "Camera", onPress: takePhoto },
+                    { text: "Cancel", style: "cancel" },
+                  ])
+                }
+                style={styles.imagePickerCard}
+              >
+                {image ? (
+                  <Animated.Image
+                    source={{ uri: image }}
+                    style={[styles.imagePreview, { transform: [{ scale: imageScale }] }]}
+                  />
+                ) : (
+                  <View style={styles.imagePlaceholder}>
+                    <MaterialIcons name="image" size={36} color="#999" />
+                    <Text style={styles.imagePlaceholderText}>Select Image</Text>
+                  </View>
+                )}
+
+                {image && (
+                  <View style={styles.changeOverlay}>
+                    <MaterialIcons name="edit" size={16} color="#fff" />
+                    <Text style={styles.changeOverlayText}>Change</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
 
               <TouchableOpacity onPress={savePet} style={styles.saveBtn}>
                 <Text style={styles.saveBtnText}>
@@ -340,6 +476,15 @@ export default function ManagePets() {
             </ScrollView>
           </View>
         </KeyboardAvoidingView>
+      </Modal>
+       <Modal transparent visible={successVisible}>
+        <View style={styles.successBg}>
+          <Animated.View style={[styles.successBox, { opacity: fadeAnim }]}>
+            <Text style={{ fontSize: 18, fontWeight: "600" }}>
+              Pet uploaded successfully ✅
+            </Text>
+          </Animated.View>
+        </View>
       </Modal>
     </View>
   );
@@ -439,4 +584,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#ddd",
   },
   cancelBtnText: { textAlign: "center", fontSize: 16 },
+  successBg: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.4)" },
+  successBox: { backgroundColor: "#fff", padding: 20, borderRadius: 12 },
+  petRow: { flexDirection: "row", alignItems: "center" },
+  petImage: { width: 70, height: 70, borderRadius: 10, marginRight: 12, backgroundColor: "#ddd" },
+  petImagePlaceholder: { width: 70, height: 70, borderRadius: 10, marginRight: 12, backgroundColor: "#eee", justifyContent: "center", alignItems: "center" },
+  petInfo: { flex: 1 }
 });
