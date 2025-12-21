@@ -15,13 +15,18 @@
 - Fahrije Gjokiqi
 - Florjetë Kuka
 
-### Statusi i projektit: Faza II 
+### Statusi i projektit: 
 Backend funksional (Firebase) <br>
 Admin panel funksional <br>
 Adoptimi funksional <br>
 UI e përfunduar <br>
 Harta funksionale <br>
 CRUD i mbyllur <br>
+Device Features (Image Picker, Local Notifications)<br>
+UI/UX (Button press, Modal me fadein/out) <br>
+Performance and optimization (FlatList, React memorization, Component Memorization, Asset optimization) <br>
+Testing (Snapshot tests, Mocking tests, unit tests) <br>
+
 
 ## Përshkrimi i Projektit
 
@@ -176,3 +181,16 @@ npx expo start
     <img src="assets/screenshots/profile.jpg" width="230"/>
     <img src="assets/screenshots/map.jpg" width="230"/>
 </p>
+
+<p align = "center">
+   <img src="assets/screenshots/adminPanel.jpg" width = "230">
+   <img src="assets/screenshots/managePets.jpg" width = "230">
+   <img src="assets/screenshots/manageUsers.jpg" width = "230">
+</p>
+
+
+<p align = "center">
+   <img src="assets/screenshots/manageStores.jpg" width = "230">
+   <img src="assets/screenshots/addStore.png" width = "230">
+</p>
+
