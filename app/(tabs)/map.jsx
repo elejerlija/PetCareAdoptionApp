@@ -16,7 +16,6 @@ import { usePets } from "../../context/PetsContext";
 import PetCard from "../../components/PetCard";
 import { useRouter } from "expo-router";
 
-const placeholderLogo = require("../../public/storeImages/placeholder.jpg");
 const MODAL_ANIMATION_DELAY = 300;
 
 export default function MapScreen() {
@@ -110,24 +109,26 @@ export default function MapScreen() {
         }}
       >
         {/* STORE MARKERS */}
-        {stores.map((store) => (
-          <Marker
-            key={store.id}
-            coordinate={{
-              latitude: store.coordinate.latitude,
-              longitude: store.coordinate.longitude,
-            }}
-            onPress={() => handleStorePress(store)}
-          >
-            <View style={styles.markerContainer}>
-              <Image
-                source={store.logo ? { uri: store.logo } : placeholderLogo}
-                style={styles.markerImage}
-              />
-              <View style={styles.markerArrow} />
-            </View>
-          </Marker>
-        ))}
+        {stores
+          .filter((store) => store && store.logo)
+          .map((store) => (
+            <Marker
+              key={store.id}
+              coordinate={{
+                latitude: store.coordinate.latitude,
+                longitude: store.coordinate.longitude,
+              }}
+              onPress={() => handleStorePress(store)}
+            >
+              <View style={styles.markerContainer}>
+                <Image
+                  source={{ uri: store?.logo }}
+                  style={styles.markerImage}
+                />
+                <View style={styles.markerArrow} />
+              </View>
+            </Marker>
+          ))}
       </MapView>
 
       <Pressable style={styles.locateBtn} onPress={centerOnUser}>
@@ -144,13 +145,10 @@ export default function MapScreen() {
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Image
-                source={
-                  selectedStore?.logo
-                    ? { uri: selectedStore.logo }
-                    : placeholderLogo
-                }
+                source={{ uri: selectedStore?.logo }}
                 style={styles.modalStoreLogo}
               />
+
               <Text style={styles.modalTitle}>{selectedStore?.name} Pets</Text>
             </View>
 

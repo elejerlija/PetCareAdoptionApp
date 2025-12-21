@@ -29,7 +29,6 @@ import {
   GeoPoint,
 } from "firebase/firestore";
 import { db } from "../../firebase";
-import placeholder from "../../public/storeImages/placeholder.jpg";
 import InputField from "../../components/InputField";
 
 /* ===================== HELPERS ===================== */
@@ -196,10 +195,7 @@ export default function ManageStores() {
   const renderStore = useCallback(
     ({ item }) => (
       <View style={styles.cardRow}>
-        <Image
-          source={item.logo ? { uri: item.logo } : placeholder}
-          style={styles.storeImage}
-        />
+        <Image source={{ uri: item?.logo }} style={styles.storeImage} />
 
         <View style={{ flex: 1 }}>
           <Text style={styles.storeName}>{item.name}</Text>
