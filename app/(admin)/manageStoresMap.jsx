@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useCallback } from "react";
+import { db } from "../../firebase";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -12,12 +13,11 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Image,
-  Pressable,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import PrimaryButton from "../../components/PrimaryButton";
-import * as ImagePicker from "expo-image-picker";
+
 import {
   collection,
   updateDoc,
@@ -28,21 +28,6 @@ import {
   serverTimestamp,
   GeoPoint,
 } from "firebase/firestore";
-import { db } from "../../firebase";
-import placeholder from "../../public/storeImages/placeholder.jpg";
-import InputField from "../../components/InputField";
-
-/* ===================== HELPERS ===================== */
-
-const extractCoordinates = (url) => {
-  const match = url?.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
-  if (!match) return null;
-  return { lat: parseFloat(match[1]), lng: parseFloat(match[2]) };
-};
-
-const getNextStoreId = () => "store_" + Date.now();
-
-/* ===================== MAIN ===================== */
 
 export default function ManageStores() {
   const router = useRouter();
@@ -53,6 +38,7 @@ export default function ManageStores() {
   const [modalVisible, setModalVisible] = useState(false);
   const [editingStore, setEditingStore] = useState(null);
 
+  // DELETE MODAL STATES
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [storeToDelete, setStoreToDelete] = useState(null);
 
@@ -65,17 +51,15 @@ export default function ManageStores() {
 
   const [errors, setErrors] = useState({});
 
-  /* ===================== FIRESTORE ===================== */
-
+  // LISTEN TO STORES
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "stores"), (snap) => {
-      setStores(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+      const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setStores(list);
       setLoading(false);
     });
     return unsub;
   }, []);
-
-  /* ===================== FORM ===================== */
 
   const resetForm = () => {
     setName("");
@@ -87,26 +71,70 @@ export default function ManageStores() {
     setErrors({});
   };
 
+  // AUTO INCREMENT ID: s1, s2, s3…
+  const getNextStoreId = () => {
+    if (stores.length === 0) return "s1";
+
+    const numbers = stores
+      .map((s) => parseInt(s.id.replace("s", "")))
+      .filter((n) => !isNaN(n));
+
+    const max = Math.max(...numbers);
+    return "s" + (max + 1);
+  };
+
+  const extractCoordinates = (url) => {
+    try {
+      if (!url) return null;
+      const at = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+      if (at) return { lat: parseFloat(at[1]), lng: parseFloat(at[2]) };
+
+      const d = url.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
+      if (d) return { lat: parseFloat(d[1]), lng: parseFloat(d[2]) };
+
+      const q = url.match(/q=(-?\d+\.\d+),(-?\d+\.\d+)/);
+      if (q) return { lat: parseFloat(q[1]), lng: parseFloat(q[2]) };
+
+      const generic = url.match(/(-?\d+\.\d+),\s*(-?\d+\.\d+)/);
+      if (generic)
+        return { lat: parseFloat(generic[1]), lng: parseFloat(generic[2]) };
+
+      return null;
+    } catch {
+      return null;
+    }
+  };
+
   const validateFields = () => {
-    let e = {};
+    let newErrors = {};
 
-    if (!name?.trim()) e.name = "Store name required";
-    if (!city?.trim()) e.city = "City required";
+    if (!name.trim()) newErrors.name = "Store name is required";
+    if (!city.trim()) newErrors.city = "City is required";
 
-    if (!editingStore && (!address || !address.trim())) {
-      e.address = "Google Maps URL required";
+    if (!address.trim()) newErrors.address = "Google Maps URL is required";
+    else {
+      const isGoogle = /^https?:\/\/(www\.)?google\.com\/maps/.test(address);
+      if (!isGoogle) newErrors.address = "Invalid Google Maps link";
+      else if (!extractCoordinates(address))
+        newErrors.address = "Link must contain valid coordinates";
     }
 
-    if (email && !/^\S+@\S+\.\S+$/.test(email)) {
-      e.email = "Invalid email address";
+    if (email && !/^\S+@\S+\.\S+$/.test(email))
+      newErrors.email = "Invalid email format";
+
+    if (phone && !/^[0-9+\-()\s]{5,20}$/.test(phone))
+      newErrors.phone = "Invalid phone number";
+
+    if (
+      logo &&
+      !logo.trim().endsWith(".jpg") &&
+      !logo.trim().endsWith(".png")
+    ) {
+      newErrors.logo = "Logo must be .jpg or .png";
     }
 
-    if (phone && !/^[0-9+\-()\s]{5,20}$/.test(phone)) {
-      e.phone = "Invalid phone number";
-    }
-
-    setErrors(e);
-    return Object.keys(e).length === 0;
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const openModal = (store = null) => {
@@ -114,6 +142,7 @@ export default function ManageStores() {
       setEditingStore(store);
       setName(store.name);
       setCity(store.city);
+      setAddress(store.address);
       setPhone(store.phone || "");
       setEmail(store.email || "");
       setLogo(store.logo || "");
@@ -127,58 +156,38 @@ export default function ManageStores() {
   const saveStore = async () => {
     if (!validateFields()) return;
 
-    if (editingStore) {
-      await updateDoc(doc(db, "stores", editingStore.id), {
-        name,
-        city,
-        phone,
-        email,
-        logo,
-        address: editingStore.address,
-        coordinate: editingStore.coordinate,
-      });
-    } else {
-      const coords = extractCoordinates(address);
+    const coords = extractCoordinates(address);
 
-      await setDoc(doc(db, "stores", getNextStoreId()), {
-        name,
-        city,
-        phone,
-        email,
-        logo,
-        address,
-        coordinate: coords ? new GeoPoint(coords.lat, coords.lng) : null,
-        createdAt: serverTimestamp(),
-      });
-    }
+    const data = {
+      name,
+      city,
+      address,
+      phone,
+      email,
+      logo,
+      coordinate: coords ? new GeoPoint(coords.lat, coords.lng) : null,
+    };
 
-    setModalVisible(false);
-    resetForm();
-  };
+    try {
+      if (editingStore) {
+        await updateDoc(doc(db, "stores", editingStore.id), data);
+      } else {
+        const newId = getNextStoreId();
 
-  /* ===================== IMAGE PICKER ===================== */
+        await setDoc(doc(db, "stores", newId), {
+          ...data,
+          createdAt: serverTimestamp(),
+        });
 
-  const handleImagePicker = async () => {
-    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (perm.status !== "granted") {
-      alert("Permission required");
-      return;
-    }
+        console.log("CREATED STORE WITH ID:", newId);
+      }
 
-    const res = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images, // ⚠️ deprecated but REQUIRED for your SDK
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.4,
-      base64: true,
-    });
-
-    if (!res.canceled && res.assets?.length) {
-      setLogo(`data:image/jpeg;base64,${res.assets[0].base64}`);
+      setModalVisible(false);
+      resetForm();
+    } catch (err) {
+      console.log("SAVE ERROR:", err);
     }
   };
-
-  /* ===================== DELETE ===================== */
 
   const deleteStore = (id) => {
     setStoreToDelete(id);
@@ -186,183 +195,176 @@ export default function ManageStores() {
   };
 
   const confirmDelete = async () => {
-    await deleteDoc(doc(db, "stores", storeToDelete));
+    try {
+      await deleteDoc(doc(db, "stores", storeToDelete));
+      console.log("DELETE SUCCESS:", storeToDelete);
+    } catch (err) {
+      console.log("DELETE ERROR:", err);
+    }
+
     setConfirmVisible(false);
     setStoreToDelete(null);
   };
 
-  /* ===================== RENDER ===================== */
+  const renderStore = ({ item }) => (
+    <View style={styles.cardRow}>
+      <Image
+        source={{
+          uri: item.logo
+            ? `/storeImages/${item.logo}`
+            : `/storeImages/placeholder.jpg`,
+        }}
+        style={styles.storeImage}
+      />
 
-  const renderStore = useCallback(
-    ({ item }) => (
-      <View style={styles.cardRow}>
-        <Image
-          source={item.logo ? { uri: item.logo } : placeholder}
-          style={styles.storeImage}
-        />
+      <View style={{ flex: 1 }}>
+        <Text style={styles.storeName}>{item.name}</Text>
+        <Text style={styles.storeMeta}>{item.city}</Text>
 
-        <View style={{ flex: 1 }}>
-          <Text style={styles.storeName}>{item.name}</Text>
-          <Text style={styles.storeMeta}>{item.city}</Text>
+        {item.phone ? (
+          <Text style={styles.storeDesc}>📞 {item.phone}</Text>
+        ) : null}
 
-          <View style={styles.actions}>
-            <TouchableOpacity
-              style={styles.actionBtn}
-              onPress={() => openModal(item)}
-            >
-              <MaterialIcons name="edit" size={30} color="#83BAC9" />
-              <Text>Edit</Text>
-            </TouchableOpacity>
+        <View style={styles.actions}>
+          <TouchableOpacity
+            onPress={() => openModal(item)}
+            style={[styles.actionBtn, styles.editBtn]}
+          >
+            <MaterialIcons name="edit" size={20} color="#83BAC9" />
+            <Text style={styles.actionText}>Edit</Text>
+          </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.actionBtn}
-              onPress={() => deleteStore(item.id)}
-            >
-              <MaterialIcons name="delete" size={30} color="#d9534f" />
-              <Text>Delete</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            onPress={() => deleteStore(item.id)}
+            style={[styles.actionBtn, styles.deleteBtn]}
+          >
+            <MaterialIcons name="delete-outline" size={20} color="#d9534f" />
+            <Text style={styles.actionText}>Delete</Text>
+          </TouchableOpacity>
         </View>
       </View>
-    ),
-    []
+    </View>
   );
-
-  /* ===================== UI ===================== */
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => router.back()}>
-        <MaterialIcons name="arrow-back" size={24} />
-      </TouchableOpacity>
+      <View style={styles.headerRow}>
+        <TouchableOpacity
+          onPress={() => router.push("/(admin)")}
+          style={styles.backBtn}
+        >
+          <MaterialIcons name="arrow-back" size={22} />
+        </TouchableOpacity>
 
-      <Text style={styles.title}>Manage Stores</Text>
+        <Text style={styles.title}>Manage Stores</Text>
+      </View>
 
       {loading ? (
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" style={{ marginTop: 40 }} />
       ) : (
         <FlatList
           data={stores}
-          keyExtractor={(i) => i.id}
+          keyExtractor={(item) => item.id}
           renderItem={renderStore}
-          contentContainerStyle={{ paddingBottom: 120 }}
+          contentContainerStyle={{ paddingBottom: 140 }}
         />
       )}
 
-      <PrimaryButton
-        title="+ Add Store"
-        onPress={() => openModal()}
-        style={styles.addStoreButton}
-      />
+      <TouchableOpacity style={styles.addBtn} onPress={() => openModal(null)}>
+        <Text style={styles.addBtnText}>+ Add New Store</Text>
+      </TouchableOpacity>
 
       {/* ADD / EDIT MODAL */}
-      <Modal visible={modalVisible} transparent animationType="slide">
+      <Modal visible={modalVisible} animationType="slide" transparent>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
-          style={styles.modalBg}
+          style={styles.modalContainer}
         >
           <View style={styles.modalContent}>
             <ScrollView>
+              <Text style={styles.modalTitle}>
+                {editingStore ? "Edit Store" : "Add Store"}
+              </Text>
+
               <InputField
                 label="Store Name"
-                placeholder="Enter store name"
                 value={name}
-                onChangeText={setName}
+                setValue={setName}
+                error={errors.name}
               />
-
               <InputField
                 label="City"
-                placeholder="Enter city"
                 value={city}
-                onChangeText={setCity}
+                setValue={setCity}
+                error={errors.city}
               />
-
-              {!editingStore && (
-                <InputField
-                  label="Google Maps URL"
-                  placeholder="Paste Google Maps link"
-                  value={address}
-                  onChangeText={setAddress}
-                />
-              )}
-
+              <InputField
+                label="Address (Google Maps URL)"
+                value={address}
+                setValue={setAddress}
+                error={errors.address}
+              />
               <InputField
                 label="Phone"
-                placeholder="+383 44 123 456"
                 value={phone}
-                onChangeText={setPhone}
-                keyboardType="phone-pad"
+                setValue={setPhone}
+                error={errors.phone}
+              />
+              <InputField
+                label="Email (optional)"
+                value={email}
+                setValue={setEmail}
+                error={errors.email}
+              />
+              <InputField
+                label="Logo File Name (.jpg/.png)"
+                value={logo}
+                setValue={setLogo}
+                error={errors.logo}
               />
 
-              <InputField
-                label="Email"
-                placeholder="example@email.com"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
+              <PrimaryButton
+                title={editingStore ? "Save Changes" : "Add Store"}
+                onPress={saveStore}
+                style={styles.saveBtn}
               />
 
               <TouchableOpacity
-                style={styles.imagePicker}
-                onPress={handleImagePicker}
+                onPress={() => setModalVisible(false)}
+                style={styles.cancelBtn}
               >
-                {logo ? (
-                  <Image source={{ uri: logo }} style={styles.previewImage} />
-                ) : (
-                  <Text style={{ color: "#666" }}>Select Store Logo</Text>
-                )}
+                <Text style={styles.cancelBtnText}>Cancel</Text>
               </TouchableOpacity>
-
-              {errors.logo && (
-                <Text style={{ color: "red" }}>{errors.logo}</Text>
-              )}
-
-              <View style={styles.modalButtons}>
-                <PrimaryButton
-                  title={editingStore ? "Save" : "Add"}
-                  onPress={saveStore}
-                />
-
-                <PrimaryButton
-                  title="Cancel"
-                  onPress={() => setModalVisible(false)}
-                  style={styles.cancelButton}
-                />
-              </View>
             </ScrollView>
           </View>
         </KeyboardAvoidingView>
       </Modal>
 
-      {/* DELETE MODAL */}
+      {/* DELETE CONFIRM MODAL */}
       <Modal visible={confirmVisible} transparent animationType="fade">
-        <View style={styles.deleteOverlay}>
-          <View style={styles.deleteModal}>
-            <MaterialIcons
-              name="warning-amber"
-              size={42}
-              color="#DC2626"
-              style={{ marginBottom: 12 }}
-            />
-
-            <Text style={styles.deleteTitle}>Delete Store</Text>
-            <Text style={styles.deleteMessage}>
-              Are you sure you want to delete this store? This action cannot be
-              undone.
+        <View style={styles.confirmBg}>
+          <View style={styles.confirmBox}>
+            <Text style={styles.confirmTitle}>Delete Store</Text>
+            <Text style={styles.confirmSubtitle}>
+              Are you sure you want to delete this store?
             </Text>
 
-            <View style={styles.deleteActions}>
-              <Pressable
-                style={styles.deleteCancel}
+            <View style={styles.confirmActions}>
+              <TouchableOpacity
                 onPress={() => setConfirmVisible(false)}
+                style={[styles.confirmBtn, { backgroundColor: "#ccc" }]}
               >
-                <Text style={styles.deleteCancelText}>Cancel</Text>
-              </Pressable>
+                <Text style={styles.confirmText}>Cancel</Text>
+              </TouchableOpacity>
 
-              <Pressable style={styles.deleteConfirm} onPress={confirmDelete}>
-                <Text style={styles.deleteConfirmText}>Delete</Text>
-              </Pressable>
+              <TouchableOpacity
+                onPress={confirmDelete}
+                style={[styles.confirmBtn, { backgroundColor: "#d9534f" }]}
+              >
+                <Text style={[styles.confirmText, { color: "#fff" }]}>
+                  Delete
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -371,11 +373,23 @@ export default function ManageStores() {
   );
 }
 
-/* ===================== STYLES ===================== */
+function InputField({ label, value, setValue, error }) {
+  return (
+    <View style={{ marginBottom: 10 }}>
+      <TextInput
+        placeholder={label}
+        value={value}
+        onChangeText={(t) => setValue(t)}
+        style={[styles.input, error && styles.inputError]}
+      />
+      {error && <Text style={styles.errorText}>{error}</Text>}
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: "#fff" },
-  title: { fontSize: 26, fontWeight: "700", marginVertical: 10 },
+  title: { fontSize: 26, fontWeight: "700", marginBottom: 10 },
 
   cardRow: {
     flexDirection: "row",
@@ -391,39 +405,41 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginRight: 12,
     backgroundColor: "#ccc",
+    resizeMode: "cover",
   },
-  placeholder: { backgroundColor: "#ddd" },
 
-  storeName: { fontSize: 20, left: 10, fontWeight: "bold" },
-  storeMeta: { fontSize: 15, left: 11, color: "#555" },
+  storeName: { fontSize: 20, fontWeight: "bold" },
+  storeMeta: { fontSize: 15, color: "#555" },
+  storeDesc: { marginTop: 4, color: "#444" },
 
   actions: {
-    fontSize: 15,
     flexDirection: "row",
-    left: 10,
-    marginTop: 30,
+    marginTop: 10,
     gap: 14,
   },
-  actionBtn: { flexDirection: "row", alignItems: "center" },
-  addStoreButton: {
-    position: "absolute",
-    bottom: 20,
-    left: 20,
-    right: 20,
-    height: 70,
+
+  actionBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 6,
   },
+
+  actionText: { marginLeft: 6, fontSize: 15 },
 
   addBtn: {
     position: "absolute",
     bottom: 20,
     left: 20,
     right: 20,
+    backgroundColor: "#2b9aa0",
     padding: 15,
     borderRadius: 10,
   },
   addBtnText: { color: "#fff", textAlign: "center", fontSize: 18 },
 
-  modalBg: {
+  modalContainer: {
     flex: 1,
     justifyContent: "flex-end",
     backgroundColor: "rgba(0,0,0,0.4)",
@@ -435,6 +451,7 @@ const styles = StyleSheet.create({
     padding: 20,
     maxHeight: "90%",
   },
+  modalTitle: { fontSize: 22, fontWeight: "700", marginBottom: 15 },
 
   input: {
     backgroundColor: "#f1f1f1",
@@ -443,36 +460,35 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ccc",
   },
+  inputError: {
+    borderColor: "red",
+  },
+  errorText: {
+    color: "red",
+    marginTop: 4,
+    fontSize: 13,
+  },
 
-  imagePicker: {
-    height: 140,
-    borderRadius: 12,
-    backgroundColor: "#f4f4f4",
-    justifyContent: "center",
+  saveBtn: { marginTop: 15 },
+  cancelBtn: {
+    padding: 14,
+    borderRadius: 8,
+    marginTop: 10,
+    backgroundColor: "#ddd",
+  },
+  cancelBtnText: { textAlign: "center", fontSize: 16 },
+
+  headerRow: {
+    flexDirection: "row",
     alignItems: "center",
-    marginVertical: 16,
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
+    marginBottom: 12,
   },
-  modalButtons: {
-    marginTop: 24,
-    gap: 14,
+  backBtn: {
+    marginRight: 10,
+    padding: 6,
   },
 
-  cancelButton: {
-    backgroundColor: "#b2b2b2ff",
-    borderColor: "#b2b2b2ff",
-  },
-  cancelButtonText: {
-    color: "#000",
-  },
-
-  previewImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 12,
-    resizeMode: "contain",
-  },
+  // DELETE MODAL STYLES
   confirmBg: {
     flex: 1,
     justifyContent: "center",
@@ -481,76 +497,32 @@ const styles = StyleSheet.create({
   },
   confirmBox: {
     width: "80%",
-    backgroundColor: "#fff",
+    backgroundColor: "white",
     padding: 20,
     borderRadius: 12,
   },
-  deleteOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.45)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  deleteModal: {
-    width: "85%",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 18,
-    padding: 22,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.25,
-    shadowRadius: 20,
-    elevation: 10,
-  },
-
-  deleteTitle: {
+  confirmTitle: {
     fontSize: 20,
     fontWeight: "700",
-    color: "#111827",
-    marginBottom: 6,
+    marginBottom: 10,
   },
-
-  deleteMessage: {
-    fontSize: 15,
-    color: "#4B5563",
-    textAlign: "center",
-    marginBottom: 22,
-    lineHeight: 22,
+  confirmSubtitle: {
+    fontSize: 16,
+    color: "#444",
+    marginBottom: 20,
   },
-
-  deleteActions: {
+  confirmActions: {
     flexDirection: "row",
-    width: "100%",
-    gap: 12,
+    justifyContent: "flex-end",
+    gap: 10,
   },
-
-  deleteCancel: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 12,
-    backgroundColor: "#F3F4F6",
-    alignItems: "center",
+  confirmBtn: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
   },
-
-  deleteCancelText: {
+  confirmText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#374151",
-  },
-
-  deleteConfirm: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 12,
-    backgroundColor: "#DC2626",
-    alignItems: "center",
-  },
-
-  deleteConfirmText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#FFFFFF",
   },
 });
