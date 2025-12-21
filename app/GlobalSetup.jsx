@@ -29,7 +29,6 @@ async function registerPushNotifications() {
 
     const token = await Notifications.getExpoPushTokenAsync();
     console.log("PUSH TOKEN:", token.data);
-
   } catch (err) {
     console.log("Error in registerPushNotifications:", err);
   }
@@ -43,29 +42,28 @@ async function requestLocationPermission() {
       alert("Location permission is required for map features.");
       return;
     }
-
   } catch (err) {
     console.log("Error in requestLocationPermission:", err);
   }
 }
 
-
 export default function GlobalSetup() {
- useEffect(() => {
- 
+  useEffect(() => {
     registerPushNotifications();
     requestLocationPermission();
-
 
     Notifications.scheduleNotificationAsync({
       content: {
         title: "Welcome to PetCare Adoption! 🐾",
         body: "Thanks for using our app!",
       },
-      trigger: { seconds: 2 },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds: 2,
+        repeats: false,
+      },
     });
-}, []);
+  }, []);
 
-
-  return null; 
+  return null;
 }
