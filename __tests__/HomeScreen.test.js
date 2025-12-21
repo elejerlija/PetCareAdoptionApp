@@ -3,7 +3,6 @@ import { render, fireEvent } from "@testing-library/react-native";
 import HomeScreen from "../app/(tabs)/index";
 import { Linking } from "react-native";
 
-//rregullim
 jest.mock("react-native/Libraries/Animated/Animated", () => {
   const ActualAnimated = jest.requireActual(
     "react-native/Libraries/Animated/Animated"

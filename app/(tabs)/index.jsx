@@ -26,7 +26,7 @@ export default function HomeScreen() {
   const [randomNews, setRandomNews] = useState([]);
   const [loadingNews, setLoadingNews] = useState(true);
 
-  // Animations
+
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(60)).current;
   const imageScale = useRef(new Animated.Value(0.75)).current;
@@ -87,7 +87,7 @@ export default function HomeScreen() {
       })
     ).start();
 
-    // ✅ CLEANUP – ky e zhduk error-in e Jest
+
     return () => {
       clearTimeout(animationTimeout);
       clearTimeout(loadingTimeout);
@@ -112,7 +112,7 @@ export default function HomeScreen() {
             </Text>
           </View>
 
-          {/* Hero image */}
+          
           <Animated.Image
             source={require("../../assets/images/pets.jpg")}
             style={[
@@ -122,7 +122,7 @@ export default function HomeScreen() {
             resizeMode="cover"
           />
 
-          {/* Banner */}
+
           <View style={styles.banner}>
             <Text style={styles.bannerTitle}>
               Adoptathon this weekend!
@@ -133,13 +133,13 @@ export default function HomeScreen() {
             </Text>
           </View>
 
-          {/* News title */}
+
           <View style={styles.newsRow}>
             <Text style={styles.newsIcon}>📰</Text>
             <Text style={styles.newsTitle}>PetCare News</Text>
           </View>
 
-          {/* Skeleton loader */}
+
           {loadingNews && (
             <View style={styles.skeletonBox}>
               {[1, 2, 3].map((_, i) => (
@@ -159,7 +159,7 @@ export default function HomeScreen() {
             </View>
           )}
 
-          {/* News */}
+
           {!loadingNews && (
             <Animated.View
               style={[
@@ -178,7 +178,7 @@ export default function HomeScreen() {
             </Animated.View>
           )}
 
-          {/* Footer */}
+
           <View style={styles.footer}>
             <Text style={styles.footerText}>
               Need help or want to get in touch?
