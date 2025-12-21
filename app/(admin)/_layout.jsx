@@ -11,41 +11,47 @@ export const unstable_settings = {
 
 export default function AdminLayout() {
   return (
-    <SafeAreaView style={styles.safe}>
+    <View style={{ flex: 1 }}>
+      {/* TOP SAFE AREA*/}
+      <SafeAreaView style={{ backgroundColor: THEME }} edges={["top"]} />
 
-      {/* Header */}
+      {/* HEADER */}
       <View style={styles.header}>
         <Text style={styles.headerText}>🐾 Admin Panel</Text>
       </View>
 
-      {/* VALID ROUTES ONLY */}
-      <Stack>
-        <Stack.Screen name="dashboard" options={{ headerShown: false }} />
-        <Stack.Screen name="managePets" options={{ headerShown: false }} />
-        <Stack.Screen name="manageUsers" options={{ headerShown: false }} />
-        <Stack.Screen name="manageStoresMap" options={{ headerShown: false }} />
-      </Stack>
+      {/* CONTENT */}
+      <View style={{ flex: 1, backgroundColor: LIGHT }}>
+        <Stack>
+          <Stack.Screen name="dashboard" options={{ headerShown: false }} />
+          <Stack.Screen name="managePets" options={{ headerShown: false }} />
+          <Stack.Screen name="manageUsers" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="manageStoresMap"
+            options={{ headerShown: false }}
+          />
+        </Stack>
+      </View>
 
-    </SafeAreaView>
+      {/* BOTTOM SAFE AREA*/}
+      <SafeAreaView style={{ backgroundColor: LIGHT }} edges={["bottom"]} />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: LIGHT,
+    backgroundColor: THEME,
   },
   header: {
     backgroundColor: THEME,
-    paddingVertical: 14,
+    paddingBottom: 14,
+    paddingTop: 4,
     alignItems: "center",
     justifyContent: "center",
     borderBottomWidth: 1,
     borderBottomColor: "#dbe7ea",
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
   },
   headerText: {
     color: "#fff",

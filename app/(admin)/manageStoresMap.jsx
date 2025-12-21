@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   Modal,
-  TextInput,
   ActivityIndicator,
   Platform,
   KeyboardAvoidingView,
@@ -39,7 +38,14 @@ const extractCoordinates = (url) => {
   return { lat: parseFloat(match[1]), lng: parseFloat(match[2]) };
 };
 
-const getNextStoreId = () => "store_" + Date.now();
+const getNextStoreId = (stores) => {
+  const numbers = stores
+    .map((s) => parseInt(s.id?.replace("s", ""), 10))
+    .filter((n) => !isNaN(n));
+
+  const next = numbers.length ? Math.max(...numbers) + 1 : 1;
+  return `s${next}`;
+};
 
 /* ===================== MAIN ===================== */
 
@@ -89,20 +95,15 @@ export default function ManageStores() {
   const validateFields = () => {
     let e = {};
 
-    if (!name?.trim()) e.name = "Store name required";
-    if (!city?.trim()) e.city = "City required";
+    if (!name.trim()) e.name = "Store name is required";
+    if (!city.trim()) e.city = "City is required";
+    if (!editingStore && !address.trim())
+      e.address = "Google Maps link is required";
 
-    if (!editingStore && (!address || !address.trim())) {
-      e.address = "Google Maps URL required";
-    }
+    if (email && !/^\S+@\S+\.\S+$/.test(email)) e.email = "Enter a valid email";
 
-    if (email && !/^\S+@\S+\.\S+$/.test(email)) {
-      e.email = "Invalid email address";
-    }
-
-    if (phone && !/^[0-9+\-()\s]{5,20}$/.test(phone)) {
-      e.phone = "Invalid phone number";
-    }
+    if (phone && !/^[0-9+\-()\s]{5,20}$/.test(phone))
+      e.phone = "Enter a valid phone number";
 
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -133,13 +134,13 @@ export default function ManageStores() {
         phone,
         email,
         logo,
-        address: editingStore.address,
         coordinate: editingStore.coordinate,
       });
     } else {
       const coords = extractCoordinates(address);
+      const newId = getNextStoreId(stores);
 
-      await setDoc(doc(db, "stores", getNextStoreId()), {
+      await setDoc(doc(db, "stores", newId), {
         name,
         city,
         phone,
@@ -159,10 +160,7 @@ export default function ManageStores() {
 
   const handleImagePicker = async () => {
     const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (perm.status !== "granted") {
-      alert("Permission required");
-      return;
-    }
+    if (perm.status !== "granted") return;
 
     const res = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -228,11 +226,12 @@ export default function ManageStores() {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => router.back()}>
-        <MaterialIcons name="arrow-back" size={24} />
-      </TouchableOpacity>
-
-      <Text style={styles.title}>Manage Stores</Text>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <MaterialIcons name="arrow-back" size={24} />
+        </TouchableOpacity>
+        <Text style={styles.title}>Manage Stores</Text>
+      </View>
 
       {loading ? (
         <ActivityIndicator size="large" />
@@ -251,7 +250,7 @@ export default function ManageStores() {
         style={styles.addStoreButton}
       />
 
-      {/* ADD / EDIT MODAL */}
+      {/* ===================== MODAL ===================== */}
       <Modal visible={modalVisible} transparent animationType="slide">
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -259,45 +258,77 @@ export default function ManageStores() {
         >
           <View style={styles.modalContent}>
             <ScrollView>
-              <InputField
-                label="Store Name"
-                placeholder="Enter store name"
-                value={name}
-                onChangeText={setName}
-              />
-
-              <InputField
-                label="City"
-                placeholder="Enter city"
-                value={city}
-                onChangeText={setCity}
-              />
-
-              {!editingStore && (
+              {/* NAME */}
+              <View style={errors.name && styles.errorWrapper}>
                 <InputField
-                  label="Google Maps URL"
-                  placeholder="Paste Google Maps link"
-                  value={address}
-                  onChangeText={setAddress}
+                  label="Store Name"
+                  placeholder="Enter store name"
+                  value={name}
+                  onChangeText={setName}
                 />
+              </View>
+              {errors.name && (
+                <Text style={styles.errorText}>{errors.name}</Text>
               )}
 
-              <InputField
-                label="Phone"
-                placeholder="+383 44 123 456"
-                value={phone}
-                onChangeText={setPhone}
-                keyboardType="phone-pad"
-              />
+              {/* CITY */}
+              <View style={errors.city && styles.errorWrapper}>
+                <InputField
+                  label="City"
+                  placeholder="Enter city"
+                  value={city}
+                  onChangeText={setCity}
+                />
+              </View>
+              {errors.city && (
+                <Text style={styles.errorText}>{errors.city}</Text>
+              )}
 
-              <InputField
-                label="Email"
-                placeholder="example@email.com"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
+              {/* MAP */}
+              {!editingStore && (
+                <>
+                  <View style={errors.address && styles.errorWrapper}>
+                    <InputField
+                      label="Google Maps URL"
+                      placeholder="Paste Google Maps link"
+                      value={address}
+                      onChangeText={setAddress}
+                    />
+                  </View>
+                  {errors.address && (
+                    <Text style={styles.errorText}>{errors.address}</Text>
+                  )}
+                </>
+              )}
+
+              {/* PHONE */}
+              <View style={errors.phone && styles.errorWrapper}>
+                <InputField
+                  label="Phone"
+                  placeholder="+383 44 123 456"
+                  value={phone}
+                  onChangeText={setPhone}
+                  keyboardType="phone-pad"
+                />
+              </View>
+              {errors.phone && (
+                <Text style={styles.errorText}>{errors.phone}</Text>
+              )}
+
+              {/* EMAIL */}
+              <View style={errors.email && styles.errorWrapper}>
+                <InputField
+                  label="Email"
+                  placeholder="example@email.com"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              </View>
+              {errors.email && (
+                <Text style={styles.errorText}>{errors.email}</Text>
+              )}
 
               <TouchableOpacity
                 style={styles.imagePicker}
@@ -310,16 +341,11 @@ export default function ManageStores() {
                 )}
               </TouchableOpacity>
 
-              {errors.logo && (
-                <Text style={{ color: "red" }}>{errors.logo}</Text>
-              )}
-
               <View style={styles.modalButtons}>
                 <PrimaryButton
                   title={editingStore ? "Save" : "Add"}
                   onPress={saveStore}
                 />
-
                 <PrimaryButton
                   title="Cancel"
                   onPress={() => setModalVisible(false)}
@@ -331,7 +357,8 @@ export default function ManageStores() {
         </KeyboardAvoidingView>
       </Modal>
 
-      {/* DELETE MODAL */}
+      {/* ===================== DELETE ===================== */}
+      {/* ===================== DELETE MODAL ===================== */}
       <Modal visible={confirmVisible} transparent animationType="fade">
         <View style={styles.deleteOverlay}>
           <View style={styles.deleteModal}>
@@ -343,9 +370,10 @@ export default function ManageStores() {
             />
 
             <Text style={styles.deleteTitle}>Delete Store</Text>
+
             <Text style={styles.deleteMessage}>
-              Are you sure you want to delete this store? This action cannot be
-              undone.
+              Are you sure you want to delete this store?
+              {"\n"}This action cannot be undone.
             </Text>
 
             <View style={styles.deleteActions}>
@@ -388,19 +416,18 @@ const styles = StyleSheet.create({
     marginRight: 12,
     backgroundColor: "#ccc",
   },
-  placeholder: { backgroundColor: "#ddd" },
 
-  storeName: { fontSize: 20, left: 10, fontWeight: "bold" },
-  storeMeta: { fontSize: 15, left: 11, color: "#555" },
+  storeName: { fontSize: 20, fontWeight: "bold" },
+  storeMeta: { fontSize: 15, color: "#555" },
 
   actions: {
-    fontSize: 15,
     flexDirection: "row",
-    left: 10,
     marginTop: 30,
     gap: 14,
   },
+
   actionBtn: { flexDirection: "row", alignItems: "center" },
+
   addStoreButton: {
     position: "absolute",
     bottom: 20,
@@ -409,35 +436,18 @@ const styles = StyleSheet.create({
     height: 70,
   },
 
-  addBtn: {
-    position: "absolute",
-    bottom: 20,
-    left: 20,
-    right: 20,
-    padding: 15,
-    borderRadius: 10,
-  },
-  addBtnText: { color: "#fff", textAlign: "center", fontSize: 18 },
-
   modalBg: {
     flex: 1,
     justifyContent: "flex-end",
     backgroundColor: "rgba(0,0,0,0.4)",
   },
+
   modalContent: {
     backgroundColor: "#fff",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
     maxHeight: "90%",
-  },
-
-  input: {
-    backgroundColor: "#f1f1f1",
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#ccc",
   },
 
   imagePicker: {
@@ -450,18 +460,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E5E7EB",
   },
-  modalButtons: {
-    marginTop: 24,
-    gap: 14,
-  },
-
-  cancelButton: {
-    backgroundColor: "#b2b2b2ff",
-    borderColor: "#b2b2b2ff",
-  },
-  cancelButtonText: {
-    color: "#000",
-  },
 
   previewImage: {
     width: 120,
@@ -469,18 +467,21 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     resizeMode: "contain",
   },
-  confirmBg: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.4)",
+
+  modalButtons: { marginTop: 24, gap: 14 },
+
+  cancelButton: {
+    backgroundColor: "#b2b2b2ff",
+    borderColor: "#b2b2b2ff",
   },
-  confirmBox: {
-    width: "80%",
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 12,
+
+  errorText: {
+    color: "#DC2626",
+    fontSize: 13,
+    marginLeft: 6,
+    marginBottom: 8,
   },
+
   deleteOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.45)",

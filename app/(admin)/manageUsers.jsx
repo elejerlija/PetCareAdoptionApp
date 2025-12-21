@@ -18,8 +18,8 @@ import {
   collection,
   onSnapshot,
   updateDoc,
-   doc,
-  getDoc
+  doc,
+  getDoc,
 } from "firebase/firestore";
 
 import { auth, db } from "../../firebase";
@@ -29,13 +29,10 @@ const THEME = "#83BAC9";
 const LIGHT = "#FFFFF0";
 
 export default function ManageUsers() {
-
   const router = useRouter();
 
   const [users, setUsers] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
-
-
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
@@ -84,7 +81,6 @@ export default function ManageUsers() {
     return () => unsub();
   }, [isAdmin]);
 
-
   // ============================================
   // TOGGLE STATUS
   // ============================================
@@ -99,13 +95,11 @@ export default function ManageUsers() {
       } else {
         Alert.alert("Success", `Status updated to ${newStatus}`);
       }
-
     } catch (error) {
       console.error("Error updating status:", error);
       Alert.alert("Error", "Failed to update user status.");
     }
   };
-
 
   const renderUser = ({ item }) => (
     <View style={styles.userCard}>
@@ -136,14 +130,9 @@ export default function ManageUsers() {
     </View>
   );
 
-
   return (
-    <SafeAreaView style={styles.safe}>
- 
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => router.back()}
-      >
+    <View style={styles.safe}>
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
         <Ionicons name="arrow-back" size={24} color="#fff" />
       </TouchableOpacity>
 
@@ -159,17 +148,16 @@ export default function ManageUsers() {
           contentContainerStyle={{ padding: 16 }}
         />
       )}
-    </SafeAreaView>
+    </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
     backgroundColor: "#fff",
   },
-   backButton: {
+  backButton: {
     position: "absolute",
     top: 16,
     left: 16,
@@ -179,7 +167,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     elevation: 4,
   },
-   header: {
+  header: {
     fontSize: 24,
     fontWeight: "700",
     color: THEME,
@@ -187,12 +175,12 @@ const styles = StyleSheet.create({
     marginTop: 60,
     marginBottom: 16,
   },
-   empty: {
+  empty: {
     textAlign: "center",
     color: "#777",
     marginTop: 40,
   },
-   userCard: {
+  userCard: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: LIGHT,
@@ -205,28 +193,28 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-   name: {
+  name: {
     fontSize: 16,
     fontWeight: "700",
     color: "#222",
-   },
+  },
   email: {
     color: "#666",
     fontSize: 14,
   },
-   status: {
+  status: {
     color: "#333",
     fontSize: 13,
     marginTop: 4,
-   },
+  },
   statusBtn: {
     paddingVertical: 6,
     paddingHorizontal: 14,
     borderRadius: 8,
-   },
+  },
   statusBtnText: {
     color: "#fff",
     fontWeight: "700",
     fontSize: 13,
-   },
+  },
 });

@@ -32,11 +32,9 @@ import {
 export default function ManagePets() {
   const router = useRouter();
 
-  
   const [pets, setPets] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  
   const [modalVisible, setModalVisible] = useState(false);
   const [editingPet, setEditingPet] = useState(null);
   const [name, setName] = useState("");
@@ -51,10 +49,8 @@ export default function ManagePets() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const imageScale = useRef(new Animated.Value(1)).current;
 
-  
   const [requests, setRequests] = useState([]);
 
-  
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "pets"), (snapshot) => {
       const petList = snapshot.docs.map((doc) => ({
@@ -69,7 +65,6 @@ export default function ManagePets() {
     return unsubscribe;
   }, []);
 
-  
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "adoptionRequests"), (snapshot) => {
       const list = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
@@ -79,7 +74,6 @@ export default function ManagePets() {
     return unsub;
   }, []);
 
- 
   const getRequestForPet = (petId) => {
     return requests.find((r) => r.petId === petId) || null;
   };
@@ -111,7 +105,7 @@ export default function ManagePets() {
 
     setModalVisible(true);
   };
-   const pickImage = async () => {
+  const pickImage = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
       Alert.alert("Permission required", "Gallery access is needed");
@@ -187,7 +181,6 @@ export default function ManagePets() {
     }, 1500);
   };
 
-  
   const savePet = async () => {
     if (!name.trim()) {
       Alert.alert("Error", "Pet name is required.");
@@ -223,7 +216,6 @@ export default function ManagePets() {
     }
   };
 
-  
   const handleApprove = async (req) => {
     try {
       await updateDoc(doc(db, "pets", req.petId), {
@@ -250,14 +242,13 @@ export default function ManagePets() {
     }
   };
 
- 
   const renderPet = ({ item }) => {
     const request = getRequestForPet(item.id);
     const imageUri = item.image || item.imageUrl;
 
     return (
       <View style={styles.petCard}>
-      <View style={styles.petRow}>
+        <View style={styles.petRow}>
           {imageUri ? (
             <Image
               source={{ uri: imageUri }}
@@ -269,7 +260,7 @@ export default function ManagePets() {
               <MaterialIcons name="pets" size={28} color="#aaa" />
             </View>
           )}
-        <View style={styles.petInfo}>
+          <View style={styles.petInfo}>
             <Text style={styles.petName}>{item.name}</Text>
             <Text style={styles.petMeta}>
               {item.type} • {item.age} yrs • {item.city}
@@ -282,7 +273,6 @@ export default function ManagePets() {
           </View>
         </View>
 
-        
         <View style={styles.actions}>
           <TouchableOpacity
             onPress={() =>
@@ -311,7 +301,6 @@ export default function ManagePets() {
           </TouchableOpacity>
         </View>
 
-        
         {request && request.status === "pending" && (
           <View style={styles.requestRow}>
             <TouchableOpacity
@@ -335,7 +324,6 @@ export default function ManagePets() {
     );
   };
 
-
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
@@ -356,14 +344,10 @@ export default function ManagePets() {
         />
       )}
 
-      
-      <TouchableOpacity
-        style={styles.addBtn}
-        onPress={() => openModal(null)}>
+      <TouchableOpacity style={styles.addBtn} onPress={() => openModal(null)}>
         <Text style={styles.addBtnText}>+ Add New Pet</Text>
       </TouchableOpacity>
 
-     
       <Modal visible={modalVisible} animationType="slide" transparent>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -444,12 +428,17 @@ export default function ManagePets() {
                 {image ? (
                   <Animated.Image
                     source={{ uri: image }}
-                    style={[styles.imagePreview, { transform: [{ scale: imageScale }] }]}
+                    style={[
+                      styles.imagePreview,
+                      { transform: [{ scale: imageScale }] },
+                    ]}
                   />
                 ) : (
                   <View style={styles.imagePlaceholder}>
                     <MaterialIcons name="image" size={36} color="#999" />
-                    <Text style={styles.imagePlaceholderText}>Select Image</Text>
+                    <Text style={styles.imagePlaceholderText}>
+                      Select Image
+                    </Text>
                   </View>
                 )}
 
@@ -477,7 +466,7 @@ export default function ManagePets() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
-       <Modal transparent visible={successVisible}>
+      <Modal transparent visible={successVisible}>
         <View style={styles.successBg}>
           <Animated.View style={[styles.successBox, { opacity: fadeAnim }]}>
             <Text style={{ fontSize: 18, fontWeight: "600" }}>
@@ -546,7 +535,7 @@ const styles = StyleSheet.create({
     bottom: 20,
     left: 20,
     right: 20,
-    backgroundColor: "#007AFF",
+    backgroundColor: "#83BAC9",
     padding: 15,
     borderRadius: 10,
   },
@@ -571,7 +560,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   saveBtn: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "#83BAC9",
     padding: 14,
     borderRadius: 8,
     marginTop: 10,
@@ -584,10 +573,29 @@ const styles = StyleSheet.create({
     backgroundColor: "#ddd",
   },
   cancelBtnText: { textAlign: "center", fontSize: 16 },
-  successBg: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.4)" },
+  successBg: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.4)",
+  },
   successBox: { backgroundColor: "#fff", padding: 20, borderRadius: 12 },
   petRow: { flexDirection: "row", alignItems: "center" },
-  petImage: { width: 70, height: 70, borderRadius: 10, marginRight: 12, backgroundColor: "#ddd" },
-  petImagePlaceholder: { width: 70, height: 70, borderRadius: 10, marginRight: 12, backgroundColor: "#eee", justifyContent: "center", alignItems: "center" },
-  petInfo: { flex: 1 }
+  petImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 10,
+    marginRight: 12,
+    backgroundColor: "#ddd",
+  },
+  petImagePlaceholder: {
+    width: 70,
+    height: 70,
+    borderRadius: 10,
+    marginRight: 12,
+    backgroundColor: "#eee",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  petInfo: { flex: 1 },
 });

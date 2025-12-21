@@ -7,11 +7,13 @@ const LIGHT = "#FFFFF0";
 
 export default function WelcomeScreen() {
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={[]}>
       <View style={styles.container}>
         <Text style={styles.title}>Welcome to</Text>
         <Text style={styles.appTitle}>PetCare Adoption</Text>
-        <Text style={styles.subtitle}>Find your perfect four-pawed friend 🐾</Text>
+        <Text style={styles.subtitle}>
+          Find your perfect four-pawed friend 🐾
+        </Text>
 
         <Image
           source={require("../assets/images/pets.jpg")}

@@ -3,7 +3,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-
 const THEME_COLOR = "#83BAC9";
 const ICON_ACTIVE = "#FFFFF0";
 const ICON_INACTIVE = "#f4deb4ff";
@@ -58,20 +57,20 @@ export default function RootLayout() {
             }}
           />
           <Tabs.Screen
-            name="profile"
-            options={{
-              title: "Profile",
-              tabBarIcon: ({ color, size }) => (
-                <Ionicons name="person" size={size} color={color} />
-              ),
-            }}
-          />
-          <Tabs.Screen
             name="map"
             options={{
               title: "Map",
               tabBarIcon: ({ color, size }) => (
                 <Ionicons name="map" size={size} color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="profile"
+            options={{
+              title: "Profile",
+              tabBarIcon: ({ color, size }) => (
+                <Ionicons name="person" size={size} color={color} />
               ),
             }}
           />
